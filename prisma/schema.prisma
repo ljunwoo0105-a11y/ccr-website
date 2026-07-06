@@ -1,0 +1,243 @@
+// CCR Website — data model
+// SQLite locally; switch the datasource provider to "postgresql" in production.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Staff & admin accounts. Roles: "ADMIN" | "STAFF" (validated in src/lib/auth.ts)
+// ---------------------------------------------------------------------------
+model User {
+  id           String         @id @default(cuid())
+  email        String         @unique
+  name         String
+  passwordHash String
+  role         String         @default("STAFF")
+  active       Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  intakes      RepairIntake[]
+  repairForms  RepairForm[]
+}
+
+// ---------------------------------------------------------------------------
+// Parts price list (staff-only). Prices in AUD. Quality tiers:
+// "GENUINE" | "OEM" | "PREMIUM" | "AFTERMARKET" (cheapest)
+// ---------------------------------------------------------------------------
+model Part {
+  id           String   @id @default(cuid())
+  deviceType   String // Phone | Tablet | Computer | Drone | Watch | Other
+  brand        String
+  model        String
+  repairType   String // e.g. "Screen Replacement"
+  quality      String
+  colour       String? // device/part colour, when it affects the part (e.g. screen colour)
+  costPrice    Float // what CCR pays (staff/admin only)
+  sellPrice    Float // what the customer pays
+  warrantyDays Int      @default(90)
+  stockQty     Int      @default(0)
+  sku          String?
+  supplier     String?
+  posItemId    String? // link to POS (e.g. Loyverse item id)
+  notes        String?
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  repairFormItems RepairFormItem[]
+
+  @@index([brand, model, repairType])
+  @@index([posItemId])
+}
+
+// ---------------------------------------------------------------------------
+// Public quote requests (leads). The emailed price is the cheapest-tier
+// "from" price; it is stored here but NEVER returned to the public client.
+// ---------------------------------------------------------------------------
+model QuoteRequest {
+  id             String    @id @default(cuid())
+  name           String
+  email          String
+  phone          String
+  suburb         String
+  referralSource String // GOOGLE | WORD_OF_MOUTH | FACEBOOK | INSTAGRAM | WALK_IN | REPEAT | OTHER
+  referralOther  String?
+  deviceType     String
+  brand          String
+  model          String
+  repairType     String
+  issueNotes     String?
+  fromPriceAud   Float? // cheapest-tier sell price at quote time (null = inspection required)
+  partQuality    String? // tier used for the estimate
+  status         String    @default("NEW") // NEW | EMAILED | CONTACTED | BOOKED | CLOSED
+  emailedAt      DateTime?
+  emailError     String?
+  ipHash         String? // sha256 of requester IP — for rate limiting/abuse review, not marketing
+  userAgent      String?
+  createdAt      DateTime  @default(now())
+
+  @@index([email])
+  @@index([createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Walk-in customers + repair intake (device pre-condition before repair)
+// ---------------------------------------------------------------------------
+model Customer {
+  id        String         @id @default(cuid())
+  name      String
+  phone     String
+  email     String?
+  suburb    String?
+  notes     String?
+  createdAt DateTime       @default(now())
+  intakes   RepairIntake[]
+
+  @@index([phone])
+}
+
+model RepairIntake {
+  id                String    @id @default(cuid())
+  customerId        String
+  customer          Customer  @relation(fields: [customerId], references: [id])
+  staffId           String
+  staff             User      @relation(fields: [staffId], references: [id])
+  deviceType        String
+  brand             String
+  model             String
+  imei              String?
+  serialNo          String?
+  repairTypes       String // JSON array of repair type strings
+  preCondition      String // JSON object — checklist captured before repair (see src/lib/validation.ts)
+  accessories       String? // what the customer left with the device
+  conditionNotes    String?
+  partQuality       String? // tier chosen for the job
+  warrantyDays      Int?
+  quotedPrice       Float?
+  depositPaid       Float?
+  status            String    @default("CHECKED_IN") // CHECKED_IN | IN_REPAIR | READY | COLLECTED | CANCELLED
+  customerSignature String? // typed-name acknowledgement of pre-condition record
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  completedAt       DateTime?
+
+  @@index([status])
+  @@index([customerId])
+}
+
+// ---------------------------------------------------------------------------
+// Staff-built in-store repair quote / form. Unlike the public QuoteRequest
+// (which only ever stores/sends a cheapest-tier "from" price), this is created
+// by staff at the counter for a specific part choice — so it records the exact
+// agreed sellPrice for the chosen quality + colour and is emailed in full to
+// the customer. Staff-only; never reachable from the public site.
+// ---------------------------------------------------------------------------
+model RepairForm {
+  id             String           @id @default(cuid())
+  staffId        String
+  staff          User             @relation(fields: [staffId], references: [id])
+  customerName   String
+  customerEmail  String
+  customerPhone  String?
+  deviceType     String
+  brand          String
+  model          String
+  total          Float // sum of every repair line item's sellPrice
+  preCondition   String? // JSON checklist (optional) — device condition snapshot
+  conditionNotes String?
+  status         String           @default("QUOTED") // QUOTED | EMAILED | ACCEPTED | DECLINED
+  emailedAt      DateTime?
+  emailError     String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  items          RepairFormItem[]
+
+  @@index([createdAt])
+  @@index([customerEmail])
+}
+
+// One repair line on a RepairForm (e.g. "Screen Replacement", "Battery").
+// A single quote/form can hold many — one device, multiple repairs.
+model RepairFormItem {
+  id           String     @id @default(cuid())
+  repairFormId String
+  repairForm   RepairForm @relation(fields: [repairFormId], references: [id], onDelete: Cascade)
+  repairType    String
+  quality       String
+  colour        String?
+  partId        String? // resolved catalog part at quote time
+  part          Part?      @relation(fields: [partId], references: [id])
+  sellPrice     Float // catalog list price for this line (before discount)
+  discountType  String? // PERCENT | AMOUNT | null
+  discountValue Float? // the % (0-100) or the $ amount taken off
+  warrantyDays  Int?
+
+  @@index([repairFormId])
+  @@index([partId])
+}
+
+// ---------------------------------------------------------------------------
+// Reviews. Synced from Google Places (source=GOOGLE) or added manually.
+// The public site only ever shows visible=true AND rating=5.
+// ---------------------------------------------------------------------------
+model Review {
+  id         String    @id @default(cuid())
+  source     String // GOOGLE | MANUAL
+  externalId String?   @unique // Google review resource name — prevents duplicates on re-sync
+  authorName String
+  rating     Int
+  text       String
+  reviewedAt DateTime?
+  visible    Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+
+  @@index([rating, visible])
+}
+
+// ---------------------------------------------------------------------------
+// AI model registry + usage tracking (Admin AI console)
+// Prices are USD per million tokens.
+// ---------------------------------------------------------------------------
+model AiModel {
+  id            String  @id @default(cuid())
+  label         String
+  modelId       String  @unique // exact Anthropic model id, e.g. "claude-opus-4-8"
+  inputPerMTok  Float
+  outputPerMTok Float
+  enabled       Boolean @default(true)
+  notes         String?
+}
+
+model AiUsageLog {
+  id           String   @id @default(cuid())
+  feature      String // market_research | margin_pricing | ...
+  modelId      String
+  inputTokens  Int
+  outputTokens Int
+  costUsd      Float
+  durationMs   Int
+  status       String // success | failed | blocked_budget
+  error        String?
+  meta         String? // JSON context (part, device, etc.)
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([feature])
+}
+
+// ---------------------------------------------------------------------------
+// Key/value settings (JSON-encoded values). Keys used:
+//   business.hours, google.rating, google.reviewCount, google.lastSyncAt,
+//   ai.monthlyBudgetUsd, ai.blockAtCap, ai.defaultPricingModel,
+//   ai.defaultResearchModel, pricing.targetMarginPct
+// ---------------------------------------------------------------------------
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}

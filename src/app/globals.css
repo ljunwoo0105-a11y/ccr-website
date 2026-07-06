@@ -1,0 +1,350 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Font vars are set by next/font in src/app/layout.tsx; these are fallbacks. */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-display: var(--font-sans);
+  --font-heading: var(--font-display);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono",
+    monospace;
+
+  /* Benchlight motion: exactly two easings do everything. */
+  --ease-precision: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Bench-lamp glow (13% alpha gold) — used by .bench-glow and focus halos. */
+  --gold-glow: rgba(255, 178, 36, 0.13);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-white text-slate-900 antialiased;
+  }
+  /* No-JS safety net: motion components mark themselves data-motion; if
+     scripting is unavailable nothing may be stuck at initial opacity 0. */
+  @media (scripting: none) {
+    [data-motion] {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  }
+}
+
+@layer components {
+  /* ======================================================================
+     Staff portal / admin console (legacy) — do not restyle.
+     ====================================================================== */
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-ccr-accent px-5 py-3 text-sm font-semibold text-white shadow transition hover:bg-ccr-accent-dark focus:outline-none focus:ring-2 focus:ring-ccr-accent focus:ring-offset-2 disabled:opacity-50;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-ccr-primary px-5 py-3 text-sm font-semibold text-white shadow transition hover:bg-ccr-primary-dark focus:outline-none focus:ring-2 focus:ring-ccr-primary focus:ring-offset-2 disabled:opacity-50;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-300 disabled:opacity-50;
+  }
+  .input {
+    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-ccr-primary focus:outline-none focus:ring-2 focus:ring-ccr-primary/30 disabled:bg-slate-100;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-slate-700;
+  }
+  .card {
+    @apply rounded-xl border border-slate-200 bg-white p-6 shadow-sm;
+  }
+
+  /* ======================================================================
+     "Benchlight" public design system.
+     Dark act: ink-950 surfaces, hairline ink-700 borders, gold accent.
+     Paper act: paper background, line hairlines, ink-950 headings,
+     ink-600 body, gold-700 for accent-colored text.
+     ====================================================================== */
+  .site-container {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8;
+  }
+  .site-container-wide {
+    @apply mx-auto w-full max-w-7xl px-5 sm:px-6 lg:px-8;
+  }
+
+  /* --- Typography voices --------------------------------------------- */
+  /* Display: Archivo Expanded — heavy grotesque, sentence case, tight. */
+  .type-display {
+    font-family: var(--font-display);
+    font-stretch: 125%;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 1.04;
+    text-wrap: balance;
+  }
+  .type-title {
+    font-family: var(--font-display);
+    font-stretch: 110%;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  /* Mono is the "instrument voice": labels, numbers, tables — never
+     paragraphs. Uppercase, tracked, small. */
+  .mono-label {
+    @apply font-mono text-xs font-medium uppercase tracking-[0.14em];
+  }
+  .eyebrow {
+    @apply mono-label;
+  }
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+  .ccr-wordmark {
+    font-family: var(--font-display), "Arial Black", Impact, system-ui,
+      sans-serif;
+    font-stretch: 125%;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+  }
+  .site-heading {
+    @apply type-title text-3xl sm:text-4xl;
+    font-stretch: 118%;
+    font-weight: 800;
+  }
+  .site-subheading {
+    @apply text-base leading-relaxed sm:text-lg;
+  }
+
+  /* --- Buttons --------------------------------------------------------
+     One shape (pill), three voices. Gold pill is THE action. */
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-gold-500 px-6 py-3.5 text-sm font-semibold text-ink-950 transition-colors duration-200 hover:bg-gold-300 active:bg-gold-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-500 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-950 disabled:opacity-50;
+  }
+  .btn-ghost-dark {
+    /* On ink surfaces */
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-ink-600 px-6 py-3.5 text-sm font-semibold text-ink-100 transition-colors duration-200 hover:border-gold-500 hover:text-gold-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-500 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-950 disabled:opacity-50;
+  }
+  .btn-ghost-paper {
+    /* On paper surfaces */
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-ink-950/25 px-6 py-3.5 text-sm font-semibold text-ink-950 transition-colors duration-200 hover:border-ink-950 hover:bg-ink-950 hover:text-ink-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ink-950 focus-visible:ring-offset-2 disabled:opacity-50;
+  }
+  .btn-ink {
+    /* On the gold CtaBanner */
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-ink-950 px-6 py-3.5 text-sm font-semibold text-ink-50 transition-colors duration-200 hover:bg-ink-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-ink-950 focus-visible:ring-offset-2 focus-visible:ring-offset-gold-500 disabled:opacity-50;
+  }
+  .btn-sm {
+    @apply px-4 py-2.5 text-xs;
+  }
+
+  /* --- Inputs (dark diagnostic-intake style) -------------------------- */
+  .input-dark {
+    @apply w-full rounded-lg border border-ink-700 bg-ink-800 px-4 py-3 text-sm text-ink-100 placeholder:text-ink-500 transition-colors focus:border-gold-500 focus:outline-none focus:ring-2 focus:ring-gold-500/25 disabled:opacity-50;
+  }
+  .label-dark {
+    @apply mono-label mb-2 block text-[0.6875rem] text-ink-400;
+  }
+
+  /* --- Surfaces & furniture ------------------------------------------ */
+  .card-dark {
+    @apply rounded-lg border border-ink-700 bg-ink-900;
+  }
+  .card-paper {
+    @apply rounded-lg border border-line bg-white;
+  }
+  /* 48px technical grid, drawn in CSS. Add .animate-grid-drift for the
+     barely-perceptible hero drift (one of only two continuous animations). */
+  .tech-grid {
+    background-image: linear-gradient(
+        to right,
+        rgba(38, 43, 49, 0.55) 1px,
+        transparent 1px
+      ),
+      linear-gradient(to bottom, rgba(38, 43, 49, 0.55) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .tech-grid-gold {
+    background-image: linear-gradient(
+        to right,
+        rgba(232, 155, 12, 0.2) 1px,
+        transparent 1px
+      ),
+      linear-gradient(to bottom, rgba(232, 155, 12, 0.2) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  /* Registration ticks: small "+" marks at two opposing corners. */
+  .tick-corners {
+    position: relative;
+  }
+  .tick-corners::before,
+  .tick-corners::after {
+    content: "";
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    opacity: 0.45;
+    background:
+      linear-gradient(currentColor, currentColor) center / 9px 1px no-repeat,
+      linear-gradient(currentColor, currentColor) center / 1px 9px no-repeat;
+  }
+  .tick-corners::before {
+    top: -4.5px;
+    left: -4.5px;
+  }
+  .tick-corners::after {
+    bottom: -4.5px;
+    right: -4.5px;
+  }
+  /* Bench-lamp glow: pair with <GlowCard> which drives --glow-x/--glow-y. */
+  .bench-glow {
+    position: relative;
+  }
+  .bench-glow::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 300ms var(--ease-precision);
+    background: radial-gradient(
+      320px circle at var(--glow-x, 50%) var(--glow-y, 50%),
+      var(--gold-glow),
+      transparent 70%
+    );
+  }
+  .bench-glow:hover::before {
+    opacity: 1;
+  }
+  /* CSS-only scanline sweep on card hover (once per hover entry). */
+  .scan-on-hover {
+    position: relative;
+    overflow: hidden;
+  }
+  .scan-on-hover::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      #ffb224 30%,
+      #ffb224 70%,
+      transparent
+    );
+    box-shadow: 0 0 12px 1px rgba(255, 178, 36, 0.35);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .scan-on-hover:hover::after {
+    animation: scanline 0.9s var(--ease-inout) 1 both;
+  }
+  /* Dotted leader rows (hours tables, pricing) — print-craft detail. */
+  .leader-row {
+    @apply flex items-baseline gap-3;
+  }
+  .leader-row::before {
+    content: "";
+    order: 2;
+    flex: 1 1 auto;
+    min-width: 1.5rem;
+    border-bottom: 1px dotted currentColor;
+    opacity: 0.35;
+    transform: translateY(-0.2em);
+  }
+  .leader-row > :first-child {
+    order: 1;
+  }
+  .leader-row > :last-child {
+    order: 3;
+  }
+
+  /* --- Links ----------------------------------------------------------- */
+  .link-gold {
+    @apply font-medium text-gold-500 underline-offset-4 transition-colors hover:text-gold-300 hover:underline;
+  }
+  .link-paper {
+    @apply font-medium text-gold-700 underline-offset-4 transition-colors hover:text-ink-950 hover:underline;
+  }
+
+  /* ======================================================================
+     .a-* aliases — consumed by the public QuoteWizard ("repair docket",
+     dark diagnostic intake) and legacy public pages.
+     ====================================================================== */
+  .a-container {
+    @apply site-container;
+  }
+  .a-container-wide {
+    @apply site-container-wide;
+  }
+  .a-btn {
+    @apply btn-gold;
+  }
+  .a-btn-gray {
+    @apply btn-ghost-dark;
+  }
+  .a-btn-sm {
+    @apply btn-sm;
+  }
+  .a-input {
+    @apply input-dark;
+  }
+  .a-label {
+    @apply label-dark;
+  }
+  .a-link {
+    @apply link-gold inline-flex items-center gap-1 text-sm;
+  }
+  .a-eyebrow {
+    @apply eyebrow text-gold-500;
+  }
+  .a-title {
+    @apply site-heading text-ink-50;
+  }
+  .a-subtitle {
+    @apply site-subheading text-ink-300;
+  }
+  .a-tile {
+    @apply card-dark p-6;
+  }
+  .a-tile-white {
+    @apply card-dark p-6;
+  }
+  .a-display {
+    @apply type-display text-4xl text-ink-50 sm:text-5xl lg:text-6xl;
+  }
+
+  /* Back-compat aliases for the old public class names (site-btn family)
+     so nothing 404s visually while sections are migrated. */
+  .site-btn {
+    @apply btn-gold;
+  }
+  .site-btn-outline {
+    @apply btn-ghost-dark;
+  }
+  .site-btn-white {
+    @apply btn-ink;
+  }
+  .site-btn-sm {
+    @apply btn-sm;
+  }
+  .site-heading-light {
+    @apply site-heading text-ink-50;
+  }
+  .site-card {
+    @apply card-paper p-6;
+  }
+  .site-input {
+    @apply input-dark;
+  }
+  .site-label {
+    @apply label-dark;
+  }
+}
