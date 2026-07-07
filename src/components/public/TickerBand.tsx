@@ -7,14 +7,15 @@ const PROMISES = [
 ];
 
 /**
- * The gold ticker — the site's chromatic heartbeat and its third (and last)
- * sanctioned continuous animation. Pure CSS marquee: pauses on hover and
- * keyboard focus, collapses to a static line under prefers-reduced-motion,
- * costs zero JavaScript. Server component.
+ * The volt ticker — the site's chromatic heartbeat and its third (and last)
+ * sanctioned continuous animation. An electric strip: cyan promises with
+ * violet markers streaming over glass between hairlines. Pure CSS marquee:
+ * pauses on hover and keyboard focus, collapses to a static line under
+ * prefers-reduced-motion, costs zero JavaScript. Server component.
  */
 export default function TickerBand() {
   return (
-    <div className="group relative overflow-hidden border-y border-gold-600/40 bg-gold-500">
+    <div className="group relative overflow-hidden border-y border-gold-500/30 bg-ink-900/80">
       <span className="sr-only">
         Same-day repairs. Price Beat Guarantee. 12-month warranty. Certified
         technicians. Walk-ins welcome.
@@ -30,12 +31,10 @@ export default function TickerBand() {
           <div key={half} className="flex shrink-0 items-center">
             {PROMISES.map((promise) => (
               <span key={promise} className="flex items-center">
-                <span className="whitespace-nowrap px-6 font-display text-sm font-extrabold uppercase tracking-wide text-ink-950 md:px-8 md:text-base">
+                <span className="whitespace-nowrap px-6 font-display text-sm font-bold uppercase tracking-wider text-gold-500 md:px-8 md:text-base">
                   {promise}
                 </span>
-                <span className="text-base leading-none text-ink-950/50">
-                  ✦
-                </span>
+                <span className="text-xs leading-none text-pulse-500">◆</span>
               </span>
             ))}
           </div>
@@ -45,7 +44,7 @@ export default function TickerBand() {
       {/* Static fallback under prefers-reduced-motion */}
       <p
         aria-hidden="true"
-        className="hidden px-5 py-3 text-center font-display text-sm font-extrabold uppercase tracking-wide text-ink-950 motion-reduce:block"
+        className="hidden px-5 py-3 text-center font-display text-sm font-bold uppercase tracking-wider text-gold-500 motion-reduce:block"
       >
         {PROMISES.join(" · ")}
       </p>

@@ -45,7 +45,7 @@ export default function Footer() {
             <p className="mt-4 flex items-center gap-2 font-mono text-xs text-ink-400">
               <Star
                 size={13}
-                className="fill-gold-500 text-gold-500"
+                className="fill-star text-star"
                 aria-hidden="true"
               />
               <span className="tnum">

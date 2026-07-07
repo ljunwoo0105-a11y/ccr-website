@@ -4,7 +4,8 @@ import { BUSINESS } from "@/lib/config";
 import { Reveal } from "@/components/motion/Reveal";
 import Parallax from "@/components/motion/Parallax";
 
-/** The gold inversion — the one section where the accent becomes the surface. */
+/** The beam inversion — the one section where the accent becomes the surface,
+ *  now as the full volt→violet electric gradient. */
 export default function CtaBanner({
   heading = "Get it fixed today.",
   body = "Free quotes. Price Beat Guarantee. Most repairs same-day.",
@@ -14,7 +15,7 @@ export default function CtaBanner({
 }) {
   return (
     <section
-      className="relative overflow-hidden bg-gold-500 py-24"
+      className="relative overflow-hidden bg-pulse-beam py-24"
       aria-labelledby="cta-heading"
     >
       <div
@@ -34,14 +35,14 @@ export default function CtaBanner({
           >
             {heading}
           </h2>
-          <p className="mt-4 text-lg text-ink-950/70">{body}</p>
+          <p className="mt-4 text-lg font-medium text-ink-950/75">{body}</p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
             <Link href="/quote" className="btn-ink w-full sm:w-auto">
               Get a free quote
             </Link>
             <a
               href={BUSINESS.phoneHref}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full border-2 border-ink-950 px-6 py-3.5 text-sm font-semibold text-ink-950 transition-colors hover:bg-ink-950 hover:text-gold-500 sm:w-auto"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-md border-2 border-ink-950 px-6 py-3.5 text-sm font-semibold text-ink-950 transition-colors hover:bg-ink-950 hover:text-gold-500 sm:w-auto"
             >
               <Phone size={16} aria-hidden="true" />
               <span className="sr-only">Call </span>

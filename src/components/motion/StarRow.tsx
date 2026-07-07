@@ -44,7 +44,7 @@ export default function StarRow({
           <Star
             width={size}
             height={size}
-            className="fill-gold-500 text-gold-500"
+            className="fill-star text-star"
           />
         </motion.span>
       ))}

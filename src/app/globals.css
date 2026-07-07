@@ -10,12 +10,12 @@
      --font-heading is a pure alias, safe to keep. */
   --font-heading: var(--font-display);
 
-  /* Benchlight motion: exactly two easings do everything. */
+  /* Pulse motion: exactly two easings do everything. */
   --ease-precision: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
 
-  /* Bench-lamp glow (13% alpha gold) — used by .bench-glow and focus halos. */
-  --gold-glow: rgba(255, 178, 36, 0.13);
+  /* Volt glow (13% alpha cyan) — used by .bench-glow and focus halos. */
+  --gold-glow: rgba(0, 217, 255, 0.13);
 }
 
 @layer base {
@@ -75,21 +75,26 @@
   }
 
   /* --- Typography voices --------------------------------------------- */
-  /* Display: Archivo Expanded — heavy grotesque, sentence case, tight. */
+  /* Display: Space Grotesk — techy grotesque, sentence case, tight. */
   .type-display {
     font-family: var(--font-display);
-    font-stretch: 125%;
-    font-weight: 900;
-    letter-spacing: -0.02em;
-    line-height: 1.04;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.02;
     text-wrap: balance;
   }
   .type-title {
     font-family: var(--font-display);
-    font-stretch: 110%;
-    font-weight: 700;
-    letter-spacing: -0.01em;
+    font-weight: 600;
+    letter-spacing: -0.02em;
     text-wrap: balance;
+  }
+  /* Electric gradient text — volt→violet. One word per headline, max. */
+  .text-gradient-pulse {
+    background-image: linear-gradient(100deg, #00d9ff 10%, #7c5cff 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
   /* Mono is the "instrument voice": labels, numbers, tables — never
      paragraphs. Uppercase, tracked, small. */
@@ -106,35 +111,34 @@
   .ccr-wordmark {
     font-family: var(--font-display), "Arial Black", Impact, system-ui,
       sans-serif;
-    font-stretch: 125%;
-    font-weight: 900;
+    font-weight: 700;
     letter-spacing: -0.02em;
   }
   .site-heading {
     @apply type-title text-3xl sm:text-4xl;
-    font-stretch: 118%;
-    font-weight: 800;
+    font-weight: 700;
   }
   .site-subheading {
     @apply text-base leading-relaxed sm:text-lg;
   }
 
   /* --- Buttons --------------------------------------------------------
-     One shape (pill), three voices. Gold pill is THE action. */
+     One shape (sharp 8px), three voices. Volt fill is THE action —
+     it glows on hover. */
   .btn-gold {
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-gold-500 px-6 py-3.5 text-sm font-semibold text-ink-950 transition-colors duration-200 hover:bg-gold-300 active:bg-gold-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-500 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-950 disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-md bg-gold-500 px-6 py-3.5 text-sm font-semibold text-ink-950 transition-all duration-200 hover:bg-gold-300 hover:shadow-gold-glow active:bg-gold-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-500 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-950 disabled:opacity-50;
   }
   .btn-ghost-dark {
-    /* On ink surfaces */
-    @apply inline-flex items-center justify-center gap-2 rounded-full border border-ink-600 px-6 py-3.5 text-sm font-semibold text-ink-100 transition-colors duration-200 hover:border-gold-500 hover:text-gold-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-500 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-950 disabled:opacity-50;
+    /* On space surfaces */
+    @apply inline-flex items-center justify-center gap-2 rounded-md border border-ink-600 px-6 py-3.5 text-sm font-semibold text-ink-100 transition-all duration-200 hover:border-gold-500 hover:text-gold-500 hover:shadow-gold-glow focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-500 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-950 disabled:opacity-50;
   }
   .btn-ghost-paper {
-    /* On paper surfaces */
-    @apply inline-flex items-center justify-center gap-2 rounded-full border border-ink-950/25 px-6 py-3.5 text-sm font-semibold text-ink-950 transition-colors duration-200 hover:border-ink-950 hover:bg-ink-950 hover:text-ink-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ink-950 focus-visible:ring-offset-2 disabled:opacity-50;
+    /* Rare light docket accents only */
+    @apply inline-flex items-center justify-center gap-2 rounded-md border border-ink-950/25 px-6 py-3.5 text-sm font-semibold text-ink-950 transition-colors duration-200 hover:border-ink-950 hover:bg-ink-950 hover:text-ink-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ink-950 focus-visible:ring-offset-2 disabled:opacity-50;
   }
   .btn-ink {
-    /* On the gold CtaBanner */
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-ink-950 px-6 py-3.5 text-sm font-semibold text-ink-50 transition-colors duration-200 hover:bg-ink-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-ink-950 focus-visible:ring-offset-2 focus-visible:ring-offset-gold-500 disabled:opacity-50;
+    /* On the beam CtaBanner */
+    @apply inline-flex items-center justify-center gap-2 rounded-md bg-ink-950 px-6 py-3.5 text-sm font-semibold text-ink-50 transition-colors duration-200 hover:bg-ink-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-ink-950 focus-visible:ring-offset-2 disabled:opacity-50;
   }
   .btn-sm {
     @apply px-4 py-2.5 text-xs;
@@ -149,8 +153,33 @@
   }
 
   /* --- Surfaces & furniture ------------------------------------------ */
+  /* Glass HUD panel — translucent space surface with a hairline. */
   .card-dark {
-    @apply rounded-lg border border-ink-700 bg-ink-900;
+    @apply rounded-lg border border-ink-700 bg-ink-900/70 backdrop-blur-sm;
+  }
+  /* HUD corner brackets — L-shaped interface frames (top-left, bottom-right). */
+  .hud-corners {
+    position: relative;
+  }
+  .hud-corners::before,
+  .hud-corners::after {
+    content: "";
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    opacity: 0.6;
+  }
+  .hud-corners::before {
+    top: -1px;
+    left: -1px;
+    border-top: 1px solid currentColor;
+    border-left: 1px solid currentColor;
+  }
+  .hud-corners::after {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 1px solid currentColor;
+    border-right: 1px solid currentColor;
   }
   .card-paper {
     @apply rounded-lg border border-line bg-white;
@@ -160,19 +189,19 @@
   .tech-grid {
     background-image: linear-gradient(
         to right,
-        rgba(38, 43, 49, 0.55) 1px,
+        rgba(27, 42, 71, 0.7) 1px,
         transparent 1px
       ),
-      linear-gradient(to bottom, rgba(38, 43, 49, 0.55) 1px, transparent 1px);
+      linear-gradient(to bottom, rgba(27, 42, 71, 0.7) 1px, transparent 1px);
     background-size: 48px 48px;
   }
   .tech-grid-gold {
     background-image: linear-gradient(
         to right,
-        rgba(232, 155, 12, 0.2) 1px,
+        rgba(4, 7, 15, 0.16) 1px,
         transparent 1px
       ),
-      linear-gradient(to bottom, rgba(232, 155, 12, 0.2) 1px, transparent 1px);
+      linear-gradient(to bottom, rgba(4, 7, 15, 0.16) 1px, transparent 1px);
     background-size: 48px 48px;
   }
   /* Registration ticks: small "+" marks at two opposing corners. */
@@ -234,11 +263,11 @@
     background: linear-gradient(
       90deg,
       transparent,
-      #ffb224 30%,
-      #ffb224 70%,
+      #00d9ff 30%,
+      #00d9ff 70%,
       transparent
     );
-    box-shadow: 0 0 12px 1px rgba(255, 178, 36, 0.35);
+    box-shadow: 0 0 12px 1px rgba(0, 217, 255, 0.35);
     opacity: 0;
     pointer-events: none;
   }

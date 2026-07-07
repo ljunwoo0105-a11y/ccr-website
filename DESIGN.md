@@ -1,74 +1,70 @@
-# CCR "Benchlight" Design System
+# CCR "Pulse" Design System
 
-The repair bench as a precision lab, shot at night. Near-black warm ink
-surfaces, a fine technical grid, registration-mark ticks, and monospace spec
-labels — lit by a single warm **gold bench-lamp accent that is also the
-Google-star hue**, so every accent moment reinforces the 4.9★ trust signal.
-Copy stays sentence-case and plain-English so mall shoppers feel welcomed,
-not intimidated.
+An electric deep-space service lab. Blue-black navy surfaces under a drifting
+technical grid, glass HUD panels with corner brackets, and one **electric
+volt-cyan accent** with a violet gradient partner — the site feels like the
+diagnostic equipment on the bench, powered on. Copy stays sentence-case and
+plain-English; the energy comes from light, motion and precision, not jargon.
 
-The public site is **dark end-to-end** — one continuous night-lab world.
-Pacing comes from alternating surface lightness (ink-950 ↔ ink-900 bands),
-photographic relief (service photos, the blueprint mark), the gold TickerBand,
-and exactly one full inversion: the gold CtaBanner. Paper/stone/line tokens
-survive only as rare "docket" accents (e.g. the wizard receipt) — never as
-section backgrounds.
+The public site is **dark end-to-end**: alternating ink-950/ink-900 bands,
+photographic relief, the volt ticker, and exactly one full inversion — the
+volt→violet **beam CtaBanner**. Paper/stone tokens survive only as rare
+docket accents (wizard receipt).
 
 Staff portal and admin console keep the legacy system (`.btn-primary`,
 `.card`, `ccr-*`, `slate-*`) — do not restyle them.
 
+> **Class-name note:** the site-wide semantic tokens kept their original
+> names through the re-identity — `ink-*` now holds the space-navy ramp and
+> `gold-*` holds volt cyan. Read the names as "surface ramp" and "accent".
+
 ## 1. Color
 
-Elevation on dark = **lightness + hairlines**, never shadows. One accent.
+Elevation on dark = lightness + hairlines (+ glass blur on panels). One accent.
 
 | Token | Hex | Usage |
 |---|---|---|
-| `ink-950` | `#0B0C0E` | Page background, surface 0 |
-| `ink-900` | `#101214` | Surface 1: bands, cards, header backdrop (`/85` + blur) |
-| `ink-850` | `#15181B` | Surface 1.5: row hover, accordion open |
-| `ink-800` | `#1A1E22` | Surface 2: raised cards, inputs, table rows |
-| `ink-700` | `#262B31` | Hairlines, dividers, tech grid — the border floor on dark |
-| `ink-600` | `#3A4148` | Strong borders on hover, inactive ticks |
-| `ink-500` | `#566069` | Disabled/placeholder (dark); secondary-text floor on paper |
-| `ink-400` | `#828D97` | Muted meta text — dark surfaces only, never on paper |
-| `ink-300` | `#9AA5AE` | Secondary text on dark |
-| `ink-200` | `#C3CBD2` | Primary body text on dark |
-| `ink-100` | `#E4E8EC` | High-emphasis body, card titles on dark |
-| `ink-50`  | `#F4F6F8` | Display headlines on dark, logo on dark |
-| `paper`   | `#FAF9F6` | Rare docket/receipt accents only — never a section bg |
-| `stone`   | `#F0EEE8` | Photo mat tint inside docket accents |
-| `line`    | `#DCDAD2` | Hairlines on the rare paper accents |
-| `gold-300` | `#FFC966` | Accent hover tint, star gradient top |
-| `gold-500` | `#FFB224` | **THE accent**: CTAs, stars, prices, counters, scanline, CtaBanner bg |
-| `gold-600` | `#E89B0C` | Pressed state, active wizard tile borders |
-| `gold-700` | `#8F5C00` | AA-safe accent **text** twin on paper surfaces |
-| `status-green` | `#34D399` | "Open now" pulse dot only. Never decorative |
+| `ink-950` | `#04070F` | Page background — deep space |
+| `ink-900` | `#090F1E` | Surface 1: bands, cards, header backdrop (`/85` + blur) |
+| `ink-850` | `#0C1426` | Surface 1.5: row hover, accordion open |
+| `ink-800` | `#101A30` | Surface 2: raised cards, inputs, table rows |
+| `ink-700` | `#1B2A47` | Hairlines, dividers, tech grid — the border floor |
+| `ink-600` | `#2B3E63` | Strong borders on hover, empty stars |
+| `ink-500` | `#46587E` | Disabled/placeholder |
+| `ink-400` | `#7186AB` | Muted meta text (floor for text) |
+| `ink-300` | `#96A7C8` | Secondary text |
+| `ink-200` | `#C2CDE4` | Primary body text |
+| `ink-100` | `#E0E7F5` | High-emphasis body, card titles |
+| `ink-50`  | `#F1F5FD` | Display headlines |
+| `gold-300` | `#7DF3FF` | Accent hover tint |
+| `gold-500` | `#00D9FF` | **THE accent (volt)**: CTAs, links, prices, counters, scanline, ticker |
+| `gold-600` | `#00A9C7` | Pressed state, active borders |
+| `pulse-500` | `#7C5CFF` | Violet gradient partner — gradients/markers only, never solo text |
+| `star` | `#FFC24D` | Star ratings ONLY — the trust hue that never changes |
+| `bg-pulse-beam` | volt→violet 120° | Gradient: CtaBanner surface, `.text-gradient-pulse` |
+| `status-green` | `#34D399` | "Open now" pulse dot only |
 | `status-red` | `#F87171` | Form validation errors only |
 
-Rules:
-- Gold covers < 10% of any viewport except the deliberate CtaBanner inversion.
-- Filled gold elements always carry `text-ink-950` (10.8:1).
-- Gold-500 text is allowed on ink surfaces (10.6:1) but **banned on paper**
-  (use `gold-700`).
-- On paper: headings `ink-950`, body `ink-600`, secondary `ink-500` (floor).
-- Star ratings are ALWAYS gold — never any other hue.
+Rules: filled volt elements carry `text-ink-950`; volt text is fine on any ink
+surface; violet never appears alone (gradient partner only); stars are always
+`star` gold; max one gradient word per headline.
 
 ## 2. Typography
 
 | Voice | Font | Rules |
 |---|---|---|
-| Display | Archivo (variable, `wdth` 125 via `.type-display`/`.ccr-wordmark`) | Weights 800–900, sentence case, tracking −0.02em, `text-wrap: balance` |
-| Body | Instrument Sans | 400/500/600, 1–1.125rem, line-height 1.65, max 68ch |
-| Instrument | IBM Plex Mono | Labels, prices, numerals, tables, step counters. Uppercase +0.14em ≤ 13px. **Mono never sets a paragraph** |
+| Display | Space Grotesk (`.type-display`) | 700, sentence case, tracking −0.03em, `text-wrap: balance` |
+| Body | Manrope | 400/500/600, 1–1.125rem, line-height 1.65, max 68ch |
+| Instrument | JetBrains Mono | Labels, prices, numerals, tables. Uppercase +0.14em ≤ 13px. **Mono never sets a paragraph** |
 
-Scale: hero H1 `clamp(2.75rem, 6vw, 5.25rem)`; section H2 `clamp(2rem, 4vw, 3rem)`
-(`.site-heading`); card titles 1.25rem/700. All numerals `tabular-nums` (`.tnum`).
-Headlines: at most one gold word or full stop per headline.
+Scale: hero H1 `clamp(3rem, 7.5vw, 6.25rem)`; section H2 `clamp(2rem, 4vw, 3rem)`
+(`.site-heading`); numerals `tabular-nums` (`.tnum`). `.text-gradient-pulse`
+for the single electric word.
 
 ## 3. Motion
 
-Movements of a calibrated instrument — short travel, decisive settle, nothing
-bounces. Two easings only:
+Movements of powered-on diagnostic equipment — short travel, decisive settle,
+nothing bounces. Two easings only:
 
 - `--ease-precision: cubic-bezier(0.22, 1, 0.36, 1)` — reveals, expansions
 - `--ease-inout: cubic-bezier(0.65, 0, 0.35, 1)` — scanline sweeps, header condense
@@ -77,19 +73,16 @@ Durations: hover 150–200ms · UI state 250–350ms · reveals 500–650ms ·
 counters 1200ms · scanline 900ms.
 
 Policy:
-- Everything reveals **once** (`viewport={{ once: true, margin: "-80px" }}`),
-  pattern `opacity 0→1 + y 24→0` (rows `x -16→0`), sibling stagger 0.07s
-  capped at 6. No blur or scale reveals.
+- Everything reveals **once** (`viewport={{ once: true, margin: "-80px" }}`);
+  display headlines rise via `LineRise` masks; stagger 0.07s capped at 6.
 - Continuous motion is rationed to EXACTLY THREE elements site-wide: the
-  status-dot pulse, the 60s hero grid drift, and the gold TickerBand marquee
+  status-dot pulse, the 60s hero grid drift, and the volt TickerBand marquee
   (35s, pauses on hover/focus, static under reduced motion). Scanlines fire
   on events (load, hover, submit), never loop.
-- Hover grammar: transform + color only. Never animate layout/size.
-- All motion lives in client-leaf components under `src/components/motion/`;
-  sections stay server components wherever possible.
-- Reduced motion: `MotionConfig reducedMotion="user"` at the public layout
-  root; counters render final values; scanline and grid drift hidden.
-- Decorative animation is `aria-hidden` with a sr-only static equivalent.
+- Hover grammar: transform + color + glow only. Never animate layout/size.
+- All motion lives in client leaves under `src/components/motion/`; sections
+  stay server components. `MotionConfig reducedMotion="user"` at the public
+  layout root; decorative animation is `aria-hidden` with sr-only equivalents.
 
 ### Motion primitives (`src/components/motion/`)
 
@@ -97,63 +90,60 @@ Policy:
 |---|---|
 | `Reveal` / `RevealGroup` + `RevealItem` | Once-only scroll reveals, staggered groups |
 | `Counter` | Count-up stat numerals (SSR renders final value) |
-| `Scanline` | THE signature — gold diagnostic sweep on load/submit events |
+| `Scanline` | Volt laser sweep on load/submit events |
 | CSS `.scan-on-hover` | Card-hover scanline sweep (pure CSS) |
-| `GlowCard` + CSS `.bench-glow` | Cursor-following bench-lamp glow (pointer-fine only) |
-| `Parallax` | Short scroll-linked drift (hero content, CTA grid) |
+| `GlowCard` + CSS `.bench-glow` | Cursor-following volt glow (pointer-fine only) |
+| `Parallax` | Short scroll-linked drift |
 | `StarRow` | Five gold stars filling sequentially, sr-only rating text |
 | `Collapse` | Height-auto accordion animation |
 | `TiltCard` | ±4° pointer tilt with spring settle (pointer-fine only) |
 | `LineRise` | Masked line-rise for display headlines (once, staggered) |
 
-Plus `TickerBand` (`src/components/public/TickerBand.tsx`): the gold marquee
-of business promises under the hero — the site's third sanctioned continuous
-animation and its chromatic heartbeat.
+Plus `TickerBand` (`src/components/public/TickerBand.tsx`): the volt marquee
+of business promises under the hero — the third sanctioned continuous
+animation and the chromatic heartbeat.
 
 ## 4. Furniture
 
-- `.tech-grid` / `.tech-grid-gold` — 48px CSS technical grid backgrounds
-- `.tick-corners` — registration "+" ticks on opposing corners
-- `.leader-row` — dotted-leader rows (hours, pricing) — the "docket" detail
-- `.mono-label` / `.eyebrow` — the instrument voice; section eyebrows read
-  `01 — WHAT WE FIX` with a hairline extending right
-- Radius: 8px (`rounded-lg`) on cards, pill buttons only. **No `rounded-xl`.**
-- Buttons: `.btn-gold` (the action), `.btn-ghost-dark`, `.btn-ghost-paper`,
-  `.btn-ink` (on gold). Inputs: `.input-dark`, `.label-dark`.
-- Cards: `.card-dark` (ink-900 + ink-700 hairline), `.card-paper`
-  (white + line hairline). Hover: border warms (`ink-700→gold-500/40` on dark,
-  `line→ink-950/30` on paper), arrows translate 4px.
-- Brand: `CcrMark` (inline SVG, currentColor; `variant="blueprint"` for the
-  hero schematic). The 4K PNGs stay for print fidelity.
+- `.card-dark` — glass HUD panel: translucent ink-900 + backdrop blur +
+  ink-700 hairline; hover `border-gold-500/40` (+ `shadow-volt-card` on
+  showcase cards)
+- `.hud-corners` — L-shaped interface brackets (top-left, bottom-right),
+  currentColor
+- `.tech-grid` / `.tech-grid-gold` — 48px technical grids (space-blue / dark-on-beam)
+- `.leader-row` — dotted-leader rows (hours, pricing)
+- `.mono-label` / `.eyebrow` — instrument voice; section eyebrows read
+  `01 — WHAT WE FIX` in `text-gold-500` with an ink-700 hairline to the edge
+- Radius: `rounded-md` buttons, `rounded-lg` cards. Nothing rounder.
+- Buttons: `.btn-gold` (volt fill, glows on hover), `.btn-ghost-dark`,
+  `.btn-ink` (on the beam). Inputs: `.input-dark`, `.label-dark`.
+- Photos: duotone at rest on dark (grayscale + ink-950/30 overlay), color
+  lifts on hover; touch devices get color at rest. `?v=2` suffix preserved.
+- Brand: `CcrMark` inline SVG (currentColor; `blueprint` variant for
+  watermarks). The 4K PNGs stay for print fidelity.
 
 ## 5. Signatures
 
-1. **The diagnostic scanline** — a 1px gold line sweeping once at meaningful
-   moments: down the hero on load, across a service card on hover (leaving a
-   mono `DIAG · OK` stamp), over the quote summary on submit.
-2. **The annotated blueprint mark** — the CCR mark huge in the hero as a
-   stroke-only schematic with crosshair ticks and mono labels calling out
-   SAME-DAY / 12-MO WARRANTY / CERTIFIED TECHS.
-3. **Gold = star gold** — the accent and the rating hue are one token.
+1. **The volt scanline** — a 1px cyan laser sweeping once at meaningful
+   moments: down the hero on load, across cards on hover (leaving a mono
+   `DIAG · OK` stamp), over the quote summary on submit.
+2. **The HUD bench panel** — a floating glass card with corner brackets in
+   the hero running live `SCREEN … OK / DIAG COMPLETE` diagnostics.
+3. **The beam** — the volt→violet gradient: one word per headline, the
+   ticker's markers, and the full CtaBanner inversion.
+4. **Gold stars on an electric site** — ratings stay Google-gold no matter
+   what; trust never gets re-themed.
 
 ## 6. Layout & content rules
 
 - Containers: `.site-container` (max-w-6xl), `.site-container-wide` (max-w-7xl).
-- 4px spacing scale; sections `py-20`–`py-28`.
-- Pacing on the long dark scroll: alternate section surfaces (ink-950 ↔
-  ink-900), and never two photo-less sections in a row — photos, the
-  blueprint mark, the TickerBand and the gold CtaBanner are the relief.
-- Service photos: duotone at rest on dark (grayscale + ink-950/30 overlay),
-  color lifts on hover — on touch devices serve full color at rest.
-  `?v=2` cache-bust suffix preserved.
+- 4px spacing scale; sections `py-20`–`py-28`; alternate ink-950/ink-900 bands;
+  never two photo-less sections in a row.
 - Verified business facts only (see `src/lib/config.ts`) — phone 0452 385 321,
   Kiosk K1 near Foot Locker, hours, 4.9★/1,866+ reviews, Price Beat Guarantee,
-  up to 12-month warranty. `en-AU` number formatting everywhere.
-- Preserve: anchor ids (`#about`, `#contact`, service anchors on /services),
-  JSON-LD schemas, aria patterns, the reviews empty-state contract (never
-  fabricate reviews), `revalidate` exports, metadata.
-- Quote wizard = "diagnostic intake": mono step rail `STEP 02 / 05`, gold
-  progress fill, selectable tiles, docket-style summary, persistent
-  "Rather talk? 0452 385 321" escape hatch, 150ms error shake, scanline +
-  status-green `REQUEST LOGGED` stamp on success, reassurance line
-  "No obligation · Price Beat Guarantee" under the final submit.
+  up to 12-month warranty. `en-AU` formatting everywhere.
+- Preserve: anchor ids (`#about`, `#contact`, service anchors), JSON-LD, aria
+  patterns, the reviews empty-state contract, `revalidate` exports, metadata.
+- Quote wizard = diagnostic intake: mono step rail, volt progress fill,
+  selectable tiles, docket summary, "Rather talk? 0452 385 321" escape hatch,
+  error shake, scanline + `REQUEST LOGGED` stamp on success.

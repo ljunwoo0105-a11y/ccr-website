@@ -1,24 +1,23 @@
 import type { Metadata } from "next";
-import { Archivo, IBM_Plex_Mono, Instrument_Sans } from "next/font/google";
+import { JetBrains_Mono, Manrope, Space_Grotesk } from "next/font/google";
 import { BUSINESS, SITE_URL } from "@/lib/config";
 import "./globals.css";
 
-// Benchlight type system — Archivo Expanded (display), Instrument Sans (body),
-// IBM Plex Mono (the "instrument voice": labels, numbers, tables).
-const display = Archivo({
+// Pulse type system — Space Grotesk (display), Manrope (body),
+// JetBrains Mono (the "instrument voice": labels, numbers, tables).
+const display = Space_Grotesk({
   subsets: ["latin"],
-  axes: ["wdth"],
   variable: "--font-display",
   display: "swap",
 });
 
-const sans = Instrument_Sans({
+const sans = Manrope({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
 });
 
-const mono = IBM_Plex_Mono({
+const mono = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "500"],
   variable: "--font-mono",

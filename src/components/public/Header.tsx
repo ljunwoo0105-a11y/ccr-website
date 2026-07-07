@@ -26,7 +26,7 @@ export default function Header() {
           <div className="site-container-wide flex h-9 items-center justify-between gap-4 font-mono text-[0.6875rem] sm:text-xs">
             <span className="inline-flex items-center gap-2 text-ink-200">
               <Star
-                className="h-3 w-3 fill-gold-500 text-gold-500"
+                className="h-3 w-3 fill-star text-star"
                 aria-hidden="true"
               />
               <span className="tnum">

@@ -25,7 +25,7 @@ export default function Stars({
           key={i}
           className={cn(
             size === "lg" ? "h-6 w-6" : "h-4 w-4",
-            i < count ? "fill-gold-500 text-gold-500" : "text-ink-600"
+            i < count ? "fill-star text-star" : "text-ink-600"
           )}
         />
       ))}
