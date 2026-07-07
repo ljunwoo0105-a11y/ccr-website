@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Static five-star row for review cards and rating summaries. Filled stars
- * are always gold (the accent IS the star hue); empty stars are line-grey
+ * are always gold (the accent IS the star hue); empty stars are ink-grey
  * outlines. Decorative — pair with sr-only rating text at the call site.
  */
 export default function Stars({
@@ -25,7 +25,7 @@ export default function Stars({
           key={i}
           className={cn(
             size === "lg" ? "h-6 w-6" : "h-4 w-4",
-            i < count ? "fill-gold-500 text-gold-500" : "text-line"
+            i < count ? "fill-gold-500 text-gold-500" : "text-ink-600"
           )}
         />
       ))}

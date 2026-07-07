@@ -8,6 +8,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal";
+import LineRise from "@/components/motion/LineRise";
 
 interface Reason {
   icon: LucideIcon;
@@ -53,26 +54,29 @@ export default function WhyChooseUs({
   return (
     <section
       id="about"
-      className="scroll-mt-24 bg-paper py-24"
+      className="scroll-mt-24 border-y border-ink-700 bg-ink-900 py-24"
       aria-labelledby="why-heading"
     >
       <div className="site-container">
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
           <Reveal className="self-start lg:sticky lg:top-28 lg:col-span-5">
             <div className="flex items-center gap-4">
-              <span className="eyebrow text-gold-700">02 — WHY CCR</span>
-              <div className="h-px flex-1 bg-line" aria-hidden="true" />
+              <span className="eyebrow text-gold-500">02 — WHY CCR</span>
+              <div className="h-px flex-1 bg-ink-700" aria-hidden="true" />
             </div>
-            <h2 id="why-heading" className="site-heading mt-5 text-ink-950">
-              Repairs you can watch happen.
-            </h2>
-            <p className="mt-4 text-ink-600">
+            <LineRise
+              as="h2"
+              id="why-heading"
+              className="site-heading mt-5 text-ink-50"
+              lines={["Repairs you can", "watch happen."]}
+            />
+            <p className="mt-4 text-ink-300">
               Our kiosk sits out in the open at Orion Springfield Central — no
               back room, no mystery. Certified technicians work in front of
               you, explain your options in plain English, and back the repair
               with a warranty.
             </p>
-            <Link href="/quote" className="link-paper mt-6 inline-block">
+            <Link href="/quote" className="link-gold mt-6 inline-block text-sm">
               Get a free quote →
             </Link>
           </Reveal>
@@ -84,22 +88,22 @@ export default function WhyChooseUs({
                 index={index}
                 x={-16}
                 y={0}
-                className="group -mx-4 grid grid-cols-[auto_auto_1fr] items-start gap-5 rounded-lg border-t border-line px-4 py-6 transition-colors last:border-b hover:bg-stone/60"
+                className="group -mx-4 grid grid-cols-[auto_auto_1fr] items-start gap-5 rounded-lg border-t border-ink-700 px-4 py-6 transition-colors last:border-b hover:bg-ink-850"
               >
-                <span className="mono-label tnum pt-1 text-ink-500 transition-colors group-hover:text-gold-700">
+                <span className="mono-label tnum pt-1 text-ink-500 transition-colors group-hover:text-gold-500">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <span
-                  className="flex h-12 w-12 items-center justify-center rounded-lg border border-line text-gold-700"
+                  className="flex h-12 w-12 items-center justify-center rounded-lg border border-ink-700 text-gold-500"
                   aria-hidden="true"
                 >
                   <reason.icon className="h-5 w-5" strokeWidth={1.5} />
                 </span>
                 <div>
-                  <h3 className="font-display text-lg font-bold text-ink-950">
+                  <h3 className="font-display text-lg font-bold text-ink-100">
                     {reason.title}
                   </h3>
-                  <p className="mt-1 text-sm leading-relaxed text-ink-600">
+                  <p className="mt-1 text-sm leading-relaxed text-ink-300">
                     {reason.body}
                   </p>
                 </div>

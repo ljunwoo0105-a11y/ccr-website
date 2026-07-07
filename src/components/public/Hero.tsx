@@ -3,9 +3,11 @@ import { ArrowRight } from "lucide-react";
 import { BUSINESS } from "@/lib/config";
 import { CcrMark } from "@/components/brand/CcrMark";
 import { RevealGroup, RevealItem } from "@/components/motion/Reveal";
+import LineRise from "@/components/motion/LineRise";
 import Parallax from "@/components/motion/Parallax";
 import Scanline from "@/components/motion/Scanline";
 import StarRow from "@/components/motion/StarRow";
+import DiagReadout from "@/components/public/hero/DiagReadout";
 
 /** Annotated-blueprint callouts around the mark: label, leader width, position. */
 const ANNOTATIONS = [
@@ -69,12 +71,17 @@ export default function Hero({
                 </div>
               </RevealItem>
 
-              <RevealItem index={1}>
-                <h1 className="type-display mt-6 text-[clamp(2.75rem,6vw,5.25rem)] text-ink-50">
-                  Broken today.
-                  <br />
-                  <span className="text-gold-500">Fixed today.</span>
-                </h1>
+              <RevealItem index={1} y={0}>
+                <LineRise
+                  as="h1"
+                  className="type-display mt-6 text-[clamp(2.75rem,6vw,5.25rem)] text-ink-50"
+                  lines={[
+                    { text: "Broken today." },
+                    { text: "Fixed today.", className: "text-gold-500" },
+                  ]}
+                  stagger={0.12}
+                  delay={0.15}
+                />
               </RevealItem>
 
               <RevealItem index={2}>
@@ -115,11 +122,11 @@ export default function Hero({
           <div className="lg:col-span-5">
             <p className="sr-only">
               Same-day repairs. Parts warranty up to 12 months. Certified
-              technicians.
+              technicians. Diagnostics complete — same-day repairs available.
             </p>
             <div
               aria-hidden="true"
-              className="hidden items-center justify-center lg:flex"
+              className="hidden flex-col items-center justify-center lg:flex"
             >
               <div className="relative">
                 <CcrMark
@@ -155,6 +162,7 @@ export default function Hero({
                   </div>
                 ))}
               </div>
+              <DiagReadout className="mt-10" />
             </div>
           </div>
         </div>

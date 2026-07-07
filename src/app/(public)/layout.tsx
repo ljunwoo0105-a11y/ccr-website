@@ -3,10 +3,11 @@ import Footer from "@/components/public/Footer";
 import MotionProvider from "@/components/motion/MotionProvider";
 
 /**
- * Public marketing layout — Benchlight. The page is a two-act composition:
- * dark ink bookends (header/hero and contact/footer) around a warm paper
- * middle. MotionProvider gates all animation behind prefers-reduced-motion;
- * the noscript block guarantees content is never stuck at initial opacity.
+ * Public marketing layout — Benchlight. Dark end-to-end: one continuous
+ * night-lab world paced by alternating ink bands, the gold ticker and the
+ * gold CTA inversion. MotionProvider gates all animation behind
+ * prefers-reduced-motion; the noscript block guarantees content is never
+ * stuck at initial opacity.
  */
 export default function PublicLayout({
   children,

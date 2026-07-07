@@ -75,8 +75,11 @@ export default async function ReviewsPage() {
         </div>
       </PageMasthead>
 
-      {/* Review grid on paper */}
-      <section className="bg-paper py-16 sm:py-20" aria-label="Customer reviews">
+      {/* Review grid — dark act */}
+      <section
+        className="bg-ink-950 py-16 sm:py-20"
+        aria-label="Customer reviews"
+      >
         <div className="site-container-wide">
           {reviews.length > 0 ? (
             <RevealGroup className="columns-1 gap-5 sm:columns-2 lg:columns-3">
@@ -91,8 +94,8 @@ export default async function ReviewsPage() {
               ))}
             </RevealGroup>
           ) : (
-            <div className="card-paper mx-auto max-w-xl p-6 text-center">
-              <p className="text-sm leading-relaxed text-ink-600">
+            <div className="card-dark mx-auto max-w-xl p-6 text-center">
+              <p className="text-sm leading-relaxed text-ink-300">
                 Our latest reviews live on Google — read them on our listing,
                 or leave one of your own after your repair.
               </p>
@@ -101,7 +104,7 @@ export default async function ReviewsPage() {
                   href={BUSINESS.googleMapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="link-paper inline-flex items-center gap-1.5 text-sm"
+                  className="link-gold inline-flex items-center gap-1.5 text-sm"
                 >
                   See our Google listing
                   <ArrowRight size={14} aria-hidden="true" />

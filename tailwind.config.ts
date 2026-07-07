@@ -121,11 +121,16 @@ const config: Config = {
           "92%": { opacity: "1" },
           "100%": { top: "100%", opacity: "0" },
         },
+        marquee: {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-50%)" },
+        },
       },
       animation: {
         "status-pulse": "status-pulse 2s cubic-bezier(0.65, 0, 0.35, 1) infinite",
         "grid-drift": "grid-drift 60s linear infinite",
         scanline: "scanline 0.9s cubic-bezier(0.65, 0, 0.35, 1) 1 both",
+        marquee: "marquee 35s linear infinite",
       },
     },
   },

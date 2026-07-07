@@ -29,31 +29,31 @@ export default function WarrantyPage() {
           When you book a repair we offer a choice of part quality where
           available, and your warranty period follows the tier you choose:
         </p>
-        <div className="card-paper overflow-hidden">
+        <div className="card-dark overflow-hidden">
           <table className="w-full text-left text-sm">
             <caption className="sr-only">
               Warranty periods by part quality tier
             </caption>
             <thead>
-              <tr className="border-b border-line bg-stone">
-                <th scope="col" className="mono-label px-5 py-3 text-ink-500">
+              <tr className="border-b border-ink-700 bg-ink-800">
+                <th scope="col" className="mono-label px-5 py-3 text-ink-400">
                   Part quality
                 </th>
-                <th scope="col" className="mono-label px-5 py-3 text-ink-500">
+                <th scope="col" className="mono-label px-5 py-3 text-ink-400">
                   Warranty period
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-line">
+            <tbody className="divide-y divide-ink-700">
               {PART_QUALITIES.map((quality) => (
                 <tr key={quality}>
                   <th
                     scope="row"
-                    className="px-5 py-3.5 font-medium text-ink-950"
+                    className="px-5 py-3.5 font-medium text-ink-100"
                   >
                     {QUALITY_LABELS[quality]}
                   </th>
-                  <td className="mono-label px-5 py-3.5 text-gold-700">
+                  <td className="mono-label px-5 py-3.5 text-gold-500">
                     {warrantyWords(QUALITY_DEFAULT_WARRANTY[quality] ?? 90)}
                   </td>
                 </tr>

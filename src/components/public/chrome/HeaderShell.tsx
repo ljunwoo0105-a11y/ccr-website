@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useScroll, useSpring } from "framer-motion";
 import { EASE_INOUT } from "@/components/motion/Reveal";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +20,11 @@ export default function HeaderShell({
   children: React.ReactNode;
 }) {
   const [condensed, setCondensed] = useState(false);
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 30,
+  });
 
   useEffect(() => {
     const onScroll = () => setCondensed(window.scrollY > 24);
@@ -55,6 +60,12 @@ export default function HeaderShell({
         {utility}
       </motion.div>
       {children}
+      {/* Reading-progress rail — appears once the header condenses */}
+      <motion.div
+        aria-hidden="true"
+        className="absolute bottom-0 left-0 right-0 h-[2px] origin-left bg-gold-500 transition-opacity duration-300"
+        style={{ scaleX: progress, opacity: condensed ? 1 : 0 }}
+      />
     </header>
   );
 }

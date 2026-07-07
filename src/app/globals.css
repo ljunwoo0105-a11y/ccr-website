@@ -3,13 +3,12 @@
 @tailwind utilities;
 
 :root {
-  /* Font vars are set by next/font in src/app/layout.tsx; these are fallbacks. */
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
-  --font-display: var(--font-sans);
+  /* Font vars (--font-sans/--font-display/--font-mono) are set exclusively by
+     next/font classes on <html> in src/app/layout.tsx. Do NOT redeclare them
+     here — a :root declaration ties with the next/font variable class on
+     specificity and wins on source order, silently killing the custom fonts.
+     --font-heading is a pure alias, safe to keep. */
   --font-heading: var(--font-display);
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono",
-    monospace;
 
   /* Benchlight motion: exactly two easings do everything. */
   --ease-precision: cubic-bezier(0.22, 1, 0.36, 1);

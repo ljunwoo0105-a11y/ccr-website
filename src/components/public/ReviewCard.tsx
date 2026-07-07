@@ -11,22 +11,22 @@ export interface PublicReview {
 }
 
 /**
- * Paper test-report card: mono initial tile, reviewer name, dated in the
+ * Dark test-report card: mono initial tile, reviewer name, dated in the
  * instrument voice, gold stars, clamped verdict text and a GOOGLE source tag.
  */
 export default function ReviewCard({ review }: { review: PublicReview }) {
   const initial = review.authorName.trim().charAt(0).toUpperCase() || "?";
 
   return (
-    <article className="card-paper flex h-full flex-col p-6">
+    <article className="card-dark flex h-full flex-col p-6 transition-colors hover:border-gold-500/40">
       <div className="flex items-center gap-3">
         <span
           aria-hidden="true"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-line font-mono text-sm text-ink-950"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-ink-700 font-mono text-sm text-ink-100"
         >
           {initial}
         </span>
-        <span className="min-w-0 flex-1 truncate text-sm font-medium text-ink-950">
+        <span className="min-w-0 flex-1 truncate text-sm font-medium text-ink-100">
           {review.authorName}
         </span>
         {review.reviewedAt && (
@@ -41,12 +41,12 @@ export default function ReviewCard({ review }: { review: PublicReview }) {
         <span className="sr-only">{review.rating} out of 5 stars</span>
       </div>
 
-      <p className="mt-3 flex-1 text-sm leading-relaxed text-ink-600 line-clamp-5">
+      <p className="mt-3 flex-1 text-sm leading-relaxed text-ink-300 line-clamp-5">
         &ldquo;{review.text}&rdquo;
       </p>
 
-      <footer className="mt-5 border-t border-line pt-4">
-        <span className="mono-label inline-flex rounded-full border border-line px-2 py-0.5 text-[0.625rem] text-ink-500">
+      <footer className="mt-5 border-t border-ink-700 pt-4">
+        <span className="mono-label inline-flex rounded-full border border-ink-700 px-2 py-0.5 text-[0.625rem] text-ink-500">
           Google
         </span>
       </footer>

@@ -16,7 +16,7 @@ export default function FaqAccordion({ items }: { items: FaqItem[] }) {
   const baseId = useId();
 
   return (
-    <div className="border-b border-line">
+    <div className="border-b border-ink-700">
       {items.map((item, index) => {
         const open = openIndex === index;
         const buttonId = `${baseId}-faq-button-${index}`;
@@ -26,10 +26,8 @@ export default function FaqAccordion({ items }: { items: FaqItem[] }) {
           <div
             key={item.question}
             className={cn(
-              "-ml-4 border-l-2 border-t border-t-line pl-4 transition-colors duration-200",
-              open
-                ? "border-l-gold-600 bg-stone/50"
-                : "border-l-transparent"
+              "-ml-4 border-l-2 border-t border-t-ink-700 pl-4 transition-colors duration-200",
+              open ? "border-l-gold-500 bg-ink-850" : "border-l-transparent"
             )}
           >
             <h3>
@@ -39,18 +37,18 @@ export default function FaqAccordion({ items }: { items: FaqItem[] }) {
                 aria-expanded={open}
                 aria-controls={panelId}
                 onClick={() => setOpenIndex(open ? null : index)}
-                className="flex min-h-[44px] w-full items-center gap-4 rounded-sm py-5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-600"
+                className="flex min-h-[44px] w-full items-center gap-4 rounded-sm py-5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-500"
               >
                 <span
                   aria-hidden="true"
                   className={cn(
                     "mono-label tnum shrink-0 transition-colors duration-200",
-                    open ? "text-gold-700" : "text-ink-500"
+                    open ? "text-gold-500" : "text-ink-500"
                   )}
                 >
                   Q{index + 1}
                 </span>
-                <span className="flex-1 text-sm font-medium text-ink-950 sm:text-base">
+                <span className="flex-1 text-sm font-medium text-ink-100 sm:text-base">
                   {item.question}
                 </span>
                 <ChevronDown
@@ -65,7 +63,7 @@ export default function FaqAccordion({ items }: { items: FaqItem[] }) {
             </h3>
             <div id={panelId} role="region" aria-labelledby={buttonId}>
               <Collapse open={open}>
-                <p className="max-w-[65ch] pb-6 text-sm leading-relaxed text-ink-600">
+                <p className="max-w-[65ch] pb-6 text-sm leading-relaxed text-ink-300">
                   {item.answer}
                 </p>
               </Collapse>

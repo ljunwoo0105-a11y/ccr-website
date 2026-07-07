@@ -3,7 +3,7 @@ import { Reveal } from "@/components/motion/Reveal";
 /**
  * Spec-sheet masthead — the shared dark band that opens every inner page.
  * Server component; the once-only entrance is delegated to <Reveal>.
- * Body content below is expected to sit on bg-paper (the two-act rhythm).
+ * Body content below continues the dark act (ink-950 / ink-900 bands).
  */
 export default function PageMasthead({
   breadcrumb,

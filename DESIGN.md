@@ -7,13 +7,12 @@ Google-star hue**, so every accent moment reinforces the 4.9★ trust signal.
 Copy stays sentence-case and plain-English so mall shoppers feel welcomed,
 not intimidated.
 
-The public page is a **two-act composition**:
-
-- **Dark act** (ink-950): Header, Hero, StatsBand — and the closing act:
-  ContactSection, CtaBanner (gold inversion), Footer.
-- **Paper act** (warm paper): ServicesGrid, WhyChooseUs, ReviewsSection,
-  FaqSection — the content-dense middle stays bright and familiar for
-  everyday families.
+The public site is **dark end-to-end** — one continuous night-lab world.
+Pacing comes from alternating surface lightness (ink-950 ↔ ink-900 bands),
+photographic relief (service photos, the blueprint mark), the gold TickerBand,
+and exactly one full inversion: the gold CtaBanner. Paper/stone/line tokens
+survive only as rare "docket" accents (e.g. the wizard receipt) — never as
+section backgrounds.
 
 Staff portal and admin console keep the legacy system (`.btn-primary`,
 `.card`, `ccr-*`, `slate-*`) — do not restyle them.
@@ -36,9 +35,9 @@ Elevation on dark = **lightness + hairlines**, never shadows. One accent.
 | `ink-200` | `#C3CBD2` | Primary body text on dark |
 | `ink-100` | `#E4E8EC` | High-emphasis body, card titles on dark |
 | `ink-50`  | `#F4F6F8` | Display headlines on dark, logo on dark |
-| `paper`   | `#FAF9F6` | Light middle-act background (warm, printed feel) |
-| `stone`   | `#F0EEE8` | Tint panels, photo mats on paper |
-| `line`    | `#DCDAD2` | Hairlines on paper |
+| `paper`   | `#FAF9F6` | Rare docket/receipt accents only — never a section bg |
+| `stone`   | `#F0EEE8` | Photo mat tint inside docket accents |
+| `line`    | `#DCDAD2` | Hairlines on the rare paper accents |
 | `gold-300` | `#FFC966` | Accent hover tint, star gradient top |
 | `gold-500` | `#FFB224` | **THE accent**: CTAs, stars, prices, counters, scanline, CtaBanner bg |
 | `gold-600` | `#E89B0C` | Pressed state, active wizard tile borders |
@@ -81,8 +80,10 @@ Policy:
 - Everything reveals **once** (`viewport={{ once: true, margin: "-80px" }}`),
   pattern `opacity 0→1 + y 24→0` (rows `x -16→0`), sibling stagger 0.07s
   capped at 6. No blur or scale reveals.
-- Continuous motion is rationed to the status-dot pulse and the 60s hero grid
-  drift. Scanlines fire on events (load, hover, submit), never loop.
+- Continuous motion is rationed to EXACTLY THREE elements site-wide: the
+  status-dot pulse, the 60s hero grid drift, and the gold TickerBand marquee
+  (35s, pauses on hover/focus, static under reduced motion). Scanlines fire
+  on events (load, hover, submit), never loop.
 - Hover grammar: transform + color only. Never animate layout/size.
 - All motion lives in client-leaf components under `src/components/motion/`;
   sections stay server components wherever possible.
@@ -102,6 +103,12 @@ Policy:
 | `Parallax` | Short scroll-linked drift (hero content, CTA grid) |
 | `StarRow` | Five gold stars filling sequentially, sr-only rating text |
 | `Collapse` | Height-auto accordion animation |
+| `TiltCard` | ±4° pointer tilt with spring settle (pointer-fine only) |
+| `LineRise` | Masked line-rise for display headlines (once, staggered) |
+
+Plus `TickerBand` (`src/components/public/TickerBand.tsx`): the gold marquee
+of business promises under the hero — the site's third sanctioned continuous
+animation and its chromatic heartbeat.
 
 ## 4. Furniture
 
@@ -133,9 +140,12 @@ Policy:
 
 - Containers: `.site-container` (max-w-6xl), `.site-container-wide` (max-w-7xl).
 - 4px spacing scale; sections `py-20`–`py-28`.
-- Never two photo-less dark sections in a row.
-- Service photos: full color on stone mats in the paper act (product shelf
-  space — never dull), `?v=2` cache-bust suffix preserved.
+- Pacing on the long dark scroll: alternate section surfaces (ink-950 ↔
+  ink-900), and never two photo-less sections in a row — photos, the
+  blueprint mark, the TickerBand and the gold CtaBanner are the relief.
+- Service photos: duotone at rest on dark (grayscale + ink-950/30 overlay),
+  color lifts on hover — on touch devices serve full color at rest.
+  `?v=2` cache-bust suffix preserved.
 - Verified business facts only (see `src/lib/config.ts`) — phone 0452 385 321,
   Kiosk K1 near Foot Locker, hours, 4.9★/1,866+ reviews, Price Beat Guarantee,
   up to 12-month warranty. `en-AU` number formatting everywhere.

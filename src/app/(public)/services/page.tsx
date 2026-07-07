@@ -97,24 +97,25 @@ export default function ServicesPage() {
           key={service.anchor}
           id={service.anchor}
           className={cn(
-            "scroll-mt-20 bg-paper py-16 sm:py-20",
-            index > 0 && "border-t border-line"
+            "scroll-mt-20 py-16 sm:py-20",
+            index % 2 === 1 ? "bg-ink-900" : "bg-ink-950",
+            index > 0 && "border-t border-ink-700"
           )}
           aria-labelledby={`${service.anchor}-heading`}
         >
           <div className="site-container">
             <Reveal>
               <div className="flex items-center gap-4">
-                <span className="eyebrow text-gold-700">
+                <span className="eyebrow text-gold-500">
                   {String(index + 1).padStart(2, "0")} — {service.name}
                 </span>
-                <div className="h-px flex-1 bg-line" aria-hidden="true" />
+                <div className="h-px flex-1 bg-ink-700" aria-hidden="true" />
               </div>
 
               <div className="mt-10 grid items-start gap-10 lg:grid-cols-2 lg:gap-16">
                 {/* Photo on a stone mat */}
                 <div className={cn(index % 2 === 1 && "lg:order-2")}>
-                  <div className="tick-corners rounded-lg bg-stone p-3 text-ink-950">
+                  <div className="tick-corners rounded-lg border border-ink-700 bg-ink-800 p-3 text-ink-400">
                     <Image
                       src={serviceImages[service.anchor]}
                       alt={`${service.name} service`}
@@ -127,7 +128,7 @@ export default function ServicesPage() {
                 </div>
 
                 <div>
-                  <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-ink-950">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-ink-700 bg-ink-900">
                     <service.icon
                       className="h-5 w-5 text-gold-500"
                       strokeWidth={1.5}
@@ -136,22 +137,22 @@ export default function ServicesPage() {
                   </div>
                   <h2
                     id={`${service.anchor}-heading`}
-                    className="site-heading mt-4 text-ink-950"
+                    className="site-heading mt-4 text-ink-50"
                   >
                     {service.name}
                   </h2>
-                  <p className="mt-4 text-sm leading-relaxed text-ink-600 sm:text-base">
+                  <p className="mt-4 text-sm leading-relaxed text-ink-300 sm:text-base">
                     {service.detail}
                   </p>
 
-                  <h3 className="mono-label mt-8 text-ink-500">
+                  <h3 className="mono-label mt-8 text-ink-400">
                     Common repairs
                   </h3>
-                  <ul className="mt-4 grid gap-x-6 gap-y-2 text-sm text-ink-600 sm:grid-cols-2">
+                  <ul className="mt-4 grid gap-x-6 gap-y-2 text-sm text-ink-300 sm:grid-cols-2">
                     {service.commonRepairs.map((repair) => (
                       <li key={repair} className="flex items-start gap-2.5">
                         <span
-                          className="mt-2 h-1 w-1 shrink-0 rounded-full bg-gold-700"
+                          className="mt-2 h-1 w-1 shrink-0 rounded-full bg-gold-500"
                           aria-hidden="true"
                         />
                         {repair}
@@ -162,7 +163,7 @@ export default function ServicesPage() {
                   <div className="mt-6">
                     <Link
                       href="/quote"
-                      className="link-paper inline-flex items-center gap-1.5 text-sm"
+                      className="link-gold inline-flex items-center gap-1.5 text-sm"
                     >
                       Get a free {service.name.toLowerCase()} quote
                       <ArrowRight size={14} aria-hidden="true" />
@@ -178,21 +179,21 @@ export default function ServicesPage() {
       {/* Part quality explainer */}
       <section
         id="part-quality"
-        className="scroll-mt-20 border-t border-line bg-paper py-16 sm:py-20"
+        className="scroll-mt-20 border-t border-ink-700 bg-ink-950 py-16 sm:py-20"
         aria-labelledby="quality-heading"
       >
         <div className="site-container">
           <Reveal>
             <div className="flex items-center gap-4">
-              <span className="eyebrow text-gold-700">
+              <span className="eyebrow text-gold-500">
                 {String(SERVICES.length + 1).padStart(2, "0")} — Part quality
               </span>
-              <div className="h-px flex-1 bg-line" aria-hidden="true" />
+              <div className="h-px flex-1 bg-ink-700" aria-hidden="true" />
             </div>
-            <h2 id="quality-heading" className="site-heading mt-8 text-ink-950">
+            <h2 id="quality-heading" className="site-heading mt-8 text-ink-50">
               Your parts, your choice.
             </h2>
-            <p className="mt-3 max-w-2xl text-base leading-relaxed text-ink-600">
+            <p className="mt-3 max-w-2xl text-base leading-relaxed text-ink-300">
               Most repairs come with a choice of part quality, each tier backed
               by its own warranty. We&apos;ll always tell you which options are
               available for your exact device.
@@ -202,15 +203,15 @@ export default function ServicesPage() {
           <RevealGroup className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {PART_QUALITIES.map((quality, i) => (
               <RevealItem key={quality} index={i} className="h-full">
-                <div className="card-paper flex h-full flex-col p-6">
-                  <h3 className="font-display text-lg font-bold text-ink-950">
+                <div className="card-dark flex h-full flex-col p-6">
+                  <h3 className="font-display text-lg font-bold text-ink-50">
                     {QUALITY_LABELS[quality]}
                   </h3>
-                  <p className="mono-label mt-2 text-gold-700">
+                  <p className="mono-label mt-2 text-gold-500">
                     {warrantyWords(QUALITY_DEFAULT_WARRANTY[quality] ?? 90)}{" "}
                     warranty
                   </p>
-                  <p className="mt-3 text-sm leading-relaxed text-ink-600">
+                  <p className="mt-3 text-sm leading-relaxed text-ink-300">
                     {QUALITY_DESCRIPTIONS[quality]}
                   </p>
                 </div>
@@ -218,9 +219,9 @@ export default function ServicesPage() {
             ))}
           </RevealGroup>
 
-          <p className="mt-8 text-xs text-ink-500">
+          <p className="mt-8 text-xs text-ink-400">
             Availability varies by device and repair. See our{" "}
-            <Link href="/warranty" className="link-paper">
+            <Link href="/warranty" className="link-gold">
               warranty policy
             </Link>{" "}
             for full coverage details.

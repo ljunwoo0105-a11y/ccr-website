@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { BUSINESS } from "@/lib/config";
 import { getAggregateRating, getPublicReviews } from "@/lib/google-reviews";
 import Hero from "@/components/public/Hero";
+import TickerBand from "@/components/public/TickerBand";
 import StatsBand from "@/components/public/StatsBand";
 import ServicesGrid from "@/components/public/ServicesGrid";
 import WhyChooseUs from "@/components/public/WhyChooseUs";
@@ -33,6 +34,7 @@ export default async function HomePage() {
       <JsonLd data={faqPageSchema(HOME_FAQS)} />
 
       <Hero rating={rating} reviewCount={reviewCount} />
+      <TickerBand />
       <StatsBand rating={rating} reviewCount={reviewCount} />
       <ServicesGrid />
       <WhyChooseUs rating={rating} reviewCount={reviewCount} />
