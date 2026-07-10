@@ -1,12 +1,12 @@
 // CCR Website — data model
-// SQLite locally; switch the datasource provider to "postgresql" in production.
+// PostgreSQL is used for the Node staff/admin deployment.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 

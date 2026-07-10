@@ -112,6 +112,8 @@ const SECURITY_HEADERS = {
   "x-frame-options": "DENY",
 };
 
+const PROXY_PATH_PREFIXES = ["/api/", "/staff", "/admin"];
+
 function normalizedPath(pathname) {
   if (pathname.length > 1 && pathname.endsWith("/")) {
     return pathname.slice(0, -1);
@@ -161,6 +163,28 @@ async function asset(env, request, pathname) {
   return withHeaders(response, pathname);
 }
 
+function shouldProxy(pathname) {
+  return PROXY_PATH_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+}
+
+function nodeOrigin(env) {
+  const origin = env.CCR_NODE_ORIGIN;
+  if (typeof origin !== "string" || origin.trim().length === 0) {
+    return null;
+  }
+
+  return origin.replace(/\\/+$/, "");
+}
+
+async function proxyToNode(request, origin) {
+  const sourceUrl = new URL(request.url);
+  const targetUrl = new URL(origin);
+  targetUrl.pathname = sourceUrl.pathname;
+  targetUrl.search = sourceUrl.search;
+
+  return fetch(new Request(targetUrl, request));
+}
+
 function unavailable(message, asJson = false) {
   if (asJson) {
     return new Response(JSON.stringify({ ok: false, error: message }), {
@@ -186,12 +210,13 @@ export default {
     const url = new URL(request.url);
     const pathname = normalizedPath(url.pathname);
 
-    if (pathname.startsWith("/api/")) {
-      return unavailable("This form endpoint is not available on the static Sites deployment yet.", true);
-    }
+    if (shouldProxy(pathname)) {
+      const origin = nodeOrigin(env);
+      if (origin) {
+        return proxyToNode(request, origin);
+      }
 
-    if (pathname.startsWith("/staff") || pathname.startsWith("/admin")) {
-      return unavailable("The staff/admin portal needs a database-backed runtime and is not available on this static Sites deployment yet.");
+      return unavailable("The staff/admin backend is not configured yet.", pathname.startsWith("/api/"));
     }
 
     if (pathname.startsWith("/_next/") || /\.[a-z0-9]+$/i.test(pathname)) {

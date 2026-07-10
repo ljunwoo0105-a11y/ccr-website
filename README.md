@@ -13,7 +13,7 @@ Springfield Central QLD. Replaces the old Lovable-generated site.
 
 ```bash
 npm install
-npm run setup     # prisma generate + create SQLite db + seed
+npm run setup     # prisma generate + apply schema + seed
 npm run dev       # http://localhost:3000
 ```
 
@@ -23,8 +23,7 @@ them and change them after first login (Admin → Users → reset password).
 ## Tech stack
 
 - **Next.js 14 (App Router) + TypeScript (strict) + Tailwind CSS**
-- **Prisma + SQLite** locally — switch `datasource` provider to `postgresql`
-  and update `DATABASE_URL` for production
+- **Prisma + PostgreSQL** for the Node staff/admin deployment
 - **jose** JWT sessions in an httpOnly cookie, **bcryptjs** password hashing
 - **@anthropic-ai/sdk** for the AI pricing agents
 - **nodemailer** for emailed quote estimates
@@ -76,6 +75,7 @@ docs/SECURITY.md      security model + review checklist
 
 See `.env.example` for the full annotated list:
 
+- `DATABASE_URL` — PostgreSQL connection string
 - `AUTH_SECRET` — session signing key (generate a long random string)
 - `ANTHROPIC_API_KEY` — enables AI price recommendations + admin AI console
 - `GOOGLE_PLACES_API_KEY` / `GOOGLE_PLACE_ID` — live Google review sync
@@ -83,6 +83,31 @@ See `.env.example` for the full annotated list:
   `var/outbox/*.html` so you can preview them in dev)
 - `POS_PROVIDER` (`loyverse` | `mock`) + `LOYVERSE_API_TOKEN` — inventory
   stock sync. Parts match POS items by `posItemId` or SKU.
+
+## Railway staff/admin deployment
+
+The public website is deployed to Sites. The database-backed app runs as a
+normal Node/Next.js service on Railway with Railway Postgres.
+
+1. Create a Railway project from this repository and set the root directory to
+   `ccr-website`.
+2. Add a Railway Postgres service.
+3. In the Next.js service, set `DATABASE_URL` to the Postgres service's
+   connection string.
+4. Add the rest of the production variables from `.env.example`, especially
+   `AUTH_SECRET`, `NEXT_PUBLIC_SITE_URL`, SMTP, Google, Anthropic, and POS
+   values.
+5. Railway uses `railway.json`: build runs `npm run railway:build`; start runs
+   `prisma migrate deploy && next start`.
+6. After the first successful deploy, run the seed once from Railway:
+
+```bash
+npm run db:seed
+```
+
+7. Set Sites environment variable `CCR_NODE_ORIGIN` to the Railway app origin,
+   for example `https://ccr-admin-production.up.railway.app`, then redeploy
+   Sites. The Sites worker proxies `/staff`, `/admin`, and `/api/*` there.
 
 ## AI features
 
@@ -103,7 +128,7 @@ untracked path to the API.
 ## Production checklist
 
 - [ ] Change the seeded passwords; set a strong `AUTH_SECRET`
-- [ ] Move `DATABASE_URL` to PostgreSQL
+- [ ] Set `DATABASE_URL` to Railway Postgres
 - [ ] Configure SMTP (and send a test quote)
 - [ ] Add `GOOGLE_PLACES_API_KEY`, run Admin → Reviews → Sync, and confirm
       the place id matches the Springfield Central listing
