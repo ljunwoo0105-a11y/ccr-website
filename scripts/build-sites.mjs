@@ -28,6 +28,21 @@ if (result.status !== 0) {
 
 await rm(distDir, { recursive: true, force: true });
 await cp(openNextDir, distDir, { recursive: true });
+await rm(join(distDir, "server-functions", "default", ".env"), {
+  force: true,
+});
+await rm(
+  join(
+    distDir,
+    "server-functions",
+    "default",
+    "node_modules",
+    ".prisma",
+    "client",
+    "query_engine-windows.dll.node",
+  ),
+  { force: true },
+);
 await mkdir(serverDir, { recursive: true });
 await writeFile(
   join(serverDir, "index.js"),
