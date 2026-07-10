@@ -55,8 +55,8 @@ export default async function AdminAiPage() {
   return (
     <div className="space-y-8">
       <header>
-        <h1 className="text-2xl font-bold text-slate-900">AI Console</h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <h1 className="text-2xl font-bold text-carbon-950">AI Console</h1>
+        <p className="mt-1 text-sm text-carbon-500">
           Model registry, default model + budget settings, cost estimation and
           real usage.
         </p>

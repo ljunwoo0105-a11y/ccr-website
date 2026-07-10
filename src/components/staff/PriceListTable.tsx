@@ -143,7 +143,7 @@ export default function PriceListTable() {
           </label>
           <div className="relative">
             <Search
-              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-carbon-400"
               aria-hidden
             />
             <input
@@ -209,10 +209,10 @@ export default function PriceListTable() {
             ))}
           </select>
         </div>
-        <label className="flex h-[42px] items-center gap-2 text-sm text-slate-700">
+        <label className="flex h-[42px] items-center gap-2 text-sm text-carbon-700">
           <input
             type="checkbox"
-            className="h-4 w-4 rounded border-slate-300 text-ccr-primary focus:ring-ccr-primary"
+            className="h-4 w-4 rounded border-carbon-200 text-signal-600 focus:ring-signal-500"
             checked={showInactive}
             onChange={(e) => setShowInactive(e.target.checked)}
           />
@@ -231,7 +231,7 @@ export default function PriceListTable() {
       {error && (
         <p
           role="alert"
-          className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"
+          className=" border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"
         >
           {error}
         </p>
@@ -242,7 +242,7 @@ export default function PriceListTable() {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[1080px] text-left text-sm">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+              <tr className="border-b border-carbon-150 bg-bone-100 text-xs uppercase tracking-wide text-carbon-500">
                 <th className="px-4 py-3 font-semibold">Device</th>
                 <th className="px-4 py-3 font-semibold">Brand</th>
                 <th className="px-4 py-3 font-semibold">Model</th>
@@ -257,12 +257,12 @@ export default function PriceListTable() {
                 <th className="px-4 py-3 text-right font-semibold">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-carbon-150">
               {loading && (
                 <tr>
                   <td colSpan={12} className="px-4 py-10 text-center">
                     <Loader2
-                      className="mx-auto h-6 w-6 animate-spin text-ccr-primary"
+                      className="mx-auto h-6 w-6 animate-spin text-signal-600"
                       aria-hidden
                     />
                   </td>
@@ -272,7 +272,7 @@ export default function PriceListTable() {
                 <tr>
                   <td
                     colSpan={12}
-                    className="px-4 py-10 text-center text-sm text-slate-500"
+                    className="px-4 py-10 text-center text-sm text-carbon-500"
                   >
                     No parts match the current filters.
                   </td>
@@ -286,16 +286,16 @@ export default function PriceListTable() {
                       key={part.id}
                       className={part.active ? undefined : "opacity-50"}
                     >
-                      <td className="px-4 py-2.5 text-slate-600">
+                      <td className="px-4 py-2.5 text-carbon-700">
                         {part.deviceType}
                       </td>
-                      <td className="px-4 py-2.5 font-medium text-slate-900">
+                      <td className="px-4 py-2.5 font-medium text-carbon-950">
                         {part.brand}
                       </td>
-                      <td className="px-4 py-2.5 text-slate-900">
+                      <td className="px-4 py-2.5 text-carbon-950">
                         {part.model}
                       </td>
-                      <td className="px-4 py-2.5 text-slate-700">
+                      <td className="px-4 py-2.5 text-carbon-700">
                         {part.repairType}
                       </td>
                       <td className="px-4 py-2.5">
@@ -305,10 +305,10 @@ export default function PriceListTable() {
                           ] ?? part.quality}
                         </span>
                       </td>
-                      <td className="px-4 py-2.5 text-right tabular-nums text-slate-600">
+                      <td className="px-4 py-2.5 text-right tabular-nums text-carbon-700">
                         {formatAud(part.costPrice)}
                       </td>
-                      <td className="px-4 py-2.5 text-right font-semibold tabular-nums text-slate-900">
+                      <td className="px-4 py-2.5 text-right font-semibold tabular-nums text-carbon-950">
                         {formatAud(part.sellPrice)}
                       </td>
                       <td className="px-4 py-2.5 text-right tabular-nums">
@@ -317,10 +317,10 @@ export default function PriceListTable() {
                             {margin.toFixed(0)}%
                           </span>
                         ) : (
-                          <span className="text-slate-400">—</span>
+                          <span className="text-carbon-400">—</span>
                         )}
                       </td>
-                      <td className="px-4 py-2.5 text-slate-600">
+                      <td className="px-4 py-2.5 text-carbon-700">
                         {warrantyLabel(part.warrantyDays)}
                       </td>
                       <td className="px-4 py-2.5">
@@ -328,7 +328,7 @@ export default function PriceListTable() {
                           {part.stockQty}
                         </span>
                       </td>
-                      <td className="px-4 py-2.5 text-slate-600">
+                      <td className="px-4 py-2.5 text-carbon-700">
                         {part.supplier ?? "—"}
                       </td>
                       <td className="px-4 py-2.5">
@@ -337,7 +337,7 @@ export default function PriceListTable() {
                             type="button"
                             title="Edit part"
                             aria-label={`Edit ${part.brand} ${part.model} ${part.repairType}`}
-                            className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+                            className=" p-1.5 text-carbon-500 transition hover:bg-bone-200 hover:text-carbon-950"
                             onClick={() => setModal({ mode: "edit", part })}
                           >
                             <Pencil className="h-4 w-4" aria-hidden />
@@ -346,7 +346,7 @@ export default function PriceListTable() {
                             type="button"
                             title="AI price check"
                             aria-label={`AI price check for ${part.brand} ${part.model}`}
-                            className="rounded-lg p-1.5 text-violet-500 transition hover:bg-violet-50 hover:text-violet-700"
+                            className=" p-1.5 text-violet-500 transition hover:bg-violet-50 hover:text-violet-700"
                             onClick={() => setAiPart(part)}
                           >
                             <Sparkles className="h-4 w-4" aria-hidden />
@@ -356,7 +356,7 @@ export default function PriceListTable() {
                               type="button"
                               title="Deactivate part"
                               aria-label={`Deactivate ${part.brand} ${part.model}`}
-                              className="rounded-lg p-1.5 text-slate-500 transition hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50"
+                              className=" p-1.5 text-carbon-500 transition hover:bg-rose-50 hover:text-rose-600 disabled:opacity-50"
                               disabled={busyRow === part.id}
                               onClick={() => void deactivate(part)}
                             >
@@ -367,7 +367,7 @@ export default function PriceListTable() {
                               type="button"
                               title="Reactivate part"
                               aria-label={`Reactivate ${part.brand} ${part.model}`}
-                              className="rounded-lg p-1.5 text-slate-500 transition hover:bg-emerald-50 hover:text-emerald-600 disabled:opacity-50"
+                              className=" p-1.5 text-carbon-500 transition hover:bg-emerald-50 hover:text-emerald-600 disabled:opacity-50"
                               disabled={busyRow === part.id}
                               onClick={() => void reactivate(part)}
                             >
@@ -382,11 +382,11 @@ export default function PriceListTable() {
             </tbody>
           </table>
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 bg-slate-50 px-4 py-3">
-          <p className="text-xs text-slate-500">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-carbon-150 bg-bone-100 px-4 py-3">
+          <p className="text-xs text-carbon-500">
             {loading ? "Loading…" : `${parts.length} part${parts.length === 1 ? "" : "s"}`}
           </p>
-          <p className="text-xs font-medium text-slate-500">
+          <p className="text-xs font-medium text-carbon-500">
             Cost prices are confidential — staff only.
           </p>
         </div>

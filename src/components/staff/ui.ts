@@ -3,48 +3,58 @@
  * Pure functions only — safe to import anywhere.
  */
 
+// Manifold drafting tag: squared, bordered, mono uppercase — matches the
+// public site's PASS/sheet tags. Functional status hues are kept but toned to
+// sit on bone paper (soft fill, inked border + text).
 const BADGE_BASE =
-  "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold";
+  "inline-flex items-center border px-2 py-0.5 font-mono text-[0.625rem] font-semibold uppercase tracking-[0.08em]";
+
+const TONE = {
+  signal: "border-signal-500 bg-signal-100 text-signal-600",
+  green: "border-emerald-600/60 bg-emerald-50 text-emerald-700",
+  sky: "border-sky-500/60 bg-sky-50 text-sky-700",
+  violet: "border-violet-500/60 bg-violet-50 text-violet-700",
+  rose: "border-rose-500/70 bg-rose-50 text-rose-700",
+  neutral: "border-carbon-200 bg-bone-200 text-carbon-700",
+} as const;
 
 export function intakeStatusBadge(status: string): string {
   const tone =
     status === "CHECKED_IN"
-      ? "bg-sky-100 text-sky-800"
+      ? TONE.sky
       : status === "IN_REPAIR"
-        ? "bg-amber-100 text-amber-800"
+        ? TONE.signal
         : status === "READY"
-          ? "bg-emerald-100 text-emerald-800"
-          : status === "COLLECTED"
-            ? "bg-slate-200 text-slate-700"
-            : status === "CANCELLED"
-              ? "bg-rose-100 text-rose-800"
-              : "bg-slate-100 text-slate-700";
+          ? TONE.green
+          : status === "CANCELLED"
+            ? TONE.rose
+            : TONE.neutral;
   return `${BADGE_BASE} ${tone}`;
 }
 
 export function leadStatusBadge(status: string): string {
   const tone =
     status === "NEW"
-      ? "bg-orange-100 text-orange-800"
+      ? TONE.signal
       : status === "EMAILED"
-        ? "bg-sky-100 text-sky-800"
+        ? TONE.sky
         : status === "CONTACTED"
-          ? "bg-violet-100 text-violet-800"
+          ? TONE.violet
           : status === "BOOKED"
-            ? "bg-emerald-100 text-emerald-800"
-            : "bg-slate-200 text-slate-700";
+            ? TONE.green
+            : TONE.neutral;
   return `${BADGE_BASE} ${tone}`;
 }
 
 export function qualityBadge(quality: string): string {
   const tone =
     quality === "GENUINE"
-      ? "bg-emerald-100 text-emerald-800"
+      ? TONE.green
       : quality === "OEM"
-        ? "bg-sky-100 text-sky-800"
+        ? TONE.sky
         : quality === "PREMIUM"
-          ? "bg-violet-100 text-violet-800"
-          : "bg-slate-200 text-slate-700";
+          ? TONE.violet
+          : TONE.neutral;
   return `${BADGE_BASE} ${tone}`;
 }
 
@@ -69,12 +79,12 @@ export function marginPct(cost: number, sell: number): number | null {
 
 export function marginTone(pct: number): string {
   if (pct < 30) return "text-rose-600";
-  if (pct < 45) return "text-amber-600";
+  if (pct < 45) return "text-signal-600";
   return "text-emerald-600";
 }
 
 export function stockBadge(qty: number): string {
-  if (qty <= 0) return `${BADGE_BASE} bg-rose-100 text-rose-800`;
-  if (qty <= 1) return `${BADGE_BASE} bg-amber-100 text-amber-800`;
-  return `${BADGE_BASE} bg-slate-100 text-slate-700`;
+  if (qty <= 0) return `${BADGE_BASE} ${TONE.rose}`;
+  if (qty <= 1) return `${BADGE_BASE} ${TONE.signal}`;
+  return `${BADGE_BASE} ${TONE.neutral}`;
 }

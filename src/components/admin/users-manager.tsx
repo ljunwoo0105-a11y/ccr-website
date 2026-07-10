@@ -171,7 +171,7 @@ export function UsersManager({ currentUserId }: { currentUserId: string }) {
                 now, it won&apos;t be shown again.
               </p>
               <div className="mt-3 flex items-center gap-2">
-                <code className="rounded-lg border border-emerald-200 bg-white px-3 py-2 font-mono text-sm text-slate-900">
+                <code className=" border border-emerald-200 bg-bone-50 px-3 py-2 font-mono text-sm text-carbon-950">
                   {reveal.tempPassword}
                 </code>
                 <button
@@ -197,7 +197,7 @@ export function UsersManager({ currentUserId }: { currentUserId: string }) {
               type="button"
               onClick={() => setReveal(null)}
               aria-label="Dismiss temporary password"
-              className="rounded p-1 text-emerald-700 transition hover:bg-emerald-100"
+              className="rounded p-1 text-emerald-700 transition hover:border border-emerald-500/50 bg-emerald-50"
             >
               <X className="h-5 w-5" aria-hidden />
             </button>
@@ -206,8 +206,8 @@ export function UsersManager({ currentUserId }: { currentUserId: string }) {
       )}
 
       <section className="card p-0">
-        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-          <h2 className="text-base font-semibold text-slate-900">Accounts</h2>
+        <div className="flex items-center justify-between border-b border-carbon-150 px-6 py-4">
+          <h2 className="text-base font-semibold text-carbon-950">Accounts</h2>
           <button
             type="button"
             className="btn-primary"
@@ -222,20 +222,20 @@ export function UsersManager({ currentUserId }: { currentUserId: string }) {
         </div>
 
         {listError && (
-          <p className="border-b border-red-100 bg-red-50 px-6 py-3 text-sm text-red-700">
+          <p className="border-b border-rose-200/60 bg-rose-50 px-6 py-3 text-sm text-rose-700">
             {listError}
           </p>
         )}
 
         {users === null ? (
-          <p className="px-6 py-8 text-sm text-slate-500">Loading users…</p>
+          <p className="px-6 py-8 text-sm text-carbon-500">Loading users…</p>
         ) : users.length === 0 ? (
-          <p className="px-6 py-8 text-sm text-slate-500">No accounts yet.</p>
+          <p className="px-6 py-8 text-sm text-carbon-500">No accounts yet.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-400">
+                <tr className="border-b border-carbon-150 text-xs uppercase tracking-wide text-carbon-400">
                   <th className="px-6 py-3 font-medium">Name</th>
                   <th className="px-4 py-3 font-medium">Email</th>
                   <th className="px-4 py-3 font-medium">Role</th>
@@ -251,17 +251,17 @@ export function UsersManager({ currentUserId }: { currentUserId: string }) {
                   return (
                     <tr
                       key={u.id}
-                      className="border-b border-slate-100 last:border-0"
+                      className="border-b border-carbon-150 last:border-0"
                     >
-                      <td className="whitespace-nowrap px-6 py-3 font-medium text-slate-900">
+                      <td className="whitespace-nowrap px-6 py-3 font-medium text-carbon-950">
                         {u.name}
                         {isSelf && (
-                          <span className="ml-2 text-xs font-normal text-slate-400">
+                          <span className="ml-2 text-xs font-normal text-carbon-400">
                             (you)
                           </span>
                         )}
                       </td>
-                      <td className="whitespace-nowrap px-4 py-3 text-slate-600">
+                      <td className="whitespace-nowrap px-4 py-3 text-carbon-700">
                         {u.email}
                       </td>
                       <td className="px-4 py-3">
@@ -269,8 +269,8 @@ export function UsersManager({ currentUserId }: { currentUserId: string }) {
                           className={cn(
                             "inline-flex rounded-full px-2 py-0.5 text-xs font-medium",
                             u.role === "ADMIN"
-                              ? "bg-orange-100 text-orange-700"
-                              : "bg-blue-100 text-blue-700"
+                              ? "border border-signal-500/50 bg-signal-100 text-signal-600"
+                              : "border border-sky-500/50 bg-sky-50 text-sky-700"
                           )}
                         >
                           {u.role}
@@ -281,14 +281,14 @@ export function UsersManager({ currentUserId }: { currentUserId: string }) {
                           className={cn(
                             "inline-flex rounded-full px-2 py-0.5 text-xs font-medium",
                             u.active
-                              ? "bg-emerald-100 text-emerald-700"
-                              : "bg-slate-100 text-slate-500"
+                              ? "border border-emerald-500/50 bg-emerald-50 text-emerald-700"
+                              : "bg-bone-200 text-carbon-500"
                           )}
                         >
                           {u.active ? "active" : "inactive"}
                         </span>
                       </td>
-                      <td className="whitespace-nowrap px-4 py-3 text-slate-500">
+                      <td className="whitespace-nowrap px-4 py-3 text-carbon-500">
                         {formatDate(u.createdAt)}
                       </td>
                       <td className="px-4 py-3">
@@ -297,7 +297,7 @@ export function UsersManager({ currentUserId }: { currentUserId: string }) {
                             type="button"
                             onClick={() => resetPassword(u)}
                             disabled={rowBusy}
-                            className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-2 py-1 text-xs font-medium text-slate-600 transition hover:bg-slate-50 disabled:opacity-50"
+                            className="inline-flex items-center gap-1  border border-carbon-150 px-2 py-1 text-xs font-medium text-carbon-700 transition hover:bg-bone-100 disabled:opacity-50"
                           >
                             <KeyRound className="h-3.5 w-3.5" aria-hidden />
                             Reset password
@@ -313,7 +313,7 @@ export function UsersManager({ currentUserId }: { currentUserId: string }) {
                                 ? "You can't deactivate your own account"
                                 : undefined
                             }
-                            className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-2 py-1 text-xs font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="inline-flex items-center gap-1  border border-carbon-150 px-2 py-1 text-xs font-medium text-carbon-700 transition hover:bg-bone-100 disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             {u.active ? (
                               <>
@@ -343,7 +343,7 @@ export function UsersManager({ currentUserId }: { currentUserId: string }) {
                                 ? "You can't demote your own account"
                                 : undefined
                             }
-                            className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-2 py-1 text-xs font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
+                            className="inline-flex items-center gap-1  border border-carbon-150 px-2 py-1 text-xs font-medium text-carbon-700 transition hover:bg-bone-100 disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             <ShieldCheck className="h-3.5 w-3.5" aria-hidden />
                             {u.role === "ADMIN" ? "Make staff" : "Make admin"}
@@ -416,13 +416,13 @@ export function UsersManager({ currentUserId }: { currentUserId: string }) {
                 <option value="ADMIN">Admin — full console access</option>
               </select>
             </div>
-            <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500">
+            <p className=" bg-bone-100 px-3 py-2 text-xs text-carbon-500">
               A temporary 12-character password is generated automatically and
               shown once after the account is created.
             </p>
 
             {addError && (
-              <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+              <p className=" bg-rose-50 px-3 py-2 text-sm text-rose-700">
                 {addError}
               </p>
             )}

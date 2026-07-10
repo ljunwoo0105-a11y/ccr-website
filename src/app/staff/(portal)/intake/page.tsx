@@ -11,8 +11,8 @@ export default function IntakeListPage() {
     <div className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Customer intake</h1>
-          <p className="text-sm text-slate-500">
+          <h1 className="text-2xl font-bold text-carbon-950">Customer intake</h1>
+          <p className="text-sm text-carbon-500">
             Pre-repair condition records for every device checked in.
           </p>
         </div>

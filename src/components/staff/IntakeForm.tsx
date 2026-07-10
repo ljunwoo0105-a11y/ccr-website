@@ -205,7 +205,7 @@ export default function IntakeForm() {
       {error && (
         <p
           role="alert"
-          className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"
+          className="border border-rose-500/50 bg-rose-50 px-3 py-2 text-sm text-rose-700"
         >
           {error}
         </p>
@@ -213,7 +213,7 @@ export default function IntakeForm() {
 
       {/* Customer */}
       <section className="card">
-        <h2 className="mb-4 text-base font-semibold text-slate-900">
+        <h2 className="mb-4 text-base font-semibold text-carbon-950">
           Customer
         </h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -232,12 +232,12 @@ export default function IntakeForm() {
               autoComplete="off"
             />
             {matchesOpen && (
-              <ul className="absolute z-20 mt-1 w-full overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg">
+              <ul className="absolute z-20 mt-1 w-full overflow-hidden  border border-carbon-150 bg-bone-50 shadow-hard">
                 {matches.map((match) => (
                   <li key={match.id}>
                     <button
                       type="button"
-                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-slate-50"
+                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-bone-100"
                       onClick={() => applyMatch(match)}
                     >
                       <UserCheck
@@ -245,10 +245,10 @@ export default function IntakeForm() {
                         aria-hidden
                       />
                       <span>
-                        <span className="font-medium text-slate-900">
+                        <span className="font-medium text-carbon-950">
                           {match.name}
                         </span>{" "}
-                        <span className="text-slate-500">
+                        <span className="text-carbon-500">
                           {match.phone}
                           {match.suburb ? ` · ${match.suburb}` : ""}
                         </span>
@@ -273,7 +273,7 @@ export default function IntakeForm() {
           </div>
           <div>
             <label htmlFor="in-email" className="label">
-              Email <span className="text-slate-400">(optional)</span>
+              Email <span className="text-carbon-400">(optional)</span>
             </label>
             <input
               id="in-email"
@@ -285,7 +285,7 @@ export default function IntakeForm() {
           </div>
           <div>
             <label htmlFor="in-suburb" className="label">
-              Suburb <span className="text-slate-400">(optional)</span>
+              Suburb <span className="text-carbon-400">(optional)</span>
             </label>
             <input
               id="in-suburb"
@@ -299,7 +299,7 @@ export default function IntakeForm() {
 
       {/* Device */}
       <section className="card">
-        <h2 className="mb-4 text-base font-semibold text-slate-900">Device</h2>
+        <h2 className="mb-4 text-base font-semibold text-carbon-950">Device</h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>
             <label htmlFor="in-device" className="label">
@@ -346,7 +346,7 @@ export default function IntakeForm() {
           </div>
           <div>
             <label htmlFor="in-imei" className="label">
-              IMEI <span className="text-slate-400">(optional)</span>
+              IMEI <span className="text-carbon-400">(optional)</span>
             </label>
             <input
               id="in-imei"
@@ -357,7 +357,7 @@ export default function IntakeForm() {
           </div>
           <div>
             <label htmlFor="in-serial" className="label">
-              Serial no. <span className="text-slate-400">(optional)</span>
+              Serial no. <span className="text-carbon-400">(optional)</span>
             </label>
             <input
               id="in-serial"
@@ -371,8 +371,8 @@ export default function IntakeForm() {
 
       {/* Repairs */}
       <section className="card">
-        <h2 className="mb-1 text-base font-semibold text-slate-900">Repairs</h2>
-        <p className="mb-4 text-sm text-slate-500">
+        <h2 className="mb-1 text-base font-semibold text-carbon-950">Repairs</h2>
+        <p className="mb-4 text-sm text-carbon-500">
           Select everything being done on this job.
         </p>
         <div className="flex flex-wrap gap-2">
@@ -386,8 +386,8 @@ export default function IntakeForm() {
                 onClick={() => toggleRepair(repair)}
                 className={
                   selected
-                    ? "rounded-full border border-ccr-primary bg-ccr-primary px-3 py-1.5 text-sm font-medium text-white"
-                    : "rounded-full border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:border-ccr-primary hover:text-ccr-primary"
+                    ? "rounded-full border border-signal-500 bg-signal-500 px-3 py-1.5 text-sm font-medium text-carbon-950"
+                    : "rounded-full border border-carbon-200 bg-bone-50 px-3 py-1.5 text-sm font-medium text-carbon-700 transition hover:border-signal-500 hover:text-signal-600"
                 }
               >
                 {repair}
@@ -399,14 +399,14 @@ export default function IntakeForm() {
             .map((repair) => (
               <span
                 key={repair}
-                className="inline-flex items-center gap-1.5 rounded-full border border-ccr-primary bg-ccr-primary px-3 py-1.5 text-sm font-medium text-white"
+                className="inline-flex items-center gap-1.5 rounded-full border border-signal-500 bg-signal-500 px-3 py-1.5 text-sm font-medium text-carbon-950"
               >
                 {repair}
                 <button
                   type="button"
                   aria-label={`Remove ${repair}`}
                   onClick={() => toggleRepair(repair)}
-                  className="rounded-full hover:bg-white/20"
+                  className="rounded-full hover:bg-bone-50/20"
                 >
                   <X className="h-3.5 w-3.5" aria-hidden />
                 </button>
@@ -440,20 +440,20 @@ export default function IntakeForm() {
 
       {/* Pre-repair condition */}
       <section className="card">
-        <h2 className="mb-1 text-base font-semibold text-slate-900">
+        <h2 className="mb-1 text-base font-semibold text-carbon-950">
           Pre-repair condition
         </h2>
-        <p className="mb-4 text-sm text-slate-500">
+        <p className="mb-4 text-sm text-carbon-500">
           Check each item with the customer before the device leaves the
           counter.
         </p>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {PRE_CONDITION_GROUPS.map((group) => (
             <fieldset key={group.title}>
-              <legend className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <legend className="mb-2 text-xs font-semibold uppercase tracking-wide text-carbon-500">
                 {group.title}
               </legend>
-              <div className="divide-y divide-slate-100 rounded-lg border border-slate-200">
+              <div className="divide-y divide-carbon-150  border border-carbon-150">
                 {group.fields.map((field) => {
                   const checked = pre[field.key];
                   return (
@@ -461,7 +461,7 @@ export default function IntakeForm() {
                       key={field.key}
                       className="flex cursor-pointer items-center justify-between gap-3 px-3 py-2.5"
                     >
-                      <span className="text-sm text-slate-700">
+                      <span className="text-sm text-carbon-700">
                         {field.label}
                       </span>
                       <input
@@ -472,7 +472,7 @@ export default function IntakeForm() {
                       />
                       <span
                         aria-hidden
-                        className="relative h-6 w-11 shrink-0 rounded-full bg-slate-300 transition peer-checked:bg-ccr-primary peer-focus-visible:ring-2 peer-focus-visible:ring-ccr-primary/50 after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition peer-checked:after:translate-x-5"
+                        className="relative h-6 w-11 shrink-0 rounded-full bg-carbon-200 transition peer-checked:bg-signal-500 peer-focus-visible:ring-2 peer-focus-visible:ring-signal-500/50 after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-bone-50 after:shadow after:transition peer-checked:after:translate-x-5"
                       />
                     </label>
                   );
@@ -491,8 +491,8 @@ export default function IntakeForm() {
                   key={grade.value}
                   className={
                     pre.cosmeticGrade === grade.value
-                      ? "cursor-pointer rounded-lg border border-ccr-primary bg-ccr-primary/10 px-3 py-2 text-sm font-semibold text-ccr-primary"
-                      : "cursor-pointer rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:border-slate-400"
+                      ? "cursor-pointer  border border-signal-500 bg-signal-500/10 px-3 py-2 text-sm font-semibold text-signal-600"
+                      : "cursor-pointer  border border-carbon-200 bg-bone-50 px-3 py-2 text-sm font-medium text-carbon-700 hover:border-carbon-200"
                   }
                 >
                   <input
@@ -515,7 +515,7 @@ export default function IntakeForm() {
           </fieldset>
           <div>
             <label htmlFor="in-battery" className="label">
-              Battery health % <span className="text-slate-400">(optional)</span>
+              Battery health % <span className="text-carbon-400">(optional)</span>
             </label>
             <input
               id="in-battery"
@@ -533,14 +533,14 @@ export default function IntakeForm() {
 
       {/* Accessories & notes */}
       <section className="card">
-        <h2 className="mb-4 text-base font-semibold text-slate-900">
+        <h2 className="mb-4 text-base font-semibold text-carbon-950">
           Accessories &amp; notes
         </h2>
         <div className="grid grid-cols-1 gap-4">
           <div>
             <label htmlFor="in-accessories" className="label">
               Accessories left with the device{" "}
-              <span className="text-slate-400">(optional)</span>
+              <span className="text-carbon-400">(optional)</span>
             </label>
             <input
               id="in-accessories"
@@ -552,7 +552,7 @@ export default function IntakeForm() {
           </div>
           <div>
             <label htmlFor="in-notes" className="label">
-              Condition notes <span className="text-slate-400">(optional)</span>
+              Condition notes <span className="text-carbon-400">(optional)</span>
             </label>
             <textarea
               id="in-notes"
@@ -567,7 +567,7 @@ export default function IntakeForm() {
 
       {/* Job */}
       <section className="card">
-        <h2 className="mb-4 text-base font-semibold text-slate-900">Job</h2>
+        <h2 className="mb-4 text-base font-semibold text-carbon-950">Job</h2>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div>
             <label htmlFor="in-quality" className="label">
@@ -634,10 +634,10 @@ export default function IntakeForm() {
 
       {/* Acknowledgement */}
       <section className="card">
-        <h2 className="mb-2 text-base font-semibold text-slate-900">
+        <h2 className="mb-2 text-base font-semibold text-carbon-950">
           Customer acknowledgement
         </h2>
-        <p className="mb-4 rounded-lg bg-slate-50 p-3 text-xs leading-relaxed text-slate-600">
+        <p className="mb-4  bg-bone-100 p-3 text-xs leading-relaxed text-carbon-700">
           I confirm the condition record above is accurate. I understand that
           repairs may reveal further faults not visible before teardown, and
           that the quoted price may change after inspection — any change will

@@ -23,14 +23,14 @@ export function Switch({
       disabled={disabled}
       onClick={() => onChange(!checked)}
       className={cn(
-        "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition focus:outline-none focus:ring-2 focus:ring-ccr-primary/40 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50",
-        checked ? "bg-ccr-primary" : "bg-slate-300"
+        "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition focus:outline-none focus:ring-2 focus:ring-signal-500/40 focus:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50",
+        checked ? "bg-signal-500" : "bg-carbon-200"
       )}
     >
       <span
         aria-hidden
         className={cn(
-          "inline-block h-4 w-4 transform rounded-full bg-white shadow transition",
+          "inline-block h-4 w-4 transform rounded-full bg-bone-50 shadow transition",
           checked ? "translate-x-6" : "translate-x-1"
         )}
       />

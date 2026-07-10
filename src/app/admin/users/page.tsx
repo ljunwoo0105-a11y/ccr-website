@@ -13,8 +13,8 @@ export default async function AdminUsersPage() {
   return (
     <div className="space-y-8">
       <header>
-        <h1 className="text-2xl font-bold text-slate-900">Users</h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <h1 className="text-2xl font-bold text-carbon-950">Users</h1>
+        <p className="mt-1 text-sm text-carbon-500">
           Staff and admin accounts for the portal. Passwords are generated
           server-side and only ever stored hashed.
         </p>

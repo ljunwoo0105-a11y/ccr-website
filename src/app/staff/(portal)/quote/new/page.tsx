@@ -8,8 +8,8 @@ export default function NewQuotePage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-bold text-slate-900">New repair quote</h1>
-        <p className="text-sm text-slate-500">
+        <h1 className="text-2xl font-bold text-carbon-950">New repair quote</h1>
+        <p className="text-sm text-carbon-500">
           Walk the customer through their options in store, then email them the
           repair form. Prices here are staff-only.
         </p>

@@ -57,7 +57,10 @@ export default function LoginForm({ next }: Props) {
     >
       {safeNext && <input type="hidden" name="next" value={safeNext} />}
       {error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p
+          role="alert"
+          className="border border-rose-500/70 bg-rose-50 px-3 py-2 font-mono text-xs text-rose-700"
+        >
           {error}
         </p>
       )}
@@ -95,7 +98,7 @@ export default function LoginForm({ next }: Props) {
         {busy && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
         {busy ? "Signing in…" : "Sign in"}
       </button>
-      <p className="text-[13px] text-slate-500">
+      <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-carbon-500">
         Staff access only. Contact the owner for an account.
       </p>
     </form>

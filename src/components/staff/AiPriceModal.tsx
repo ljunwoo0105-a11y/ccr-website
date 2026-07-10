@@ -18,10 +18,10 @@ interface Props {
 }
 
 const POSITIONING_BADGES: Record<string, { label: string; cls: string }> = {
-  below_market: { label: "Below market", cls: "bg-sky-100 text-sky-800" },
-  at_market: { label: "At market", cls: "bg-emerald-100 text-emerald-800" },
-  above_market: { label: "Above market", cls: "bg-amber-100 text-amber-800" },
-  no_market_data: { label: "No market data", cls: "bg-slate-200 text-slate-700" },
+  below_market: { label: "Below market", cls: "border border-sky-500/50 bg-sky-50 text-sky-700" },
+  at_market: { label: "At market", cls: "border border-emerald-500/50 bg-emerald-50 text-emerald-700" },
+  above_market: { label: "Above market", cls: "border border-amber-500/50 bg-amber-50 text-amber-700" },
+  no_market_data: { label: "No market data", cls: "border border-carbon-200 bg-bone-200 text-carbon-700" },
 };
 
 export default function AiPriceModal({ part, onApplied, onClose }: Props) {
@@ -92,28 +92,28 @@ export default function AiPriceModal({ part, onApplied, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/60 p-4 sm:items-center"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-carbon-950/60 p-4 sm:items-center"
       role="dialog"
       aria-modal="true"
       aria-label="AI price check"
     >
       <div className="card w-full max-w-2xl">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900">
+          <h2 className="flex items-center gap-2 text-lg font-bold text-carbon-950">
             <Sparkles className="h-5 w-5 text-violet-600" aria-hidden />
             AI price check
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+            className="p-1.5 text-carbon-400 transition hover:bg-bone-200 hover:text-carbon-950"
             aria-label="Close"
           >
             <X className="h-5 w-5" aria-hidden />
           </button>
         </div>
 
-        <p className="mb-4 text-sm text-slate-600">
+        <p className="mb-4 text-sm text-carbon-700">
           {part.brand} {part.model} — {part.repairType} · cost{" "}
           {formatAud(part.costPrice)} · currently selling at{" "}
           {formatAud(part.sellPrice)}
@@ -122,13 +122,13 @@ export default function AiPriceModal({ part, onApplied, onClose }: Props) {
         {!result && !error && (
           <div className="flex flex-col items-center gap-3 py-12">
             <Loader2
-              className="h-8 w-8 animate-spin text-ccr-primary"
+              className="h-8 w-8 animate-spin text-signal-600"
               aria-hidden
             />
-            <p className="text-sm font-medium text-slate-700">
+            <p className="text-sm font-medium text-carbon-700">
               Researching the market…
             </p>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-carbon-500">
               Live competitor research can take 30–60 seconds.
             </p>
           </div>
@@ -137,7 +137,7 @@ export default function AiPriceModal({ part, onApplied, onClose }: Props) {
         {error && (
           <p
             role="alert"
-            className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"
+            className="border border-rose-500/50 bg-rose-50 px-3 py-2 text-sm text-rose-700"
           >
             {error}
           </p>
@@ -145,9 +145,9 @@ export default function AiPriceModal({ part, onApplied, onClose }: Props) {
 
         {result && (
           <div className="space-y-4">
-            <section className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-              <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-900">
-                <Search className="h-4 w-4 text-slate-500" aria-hidden />
+            <section className="border border-carbon-150 bg-bone-100 p-4">
+              <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-carbon-950">
+                <Search className="h-4 w-4 text-carbon-500" aria-hidden />
                 Market research
               </h3>
               <dl className="mb-3 grid grid-cols-3 gap-3 text-center">
@@ -160,10 +160,10 @@ export default function AiPriceModal({ part, onApplied, onClose }: Props) {
                 ).map(([label, value]) => (
                   <div
                     key={label}
-                    className="rounded-lg border border-slate-200 bg-white p-2"
+                    className="border border-carbon-150 bg-bone-50 p-2"
                   >
-                    <dt className="text-xs text-slate-500">{label}</dt>
-                    <dd className="text-base font-bold text-slate-900">
+                    <dt className="text-xs text-carbon-500">{label}</dt>
+                    <dd className="text-base font-bold text-carbon-950">
                       {value !== null ? formatAud(value) : "—"}
                     </dd>
                   </div>
@@ -176,33 +176,33 @@ export default function AiPriceModal({ part, onApplied, onClose }: Props) {
                       key={`${c.name}-${i}`}
                       className="flex items-baseline justify-between gap-3 text-sm"
                     >
-                      <span className="font-medium text-slate-800">
+                      <span className="font-medium text-carbon-900">
                         {c.name}
                         {c.note && (
-                          <span className="ml-2 font-normal text-xs text-slate-500">
+                          <span className="ml-2 font-normal text-xs text-carbon-500">
                             {c.note}
                           </span>
                         )}
                       </span>
-                      <span className="shrink-0 font-semibold text-slate-900">
+                      <span className="shrink-0 font-semibold text-carbon-950">
                         {c.priceAud !== null ? formatAud(c.priceAud) : "—"}
                       </span>
                     </li>
                   ))}
                 </ul>
               )}
-              <p className="text-xs leading-relaxed text-slate-600">
+              <p className="text-xs leading-relaxed text-carbon-700">
                 {result.research.summary}
               </p>
             </section>
 
-            <section className="rounded-xl border border-violet-200 bg-violet-50 p-4">
-              <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-900">
+            <section className=" border border-violet-200 bg-violet-50 p-4">
+              <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-carbon-950">
                 <TrendingUp className="h-4 w-4 text-violet-600" aria-hidden />
                 Recommendation
               </h3>
               <div className="mb-2 flex flex-wrap items-center gap-3">
-                <span className="text-3xl font-bold text-slate-900">
+                <span className="text-3xl font-bold text-carbon-950">
                   {formatAud(result.recommendation.recommendedPriceAud)}
                 </span>
                 <span
@@ -218,7 +218,7 @@ export default function AiPriceModal({ part, onApplied, onClose }: Props) {
                   </span>
                 )}
               </div>
-              <p className="text-xs leading-relaxed text-slate-600">
+              <p className="text-xs leading-relaxed text-carbon-700">
                 {result.recommendation.reasoning}
               </p>
             </section>
@@ -226,7 +226,7 @@ export default function AiPriceModal({ part, onApplied, onClose }: Props) {
             {applyError && (
               <p
                 role="alert"
-                className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"
+                className="border border-rose-500/50 bg-rose-50 px-3 py-2 text-sm text-rose-700"
               >
                 {applyError}
               </p>

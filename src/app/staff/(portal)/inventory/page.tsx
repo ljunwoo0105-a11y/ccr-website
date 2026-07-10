@@ -12,8 +12,8 @@ export default function InventoryPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-bold text-slate-900">Inventory</h1>
-        <p className="text-sm text-slate-500">
+        <h1 className="text-2xl font-bold text-carbon-950">Inventory</h1>
+        <p className="text-sm text-carbon-500">
           Stock levels for active parts, synced from the POS or adjusted by
           hand.
         </p>

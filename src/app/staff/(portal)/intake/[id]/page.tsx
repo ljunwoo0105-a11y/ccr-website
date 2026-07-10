@@ -39,7 +39,7 @@ export default async function IntakeDetailPage({
       <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
         <Link
           href="/staff/intake"
-          className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-slate-900"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-carbon-700 hover:text-carbon-950"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden />
           All intakes
@@ -52,26 +52,26 @@ export default async function IntakeDetailPage({
       {/* Shop header — looks right on screen, mandatory for the printout. */}
       <header className="card flex flex-wrap items-start justify-between gap-4 print:rounded-none print:border-0 print:border-b print:border-slate-300 print:p-0 print:pb-4 print:shadow-none">
         <div>
-          <p className="text-lg font-bold tracking-wide text-slate-900">
+          <p className="text-lg font-bold tracking-wide text-carbon-950">
             CCR <span className="font-normal">COOL CASE REPAIR</span>
           </p>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-carbon-500">
             {BUSINESS.address.line1}, {BUSINESS.address.line2},{" "}
             {BUSINESS.address.suburb} {BUSINESS.address.state}{" "}
             {BUSINESS.address.postcode}
           </p>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-carbon-500">
             {BUSINESS.phone} · {BUSINESS.email}
           </p>
         </div>
         <div className="text-right">
-          <p className="text-sm font-semibold text-slate-900">
+          <p className="text-sm font-semibold text-carbon-950">
             Repair intake &amp; condition report
           </p>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-carbon-500">
             Job #{intake.id.slice(-8).toUpperCase()}
           </p>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-carbon-500">
             Checked in {formatDateTime(intake.createdAt)}
           </p>
         </div>
@@ -83,7 +83,7 @@ export default async function IntakeDetailPage({
         {/* Left column */}
         <div className="space-y-6 print:space-y-4">
           <section className="card print:rounded-none print:border-slate-300 print:p-4 print:shadow-none">
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-carbon-500">
               Customer
             </h2>
             <dl className="space-y-1.5 text-sm">
@@ -95,7 +95,7 @@ export default async function IntakeDetailPage({
           </section>
 
           <section className="card print:rounded-none print:border-slate-300 print:p-4 print:shadow-none">
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-carbon-500">
               Device
             </h2>
             <dl className="space-y-1.5 text-sm">
@@ -108,7 +108,7 @@ export default async function IntakeDetailPage({
           </section>
 
           <section className="card print:rounded-none print:border-slate-300 print:p-4 print:shadow-none">
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-carbon-500">
               Job &amp; pricing
             </h2>
             <dl className="space-y-1.5 text-sm">
@@ -162,11 +162,11 @@ export default async function IntakeDetailPage({
         {/* Right column — condition checklist */}
         <div className="space-y-6 print:space-y-4">
           <section className="card print:rounded-none print:border-slate-300 print:p-4 print:shadow-none">
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-carbon-500">
               Pre-repair condition
             </h2>
             {!pre && (
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-carbon-500">
                 Condition record could not be read.
               </p>
             )}
@@ -174,10 +174,10 @@ export default async function IntakeDetailPage({
               <div className="space-y-4">
                 {PRE_CONDITION_GROUPS.map((group) => (
                   <div key={group.title}>
-                    <h3 className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    <h3 className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-carbon-400">
                       {group.title}
                     </h3>
-                    <ul className="divide-y divide-slate-100 rounded-lg border border-slate-200 print:border-slate-300">
+                    <ul className="divide-y divide-carbon-150 border border-carbon-150 print:border-slate-300">
                       {group.fields.map((field) => {
                         const value = Boolean(pre[field.key]);
                         return (
@@ -185,13 +185,13 @@ export default async function IntakeDetailPage({
                             key={field.key}
                             className="flex items-center justify-between gap-3 px-3 py-1.5 text-sm"
                           >
-                            <span className="text-slate-700">{field.label}</span>
+                            <span className="text-carbon-700">{field.label}</span>
                             {value ? (
                               <span className="inline-flex items-center gap-1 font-semibold text-emerald-700">
                                 <Check className="h-4 w-4" aria-hidden /> Yes
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 font-semibold text-slate-500">
+                              <span className="inline-flex items-center gap-1 font-semibold text-carbon-500">
                                 <X className="h-4 w-4" aria-hidden /> No
                               </span>
                             )}
@@ -222,33 +222,33 @@ export default async function IntakeDetailPage({
 
           {intake.conditionNotes && (
             <section className="card print:rounded-none print:border-slate-300 print:p-4 print:shadow-none">
-              <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-500">
+              <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-carbon-500">
                 Condition notes
               </h2>
-              <p className="whitespace-pre-wrap text-sm text-slate-700">
+              <p className="whitespace-pre-wrap text-sm text-carbon-700">
                 {intake.conditionNotes}
               </p>
             </section>
           )}
 
           <section className="card print:rounded-none print:border-slate-300 print:p-4 print:shadow-none">
-            <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-carbon-500">
               Customer acknowledgement
             </h2>
-            <p className="mb-3 text-xs leading-relaxed text-slate-500">
+            <p className="mb-3 text-xs leading-relaxed text-carbon-500">
               The customer confirmed the condition record is accurate, and
               acknowledged that repairs may reveal further faults, that the
               quoted price may change after teardown (with approval before
               proceeding), that data should be backed up beforehand, and that{" "}
               {BUSINESS.name} is not responsible for data loss.
             </p>
-            <p className="text-sm text-slate-700">
+            <p className="text-sm text-carbon-700">
               Signed (typed):{" "}
-              <span className="font-semibold text-slate-900">
+              <span className="font-semibold text-carbon-950">
                 {intake.customerSignature ?? "—"}
               </span>
             </p>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-carbon-500">
               {formatDateTime(intake.createdAt)}
             </p>
           </section>
@@ -261,8 +261,8 @@ export default async function IntakeDetailPage({
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between gap-4">
-      <dt className="shrink-0 text-slate-500">{label}</dt>
-      <dd className="text-right font-medium text-slate-900">{value}</dd>
+      <dt className="shrink-0 text-carbon-500">{label}</dt>
+      <dd className="text-right font-medium text-carbon-950">{value}</dd>
     </div>
   );
 }

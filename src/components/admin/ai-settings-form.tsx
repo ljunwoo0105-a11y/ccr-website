@@ -79,10 +79,10 @@ export function AiSettingsForm({
 
   return (
     <section className="card">
-      <h2 className="text-base font-semibold text-slate-900">
+      <h2 className="text-base font-semibold text-carbon-950">
         Defaults &amp; budget
       </h2>
-      <p className="mt-0.5 text-sm text-slate-500">
+      <p className="mt-0.5 text-sm text-carbon-500">
         Which models the AI features use by default, and the monthly spend
         guard-rail.
       </p>
@@ -145,7 +145,7 @@ export function AiSettingsForm({
               onChange={(e) => setMargin(e.target.value)}
               required
             />
-            <p className="mt-1 text-xs text-slate-400">
+            <p className="mt-1 text-xs text-carbon-400">
               Used by the margin agent when recommending sell prices.
             </p>
           </div>
@@ -167,19 +167,19 @@ export function AiSettingsForm({
           </div>
         </div>
 
-        <div className="flex items-center gap-3 rounded-lg bg-slate-50 px-4 py-3">
+        <div className="flex items-center gap-3  bg-bone-100 px-4 py-3">
           <Switch
             checked={blockAtCap}
             onChange={setBlockAtCap}
             label="Block AI calls when the monthly budget is reached"
           />
-          <span className="text-sm text-slate-700">
+          <span className="text-sm text-carbon-700">
             Block AI calls when the monthly budget is reached
           </span>
         </div>
 
         {noModels && (
-          <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          <p className=" bg-amber-50 px-3 py-2 text-sm text-amber-800">
             No enabled models in the registry — add and enable a model above
             before picking defaults.
           </p>
@@ -189,8 +189,8 @@ export function AiSettingsForm({
           <p
             className={
               message.ok
-                ? "rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700"
-                : "rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700"
+                ? " bg-emerald-50 px-3 py-2 text-sm text-emerald-700"
+                : " bg-rose-50 px-3 py-2 text-sm text-rose-700"
             }
             role="status"
           >

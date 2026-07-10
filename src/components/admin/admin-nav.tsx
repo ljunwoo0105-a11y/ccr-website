@@ -25,10 +25,10 @@ export function AdminNav() {
             href={href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition",
+              "flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors",
               active
-                ? "bg-slate-800 text-white"
-                : "text-slate-400 hover:bg-slate-800/60 hover:text-slate-200"
+                ? "bg-signal-500 text-carbon-950"
+                : "text-bone-100/70 hover:bg-carbon-900 hover:text-bone-100"
             )}
           >
             <Icon className="h-4 w-4" aria-hidden />
@@ -36,10 +36,10 @@ export function AdminNav() {
           </Link>
         );
       })}
-      <div className="my-3 border-t border-slate-800" aria-hidden />
+      <div className="my-3 border-t border-bone-100/15" aria-hidden />
       <Link
         href="/staff"
-        className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-400 transition hover:bg-slate-800/60 hover:text-slate-200"
+        className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-bone-100/70 transition-colors hover:bg-carbon-900 hover:text-bone-100"
       >
         <ArrowLeft className="h-4 w-4" aria-hidden />
         Staff Portal

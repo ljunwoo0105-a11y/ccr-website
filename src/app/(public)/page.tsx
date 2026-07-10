@@ -1,18 +1,17 @@
 import type { Metadata } from "next";
 import { BUSINESS } from "@/lib/config";
 import { getAggregateRating, getPublicReviews } from "@/lib/google-reviews";
-import Hero from "@/components/public/Hero";
-import TickerBand from "@/components/public/TickerBand";
-import StatsBand from "@/components/public/StatsBand";
-import ServicesGrid from "@/components/public/ServicesGrid";
-import WhyChooseUs from "@/components/public/WhyChooseUs";
-import ReviewsSection from "@/components/public/ReviewsSection";
-import FaqSection from "@/components/public/FaqSection";
-import ContactSection from "@/components/public/ContactSection";
-import CtaBanner from "@/components/public/CtaBanner";
 import JsonLd from "@/components/public/JsonLd";
 import { localBusinessSchema, faqPageSchema } from "@/components/public/schema";
 import { HOME_FAQS } from "@/components/public/faq-data";
+import HeroBay from "@/components/sheet/HeroBay";
+import SpecStrip from "@/components/sheet/SpecStrip";
+import WorkOrders from "@/components/sheet/WorkOrders";
+import CircuitSheet from "@/components/sheet/CircuitSheet";
+import Procedure from "@/components/sheet/Procedure";
+import QcLog from "@/components/sheet/QcLog";
+import FieldNotes from "@/components/sheet/FieldNotes";
+import Depot from "@/components/sheet/Depot";
 
 export const revalidate = 3600;
 
@@ -22,6 +21,11 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
+/**
+ * The Manifold home page — a field service manual read top to bottom:
+ * SHEET 00 teardown bay → 01 work orders → 02 board-level → 03 procedure
+ * → 04 QC log → 05 field notes → 06 the depot.
+ */
 export default async function HomePage() {
   const [{ rating, reviewCount }, reviews] = await Promise.all([
     getAggregateRating(),
@@ -33,19 +37,14 @@ export default async function HomePage() {
       <JsonLd data={localBusinessSchema(rating, reviewCount)} />
       <JsonLd data={faqPageSchema(HOME_FAQS)} />
 
-      <Hero rating={rating} reviewCount={reviewCount} />
-      <TickerBand />
-      <StatsBand rating={rating} reviewCount={reviewCount} />
-      <ServicesGrid />
-      <WhyChooseUs rating={rating} reviewCount={reviewCount} />
-      <ReviewsSection
-        reviews={reviews}
-        rating={rating}
-        reviewCount={reviewCount}
-      />
-      <FaqSection />
-      <ContactSection />
-      <CtaBanner />
+      <HeroBay rating={rating} reviewCount={reviewCount} />
+      <SpecStrip rating={rating} reviewCount={reviewCount} />
+      <WorkOrders />
+      <CircuitSheet />
+      <Procedure />
+      <QcLog reviews={reviews} rating={rating} reviewCount={reviewCount} />
+      <FieldNotes />
+      <Depot />
     </>
   );
 }

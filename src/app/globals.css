@@ -15,7 +15,7 @@
   --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
 
   /* Volt glow (13% alpha cyan) — used by .bench-glow and focus halos. */
-  --gold-glow: rgba(0, 217, 255, 0.13);
+  --gold-glow: rgba(242, 76, 0, 0.13);
 }
 
 @layer base {
@@ -37,28 +37,55 @@
 
 @layer components {
   /* ======================================================================
-     Staff portal / admin console (legacy) — do not restyle.
+     Staff portal / admin console — Manifold field-service-manual theme,
+     matching the public site: bone drafting paper, carbon ink, one
+     safety-orange signal accent, squared "drawn plates" with hard offset
+     shadows on interactive elements. These class names are unchanged so the
+     staff/admin components re-skin at the class layer.
      ====================================================================== */
   .container-page {
     @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
   }
+  /* Signal-fill action — THE primary button. Drawn plate that presses in. */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-ccr-accent px-5 py-3 text-sm font-semibold text-white shadow transition hover:bg-ccr-accent-dark focus:outline-none focus:ring-2 focus:ring-ccr-accent focus:ring-offset-2 disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 border border-carbon-950 bg-signal-500 px-5 py-2.5 font-mono text-xs font-semibold uppercase tracking-[0.12em] transition-all duration-150 ease-out hover:bg-signal-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-signal-500 focus-visible:ring-offset-2 focus-visible:ring-offset-bone-100 disabled:opacity-50;
+    color: rgb(var(--ink-on-signal));
+    box-shadow: 3px 3px 0 0 rgb(var(--carbon-950));
   }
+  .btn-primary:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 0 rgb(var(--carbon-950));
+  }
+  .btn-primary:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 0 rgb(var(--carbon-950));
+  }
+  /* Ink-stamp secondary — carbon fill, bone text. */
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-ccr-primary px-5 py-3 text-sm font-semibold text-white shadow transition hover:bg-ccr-primary-dark focus:outline-none focus:ring-2 focus:ring-ccr-primary focus:ring-offset-2 disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 border border-carbon-950 bg-carbon-950 px-5 py-2.5 font-mono text-xs font-semibold uppercase tracking-[0.12em] text-bone-100 transition-all duration-150 ease-out hover:bg-carbon-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-carbon-950 focus-visible:ring-offset-2 disabled:opacity-50;
+    box-shadow: 3px 3px 0 0 rgb(var(--carbon-950) / 0.22);
   }
+  .btn-secondary:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 0 rgb(var(--carbon-950) / 0.32);
+  }
+  .btn-secondary:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 0 rgb(var(--carbon-950) / 0.28);
+  }
+  /* Outline ghost — drafting-line border that inks on hover. */
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-300 disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 border border-carbon-950 bg-transparent px-5 py-2.5 font-mono text-xs font-semibold uppercase tracking-[0.12em] text-carbon-950 transition-colors duration-150 ease-out hover:bg-carbon-950 hover:text-bone-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-carbon-950 focus-visible:ring-offset-2 disabled:opacity-50;
   }
   .input {
-    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-ccr-primary focus:outline-none focus:ring-2 focus:ring-ccr-primary/30 disabled:bg-slate-100;
+    @apply w-full border border-carbon-950 bg-bone-50 px-3 py-2.5 text-sm text-carbon-950 placeholder:text-carbon-400 transition-colors focus:border-signal-500 focus:outline-none focus:ring-2 focus:ring-signal-500/30 disabled:bg-bone-200 disabled:opacity-60;
   }
   .label {
-    @apply mb-1.5 block text-sm font-medium text-slate-700;
+    @apply mb-1.5 block font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-carbon-700;
   }
+  /* Flat drawn plate — the workshop-manual card. */
   .card {
-    @apply rounded-xl border border-slate-200 bg-white p-6 shadow-sm;
+    @apply border border-carbon-950 bg-bone-50 p-6;
   }
 
   /* ======================================================================
@@ -88,13 +115,6 @@
     font-weight: 600;
     letter-spacing: -0.02em;
     text-wrap: balance;
-  }
-  /* Electric gradient text — volt→violet. One word per headline, max. */
-  .text-gradient-pulse {
-    background-image: linear-gradient(100deg, #00d9ff 10%, #7c5cff 90%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
   }
   /* Mono is the "instrument voice": labels, numbers, tables — never
      paragraphs. Uppercase, tracked, small. */
@@ -184,8 +204,7 @@
   .card-paper {
     @apply rounded-lg border border-line bg-white;
   }
-  /* 48px technical grid, drawn in CSS. Add .animate-grid-drift for the
-     barely-perceptible hero drift (one of only two continuous animations). */
+  /* 48px technical grid, drawn in CSS — used by not-found and ServicesGrid. */
   .tech-grid {
     background-image: linear-gradient(
         to right,
@@ -263,11 +282,11 @@
     background: linear-gradient(
       90deg,
       transparent,
-      #00d9ff 30%,
-      #00d9ff 70%,
+      rgb(var(--signal-500)) 30%,
+      rgb(var(--signal-500)) 70%,
       transparent
     );
-    box-shadow: 0 0 12px 1px rgba(0, 217, 255, 0.35);
+    box-shadow: 0 0 12px 1px rgba(242, 76, 0, 0.35);
     opacity: 0;
     pointer-events: none;
   }
@@ -375,4 +394,337 @@
   .site-label {
     @apply label-dark;
   }
+}
+
+/* ==========================================================================
+   "Manifold" public design system — engineering-drawing workshop manual.
+   Bone drafting paper, carbon ink, safety-orange signal. All classes are
+   namespaced mnl-* and coexist with (do not restyle) legacy layers above.
+   ========================================================================== */
+@layer components {
+  .mnl-page {
+    @apply bg-bone-100 text-carbon-950;
+    background-image: radial-gradient(
+      rgb(var(--carbon-950) / 0.055) 1px,
+      transparent 1px
+    );
+    background-size: 26px 26px;
+  }
+
+  .mnl-container {
+    @apply mx-auto w-full max-w-[88rem] px-5 sm:px-8 lg:px-12;
+  }
+
+  /* Skip-to-content link — visually hidden until keyboard focus. */
+  .mnl-skip {
+    @apply sr-only;
+  }
+  .mnl-skip:focus {
+    @apply not-sr-only fixed left-4 top-4 z-[60] border border-carbon-950 bg-signal-500 px-4 py-2 font-mono text-xs font-semibold uppercase tracking-[0.16em] shadow-hard;
+    color: rgb(var(--ink-on-signal));
+  }
+
+  /* --- Type voices ------------------------------------------------------ */
+  /* Display: Archivo Black. Uppercase, compressed leading, drawn tight like
+     a title block stamp. */
+  .mnl-display {
+    font-family: var(--font-display);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: -0.015em;
+    line-height: 0.92;
+    text-wrap: balance;
+  }
+  .mnl-title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0;
+    line-height: 1.05;
+    text-wrap: balance;
+  }
+  /* Drafting voice: sheet numbers, dimensions, indices. Never paragraphs. */
+  .mnl-dim {
+    @apply font-mono text-[0.6875rem] font-medium uppercase tracking-[0.18em];
+  }
+  .mnl-dim-lg {
+    @apply font-mono text-xs font-medium uppercase tracking-[0.22em];
+  }
+  .mnl-num {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+
+  /* --- Rules & plates ---------------------------------------------------- */
+  .mnl-rule {
+    @apply border-carbon-150;
+  }
+  .mnl-plate {
+    @apply border border-carbon-950 bg-bone-50;
+    box-shadow: 4px 4px 0 0 rgb(var(--carbon-950) / 0.9);
+  }
+  .mnl-plate-flat {
+    @apply border border-carbon-950 bg-bone-50;
+  }
+  .mnl-plate-recessed {
+    @apply border border-carbon-200 bg-bone-200;
+  }
+  /* Stamped ink block (footer, CTA plate). */
+  .mnl-stamp {
+    @apply bg-carbon-950 text-bone-100;
+  }
+
+  /* --- Buttons — squared, drawn, mechanical ------------------------------ */
+  .mnl-btn {
+    @apply inline-flex items-center justify-center gap-2 border border-carbon-950 bg-signal-500 px-6 py-3.5 font-mono text-xs font-semibold uppercase tracking-[0.16em] transition-all duration-150 ease-out;
+    color: rgb(var(--ink-on-signal));
+    box-shadow: 3px 3px 0 0 rgb(var(--carbon-950));
+  }
+  .mnl-btn:hover {
+    @apply bg-signal-400;
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 0 rgb(var(--carbon-950));
+  }
+  .mnl-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 0 rgb(var(--carbon-950));
+  }
+  .mnl-btn:focus-visible {
+    @apply outline-none ring-2 ring-signal-500 ring-offset-2 ring-offset-bone-100;
+  }
+  .mnl-btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 border border-carbon-950 bg-transparent px-6 py-3.5 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-carbon-950 transition-all duration-150 ease-out;
+    box-shadow: 3px 3px 0 0 rgb(var(--carbon-950) / 0.22);
+  }
+  .mnl-btn-ghost:hover {
+    @apply bg-carbon-950 text-bone-100;
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 0 rgb(var(--carbon-950) / 0.35);
+  }
+  .mnl-btn-ghost:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 0 rgb(var(--carbon-950) / 0.3);
+  }
+  .mnl-btn-ghost:focus-visible {
+    @apply outline-none ring-2 ring-carbon-950 ring-offset-2 ring-offset-bone-100;
+  }
+  /* Inverse pair for use on .mnl-stamp ink plates. */
+  .mnl-btn-bone {
+    @apply inline-flex items-center justify-center gap-2 border border-bone-100 bg-bone-100 px-6 py-3.5 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-carbon-950 transition-all duration-150 ease-out;
+    box-shadow: 3px 3px 0 0 rgb(var(--bone-100) / 0.28);
+  }
+  .mnl-btn-bone:hover {
+    @apply bg-signal-500 border-signal-500;
+    color: rgb(var(--ink-on-signal));
+    transform: translate(-1px, -1px);
+  }
+  .mnl-btn-sm {
+    @apply px-4 py-2.5 text-[0.6875rem];
+  }
+
+  /* --- Controls ----------------------------------------------------------- */
+  .mnl-chip {
+    @apply inline-flex cursor-pointer select-none items-center gap-2 border border-carbon-950 bg-bone-50 px-3.5 py-2 font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-carbon-700 transition-colors duration-150;
+  }
+  .mnl-chip:hover {
+    @apply bg-bone-300 text-carbon-950;
+  }
+  .mnl-chip[data-active="true"] {
+    @apply bg-carbon-950 text-bone-100;
+    box-shadow: 2px 2px 0 0 rgb(var(--signal-500));
+  }
+  .mnl-input {
+    @apply w-full border border-carbon-950 bg-bone-50 px-4 py-3 font-mono text-sm text-carbon-950 placeholder:text-carbon-400 transition-colors focus:border-signal-500 focus:outline-none focus:ring-2 focus:ring-signal-500/30 disabled:opacity-50;
+  }
+
+  /* --- Drafting furniture -------------------------------------------------- */
+  /* Registration crosshair drawn with pure CSS. */
+  .mnl-reg {
+    position: relative;
+    width: 14px;
+    height: 14px;
+  }
+  .mnl-reg::before,
+  .mnl-reg::after {
+    content: "";
+    position: absolute;
+    background: currentColor;
+  }
+  .mnl-reg::before {
+    left: 50%;
+    top: 0;
+    width: 1px;
+    height: 100%;
+  }
+  .mnl-reg::after {
+    top: 50%;
+    left: 0;
+    height: 1px;
+    width: 100%;
+  }
+  /* Hatched fill for dead zones / margins. */
+  .mnl-hatch {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      rgb(var(--carbon-950) / 0.14) 0,
+      rgb(var(--carbon-950) / 0.14) 1px,
+      transparent 1px,
+      transparent 7px
+    );
+  }
+  .mnl-hatch-signal {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      rgb(var(--signal-500) / 0.5) 0,
+      rgb(var(--signal-500) / 0.5) 1px,
+      transparent 1px,
+      transparent 6px
+    );
+  }
+  /* Dimension row: [label] ————————— [value] */
+  .mnl-dimrow {
+    @apply flex items-baseline gap-3;
+  }
+  .mnl-dimrow::after {
+    content: "";
+    order: 1;
+    flex: 1;
+    border-bottom: 1px dashed rgb(var(--carbon-200));
+    transform: translateY(-3px);
+  }
+  .mnl-dimrow > :last-child {
+    order: 2;
+  }
+
+  /* Underline link, drafting style. */
+  .mnl-link {
+    @apply underline decoration-carbon-400 decoration-1 underline-offset-4 transition-colors hover:text-signal-600 hover:decoration-signal-500;
+  }
+
+  /* Marquee strip reuses the legacy marquee keyframes. */
+  .mnl-ticker {
+    @apply border-y border-carbon-950 bg-bone-50;
+  }
+}
+
+/* Manifold range slider — a drafting caliper. */
+@layer components {
+  .mnl-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 2px;
+    background: rgb(var(--carbon-950));
+    outline: none;
+  }
+  .mnl-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 22px;
+    background: rgb(var(--signal-500));
+    border: 1px solid rgb(var(--carbon-950));
+    box-shadow: 2px 2px 0 0 rgb(var(--carbon-950));
+    cursor: ew-resize;
+  }
+  .mnl-range::-moz-range-thumb {
+    width: 16px;
+    height: 22px;
+    border-radius: 0;
+    background: rgb(var(--signal-500));
+    border: 1px solid rgb(var(--carbon-950));
+    box-shadow: 2px 2px 0 0 rgb(var(--carbon-950));
+    cursor: ew-resize;
+  }
+  .mnl-range:focus-visible {
+    outline: 2px solid rgb(var(--signal-500));
+    outline-offset: 4px;
+  }
+}
+
+/* ==========================================================================
+   Manifold theming — the palette lives in RGB channel triplets so Tailwind
+   token classes (bg-bone-100, text-carbon-950/70, ...) resolve through vars
+   and the whole manual re-inks itself when [data-theme="dark"] is set on
+   <html>. Dark mode is the night bench: paper and ink swap sides, stamp
+   plates invert, signal orange holds. Never reintroduce Pulse neon here.
+   ========================================================================== */
+:root {
+  color-scheme: light;
+  --bone-50: 250 248 242;
+  --bone-100: 244 241 232;
+  --bone-200: 236 231 218;
+  --bone-300: 224 218 202;
+  --bone-400: 207 199 178;
+  --carbon-950: 22 21 17;
+  --carbon-900: 33 31 25;
+  --carbon-700: 61 58 48;
+  /* carbon-500 is the readable "muted / secondary text" floor. Nudged darker
+     from 110 106 92 so it clears WCAG AA 4.5:1 on the recessed bone-200 panels
+     too (was 4.38:1 there). Informational mnl-dim labels use this tier;
+     carbon-400 stays a faint decorative tone (3:1 non-text) — see below. */
+  --carbon-500: 104 100 86;
+  --carbon-400: 139 135 120;
+  --carbon-200: 185 180 163;
+  --carbon-150: 207 201 184;
+  --signal-600: 214 62 0;
+  --signal-500: 242 76 0;
+  --signal-400: 255 107 36;
+  --signal-100: 251 227 213;
+  --copper-500: 178 110 58;
+  --copper-300: 217 161 103;
+  /* Label ink on signal-orange fills — constant in both themes (a near-white
+     label on orange fails WCAG, so dark mode must NOT flip this). */
+  --ink-on-signal: 22 21 17;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bone-50: 34 32 26;
+  --bone-100: 24 23 19;
+  --bone-200: 19 18 15;
+  --bone-300: 15 14 12;
+  --bone-400: 51 48 40;
+  --carbon-950: 240 237 226;
+  --carbon-900: 228 224 210;
+  --carbon-700: 201 196 178;
+  --carbon-500: 152 147 127;
+  --carbon-400: 122 117 102;
+  --carbon-200: 69 66 55;
+  --carbon-150: 54 51 42;
+  --signal-600: 255 107 36;
+  --signal-500: 242 76 0;
+  --signal-400: 255 130 66;
+  --signal-100: 61 31 15;
+  --copper-500: 196 130 74;
+  --copper-300: 226 174 120;
+}
+
+@layer components {
+  /* Outline display type on stamp plates (footer wordmark). */
+  .mnl-outline {
+    -webkit-text-stroke: 1px rgb(var(--bone-100) / 0.16);
+  }
+}
+
+::selection {
+  background: rgb(var(--signal-500) / 0.32);
+}
+
+/* Dark-mode surgical overrides (review findings). */
+/* 1. The document canvas must re-ink too, or macOS/iOS rubber-band
+      overscroll flashes white above/below the dark manual. */
+:root[data-theme="dark"] body {
+  background-color: rgb(var(--bone-100));
+  color: rgb(var(--carbon-950));
+}
+/* 2. Stamp plates invert to bone in dark mode, but the signal text ramp
+      brightens — bright orange on a light plate fails contrast. Deepen the
+      signal ramp inside inverted stamps only. */
+:root[data-theme="dark"] .mnl-stamp {
+  --signal-400: 168 49 0;
+  --signal-600: 168 49 0;
+}
+/* 3. Same inversion on active chips: the index numeral needs deep signal
+      on the bone-filled active chip. */
+:root[data-theme="dark"] .mnl-chip[data-active="true"] .mnl-num {
+  color: rgb(168 49 0);
 }

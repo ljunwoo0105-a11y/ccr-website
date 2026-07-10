@@ -123,12 +123,12 @@ export function ModelRegistry({
 
   return (
     <section className="card p-0">
-      <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+      <div className="flex items-center justify-between border-b border-carbon-150 px-6 py-4">
         <div>
-          <h2 className="text-base font-semibold text-slate-900">
+          <h2 className="text-base font-semibold text-carbon-950">
             Model registry
           </h2>
-          <p className="mt-0.5 text-sm text-slate-500">
+          <p className="mt-0.5 text-sm text-carbon-500">
             The Anthropic models the site is allowed to call, with their
             pricing.
           </p>
@@ -140,20 +140,20 @@ export function ModelRegistry({
       </div>
 
       {listError && (
-        <p className="border-b border-red-100 bg-red-50 px-6 py-3 text-sm text-red-700">
+        <p className="border-b border-rose-200/60 bg-rose-50 px-6 py-3 text-sm text-rose-700">
           {listError}
         </p>
       )}
 
       {models.length === 0 ? (
-        <p className="px-6 py-8 text-sm text-slate-500">
+        <p className="px-6 py-8 text-sm text-carbon-500">
           No models registered yet. Add one to enable the AI pricing tools.
         </p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-400">
+              <tr className="border-b border-carbon-150 text-xs uppercase tracking-wide text-carbon-400">
                 <th className="px-6 py-3 font-medium">Label</th>
                 <th className="px-4 py-3 font-medium">Model id</th>
                 <th className="px-4 py-3 font-medium">Input $/MTok</th>
@@ -171,23 +171,23 @@ export function ModelRegistry({
                 return (
                   <tr
                     key={m.id}
-                    className="border-b border-slate-100 last:border-0"
+                    className="border-b border-carbon-150 last:border-0"
                   >
-                    <td className="px-6 py-3 font-medium text-slate-900">
+                    <td className="px-6 py-3 font-medium text-carbon-950">
                       {m.label}
                       {isDefault && (
-                        <span className="ml-2 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
+                        <span className="ml-2 rounded-full border border-sky-500/50 bg-sky-50 px-2 py-0.5 text-xs font-medium text-sky-700">
                           default
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3 font-mono text-xs text-slate-600">
+                    <td className="px-4 py-3 font-mono text-xs text-carbon-700">
                       {m.modelId}
                     </td>
-                    <td className="px-4 py-3 text-slate-700">
+                    <td className="px-4 py-3 text-carbon-700">
                       ${m.inputPerMTok}
                     </td>
-                    <td className="px-4 py-3 text-slate-700">
+                    <td className="px-4 py-3 text-carbon-700">
                       ${m.outputPerMTok}
                     </td>
                     <td className="px-4 py-3">
@@ -197,7 +197,7 @@ export function ModelRegistry({
                         label={`${m.label} enabled`}
                       />
                     </td>
-                    <td className="max-w-[16rem] truncate px-4 py-3 text-slate-500">
+                    <td className="max-w-[16rem] truncate px-4 py-3 text-carbon-500">
                       {m.notes ?? "—"}
                     </td>
                     <td className="px-4 py-3">
@@ -206,7 +206,7 @@ export function ModelRegistry({
                           type="button"
                           onClick={() => openEdit(m)}
                           aria-label={`Edit ${m.label}`}
-                          className="rounded p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                          className="rounded p-1.5 text-carbon-400 transition hover:bg-bone-200 hover:text-carbon-700"
                         >
                           <Pencil className="h-4 w-4" aria-hidden />
                         </button>
@@ -220,7 +220,7 @@ export function ModelRegistry({
                               ? "This model is a configured default — pick a different default first"
                               : undefined
                           }
-                          className="rounded p-1.5 text-slate-400 transition hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
+                          className="rounded p-1.5 text-carbon-400 transition hover:bg-rose-50 hover:text-rose-600 disabled:cursor-not-allowed disabled:opacity-40"
                         >
                           <Trash2 className="h-4 w-4" aria-hidden />
                         </button>
@@ -234,7 +234,7 @@ export function ModelRegistry({
         </div>
       )}
 
-      <p className="border-t border-slate-100 px-6 py-3 text-xs text-slate-400">
+      <p className="border-t border-carbon-150 px-6 py-3 text-xs text-carbon-400">
         Prices are USD per million tokens — check platform.claude.com for
         current pricing.
       </p>
@@ -317,7 +317,7 @@ export function ModelRegistry({
             </div>
             <div>
               <label className="label" htmlFor="model-notes">
-                Notes <span className="font-normal text-slate-400">(optional)</span>
+                Notes <span className="font-normal text-carbon-400">(optional)</span>
               </label>
               <input
                 id="model-notes"
@@ -333,13 +333,13 @@ export function ModelRegistry({
                 onChange={(v) => setForm({ ...form, enabled: v })}
                 label="Model enabled"
               />
-              <span className="text-sm text-slate-700">
+              <span className="text-sm text-carbon-700">
                 Enabled (available to AI features)
               </span>
             </div>
 
             {formError && (
-              <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+              <p className=" bg-rose-50 px-3 py-2 text-sm text-rose-700">
                 {formError}
               </p>
             )}

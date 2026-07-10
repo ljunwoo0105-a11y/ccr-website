@@ -8,8 +8,8 @@ export default function NewIntakePage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-bold text-slate-900">New intake</h1>
-        <p className="text-sm text-slate-500">
+        <h1 className="text-2xl font-bold text-carbon-950">New intake</h1>
+        <p className="text-sm text-carbon-500">
           Record the device&apos;s condition with the customer before any work
           starts.
         </p>

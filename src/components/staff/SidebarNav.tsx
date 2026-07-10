@@ -50,10 +50,10 @@ export default function SidebarNav({ isAdmin }: { isAdmin: boolean }) {
             href={item.href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition",
+              "flex items-center gap-3 px-3 py-2 text-sm font-medium transition-colors",
               active
-                ? "bg-ccr-primary text-white"
-                : "text-slate-300 hover:bg-slate-800 hover:text-white"
+                ? "bg-signal-500 text-carbon-950"
+                : "text-bone-100/70 hover:bg-carbon-900 hover:text-bone-100"
             )}
           >
             <Icon className="h-4 w-4 shrink-0" aria-hidden />
@@ -64,7 +64,7 @@ export default function SidebarNav({ isAdmin }: { isAdmin: boolean }) {
       {isAdmin && (
         <Link
           href="/admin"
-          className="mt-2 flex items-center gap-3 rounded-lg border border-slate-700 px-3 py-2 text-sm font-medium text-amber-300 transition hover:bg-slate-800"
+          className="mt-2 flex items-center gap-3 border border-bone-100/25 px-3 py-2 text-sm font-medium text-signal-400 transition-colors hover:bg-carbon-900 hover:text-signal-500"
         >
           <ShieldCheck className="h-4 w-4 shrink-0" aria-hidden />
           <span className="hidden sm:inline">Admin Console</span>

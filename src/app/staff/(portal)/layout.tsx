@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
-import { CcrLogo } from "@/components/brand/CcrLogo";
 import SidebarNav from "@/components/staff/SidebarNav";
 import LogoutButton from "@/components/staff/LogoutButton";
 
@@ -20,26 +19,33 @@ export default async function StaffPortalLayout({
   if (!user) redirect("/staff/login");
 
   return (
-    <div className="flex min-h-screen bg-slate-100">
-      <aside className="sticky top-0 flex h-screen w-16 shrink-0 flex-col bg-slate-900 px-2 py-4 sm:w-60 sm:px-4 print:hidden">
+    <div className="flex min-h-screen bg-bone-100 text-carbon-950">
+      <aside className="sticky top-0 flex h-screen w-16 shrink-0 flex-col border-r border-carbon-950 bg-carbon-950 px-2 py-4 sm:w-60 sm:px-4 print:hidden">
         <div className="mb-6 flex items-center gap-3 px-1">
-          <CcrLogo className="h-9 w-9" sizes="36px" />
+          <span
+            className="flex h-10 w-10 shrink-0 items-center justify-center border border-signal-500 bg-bone-100 font-display text-lg leading-none text-carbon-950"
+            aria-hidden="true"
+          >
+            CCR
+          </span>
           <div className="hidden sm:block">
-            <p className="text-sm font-bold leading-tight tracking-wide text-white">
+            <p className="font-display text-sm uppercase leading-tight tracking-wide text-bone-100">
               CCR Staff
             </p>
-            <p className="text-xs text-slate-400">Cool Case Repair</p>
+            <p className="font-mono text-[0.625rem] uppercase tracking-[0.14em] text-bone-100/50">
+              Field Service Console
+            </p>
           </div>
         </div>
 
         <SidebarNav isAdmin={user.role === "ADMIN"} />
 
-        <div className="mt-auto border-t border-slate-800 pt-3">
+        <div className="mt-auto border-t border-bone-100/15 pt-3">
           <div className="hidden px-3 pb-2 sm:block">
-            <p className="truncate text-sm font-medium text-white">
+            <p className="truncate text-sm font-medium text-bone-100">
               {user.name}
             </p>
-            <span className="mt-1 inline-flex items-center rounded-full bg-slate-800 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-slate-300">
+            <span className="mt-1 inline-flex items-center border border-bone-100/25 px-2 py-0.5 font-mono text-[0.625rem] font-semibold uppercase tracking-[0.1em] text-bone-100/75">
               {user.role}
             </span>
           </div>

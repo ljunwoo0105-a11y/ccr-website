@@ -11,24 +11,34 @@ export const metadata: Metadata = {
 
 const STEPS = ["Pick your device", "Leave your details", "Estimate emailed"];
 
+/**
+ * Quote request — a Manifold intake form. The wizard itself renders as a
+ * carbon "intake terminal" plate sitting on the drafting paper, like the
+ * dark stamp plates used across the manual.
+ */
 export default function QuotePage() {
   return (
-    <div className="relative bg-ink-950">
-      <div
-        className="pointer-events-none absolute inset-0 tech-grid"
-        aria-hidden="true"
-      />
-      <div className="site-container relative py-16 sm:py-20">
+    <div className="relative">
+      <div className="mnl-container py-4">
+        <div className="flex items-center gap-4 border-b border-carbon-950 pb-3">
+          <span className="mnl-reg text-carbon-950" aria-hidden="true" />
+          <span className="mnl-dim-lg mnl-num text-signal-600">FORM Q-01</span>
+          <span className="mnl-dim hidden text-carbon-500 sm:inline">
+            Repair estimate request
+          </span>
+          <span className="mnl-hatch ml-auto hidden h-3 w-24 sm:block" aria-hidden="true" />
+          <span className="mnl-dim mnl-num text-carbon-500">FREE · NO OBLIGATION</span>
+        </div>
+      </div>
+
+      <div className="mnl-container relative pb-16 pt-8 sm:pb-20">
         <Reveal y={16}>
           <header className="mx-auto max-w-[640px] text-center">
-            <p className="eyebrow text-gold-500">
-              Repair quote — free, no obligation
-            </p>
-            <h1 className="type-display mt-3 text-[clamp(2.25rem,5vw,3.75rem)] text-ink-50">
-              Get your repair estimate.
+            <h1 className="mnl-display text-[clamp(2.25rem,5vw,3.75rem)] text-carbon-950">
+              Get your estimate<span className="text-signal-500">.</span>
             </h1>
-            <p className="mt-4 text-base leading-relaxed text-ink-300">
-              A personalised estimate in your inbox in under a minute.
+            <p className="mt-4 text-base leading-relaxed text-carbon-700">
+              A personalised repair estimate in your inbox in under a minute.
             </p>
 
             <ol
@@ -38,9 +48,9 @@ export default function QuotePage() {
               {STEPS.map((label, i) => (
                 <li
                   key={label}
-                  className="mono-label flex items-center gap-2 text-ink-400"
+                  className="mnl-dim flex items-center gap-2 text-carbon-500"
                 >
-                  <span className="tnum text-gold-500" aria-hidden="true">
+                  <span className="mnl-num text-signal-600" aria-hidden="true">
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   {label}
@@ -51,13 +61,16 @@ export default function QuotePage() {
         </Reveal>
 
         <div className="mx-auto mt-10 max-w-[640px]">
-          <QuoteWizard />
+          {/* The wizard renders as a carbon intake terminal on the paper. */}
+          <div className="border border-carbon-950 shadow-hard-xl">
+            <QuoteWizard />
+          </div>
 
-          <p className="mt-6 text-center text-xs leading-relaxed text-ink-400">
+          <p className="mt-6 text-center text-xs leading-relaxed text-carbon-500">
             We email a starting price using our most affordable part option —
             exact quote after a free in-store inspection. We never share your
             details —{" "}
-            <Link href="/privacy" className="link-gold">
+            <Link href="/privacy" className="mnl-link text-carbon-950">
               privacy policy
             </Link>
             .

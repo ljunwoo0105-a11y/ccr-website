@@ -52,22 +52,22 @@ function BarList({
           <div className="mb-1 flex items-baseline justify-between gap-4 text-sm">
             <span
               className={cn(
-                "truncate text-slate-700",
+                "truncate text-carbon-700",
                 r.mono && "font-mono text-xs"
               )}
             >
               {r.key}
             </span>
-            <span className="shrink-0 text-slate-500">
+            <span className="shrink-0 text-carbon-500">
               {formatUsd(r.costUsd)}{" "}
-              <span className="text-xs text-slate-400">
+              <span className="text-xs text-carbon-400">
                 · {r.calls} call{r.calls === 1 ? "" : "s"}
               </span>
             </span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-bone-200">
             <div
-              className="h-full rounded-full bg-ccr-primary"
+              className="h-full rounded-full bg-signal-500"
               style={{ width: `${(r.costUsd / max) * 100}%` }}
             />
           </div>
@@ -105,16 +105,16 @@ export function UsageDashboard() {
 
   return (
     <section className="card p-0">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-6 py-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-carbon-150 px-6 py-4">
         <div>
-          <h2 className="text-base font-semibold text-slate-900">
+          <h2 className="text-base font-semibold text-carbon-950">
             Usage dashboard
           </h2>
-          <p className="mt-0.5 text-sm text-slate-500">
+          <p className="mt-0.5 text-sm text-carbon-500">
             Real logged spend — every Anthropic API call the site makes.
           </p>
         </div>
-        <label className="flex items-center gap-2 text-sm text-slate-600">
+        <label className="flex items-center gap-2 text-sm text-carbon-700">
           Period
           <select
             className="input w-auto py-1.5"
@@ -130,23 +130,23 @@ export function UsageDashboard() {
       </div>
 
       {error && (
-        <p className="border-b border-red-100 bg-red-50 px-6 py-3 text-sm text-red-700">
+        <p className="border-b border-rose-200/60 bg-rose-50 px-6 py-3 text-sm text-rose-700">
           {error}
         </p>
       )}
 
       {loading && !data ? (
-        <p className="px-6 py-8 text-sm text-slate-500">Loading usage…</p>
+        <p className="px-6 py-8 text-sm text-carbon-500">Loading usage…</p>
       ) : data ? (
         <div className="space-y-8 px-6 py-6">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="text-sm font-medium text-slate-500">
+              <p className="text-sm font-medium text-carbon-500">
                 Total spend (last {days} days)
               </p>
-              <p className="mt-1 text-3xl font-bold text-slate-900">
+              <p className="mt-1 text-3xl font-bold text-carbon-950">
                 {formatUsd(data.totalUsd, 2)}{" "}
-                <span className="text-sm font-normal text-slate-400">USD</span>
+                <span className="text-sm font-normal text-carbon-400">USD</span>
               </p>
             </div>
             <div
@@ -163,7 +163,7 @@ export function UsageDashboard() {
                   <div
                     className={cn(
                       "w-full rounded-t-sm",
-                      d.costUsd > 0 ? "bg-ccr-primary" : "bg-slate-100"
+                      d.costUsd > 0 ? "bg-signal-500" : "bg-bone-200"
                     )}
                     style={{
                       height: `${Math.max(
@@ -178,13 +178,13 @@ export function UsageDashboard() {
           </div>
 
           {data.byFeature.length === 0 ? (
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-carbon-500">
               No AI usage logged in this period.
             </p>
           ) : (
             <div className="grid gap-8 lg:grid-cols-2">
               <div>
-                <h3 className="mb-3 text-sm font-semibold text-slate-700">
+                <h3 className="mb-3 text-sm font-semibold text-carbon-700">
                   By feature
                 </h3>
                 <BarList
@@ -196,7 +196,7 @@ export function UsageDashboard() {
                 />
               </div>
               <div>
-                <h3 className="mb-3 text-sm font-semibold text-slate-700">
+                <h3 className="mb-3 text-sm font-semibold text-carbon-700">
                   By model
                 </h3>
                 <BarList
@@ -213,13 +213,13 @@ export function UsageDashboard() {
 
           {data.recent.length > 0 && (
             <div>
-              <h3 className="mb-3 text-sm font-semibold text-slate-700">
+              <h3 className="mb-3 text-sm font-semibold text-carbon-700">
                 Recent calls
               </h3>
-              <div className="overflow-x-auto rounded-lg border border-slate-200">
+              <div className="overflow-x-auto  border border-carbon-150">
                 <table className="w-full text-left text-sm">
                   <thead>
-                    <tr className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-400">
+                    <tr className="border-b border-carbon-150 bg-bone-100 text-xs uppercase tracking-wide text-carbon-400">
                       <th className="px-4 py-2.5 font-medium">Time</th>
                       <th className="px-4 py-2.5 font-medium">Feature</th>
                       <th className="px-4 py-2.5 font-medium">Model</th>
@@ -238,21 +238,21 @@ export function UsageDashboard() {
                       const expanded = expandedId === log.id;
                       return (
                         <Fragment key={log.id}>
-                          <tr className="border-b border-slate-100 last:border-0">
-                            <td className="whitespace-nowrap px-4 py-2.5 text-slate-500">
+                          <tr className="border-b border-carbon-150 last:border-0">
+                            <td className="whitespace-nowrap px-4 py-2.5 text-carbon-500">
                               {formatDateTime(log.createdAt)}
                             </td>
-                            <td className="px-4 py-2.5 text-slate-700">
+                            <td className="px-4 py-2.5 text-carbon-700">
                               {log.feature}
                             </td>
-                            <td className="px-4 py-2.5 font-mono text-xs text-slate-600">
+                            <td className="px-4 py-2.5 font-mono text-xs text-carbon-700">
                               {log.modelId}
                             </td>
-                            <td className="whitespace-nowrap px-4 py-2.5 text-slate-600">
+                            <td className="whitespace-nowrap px-4 py-2.5 text-carbon-700">
                               {log.inputTokens.toLocaleString("en-AU")} /{" "}
                               {log.outputTokens.toLocaleString("en-AU")}
                             </td>
-                            <td className="px-4 py-2.5 text-slate-700">
+                            <td className="px-4 py-2.5 text-carbon-700">
                               {formatUsd(log.costUsd)}
                             </td>
                             <td className="px-4 py-2.5">
@@ -262,7 +262,7 @@ export function UsageDashboard() {
                                   onClick={() =>
                                     setExpandedId(expanded ? null : log.id)
                                   }
-                                  className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700 hover:bg-red-200"
+                                  className="inline-flex items-center gap-1 rounded-full bg-rose-100 px-2 py-0.5 text-xs font-medium text-rose-700 hover:bg-rose-200"
                                   aria-expanded={expanded}
                                 >
                                   {log.status}
@@ -280,8 +280,8 @@ export function UsageDashboard() {
                                   className={cn(
                                     "inline-flex rounded-full px-2 py-0.5 text-xs font-medium",
                                     bad
-                                      ? "bg-red-100 text-red-700"
-                                      : "bg-emerald-100 text-emerald-700"
+                                      ? "bg-rose-100 text-rose-700"
+                                      : "border border-emerald-500/50 bg-emerald-50 text-emerald-700"
                                   )}
                                 >
                                   {log.status}
@@ -290,10 +290,10 @@ export function UsageDashboard() {
                             </td>
                           </tr>
                           {expanded && log.error && (
-                            <tr className="border-b border-slate-100 last:border-0">
+                            <tr className="border-b border-carbon-150 last:border-0">
                               <td
                                 colSpan={6}
-                                className="bg-red-50 px-4 py-3 text-xs text-red-800"
+                                className="bg-rose-50 px-4 py-3 text-xs text-rose-700"
                               >
                                 {log.error}
                               </td>

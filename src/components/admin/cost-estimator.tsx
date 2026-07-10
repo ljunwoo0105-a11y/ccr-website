@@ -63,10 +63,10 @@ export function CostEstimator({ models }: { models: EstimatorModel[] }) {
 
   return (
     <section className="card">
-      <h2 className="text-base font-semibold text-slate-900">
+      <h2 className="text-base font-semibold text-carbon-950">
         Cost estimator
       </h2>
-      <p className="mt-0.5 text-sm text-slate-500">
+      <p className="mt-0.5 text-sm text-carbon-500">
         Compare what a month of usage would cost on each enabled model.
       </p>
 
@@ -143,11 +143,11 @@ export function CostEstimator({ models }: { models: EstimatorModel[] }) {
       </div>
 
       {activePreset && (
-        <p className="mt-3 text-xs text-slate-400">{activePreset.description}</p>
+        <p className="mt-3 text-xs text-carbon-400">{activePreset.description}</p>
       )}
 
       {rows.length === 0 ? (
-        <p className="mt-5 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
+        <p className="mt-5  bg-amber-50 px-3 py-2 text-sm text-amber-800">
           No enabled models in the registry — enable at least one model above
           to compare costs.
         </p>
@@ -155,7 +155,7 @@ export function CostEstimator({ models }: { models: EstimatorModel[] }) {
         <div className="mt-5 overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-400">
+              <tr className="border-b border-carbon-150 text-xs uppercase tracking-wide text-carbon-400">
                 <th className="py-3 pr-4 font-medium">Model</th>
                 <th className="px-4 py-3 font-medium">Cost per use</th>
                 <th className="px-4 py-3 font-medium">Cost per month</th>
@@ -169,27 +169,27 @@ export function CostEstimator({ models }: { models: EstimatorModel[] }) {
                   <tr
                     key={r.modelId}
                     className={cn(
-                      "border-b border-slate-100 last:border-0",
+                      "border-b border-carbon-150 last:border-0",
                       isCheapest && "bg-emerald-50"
                     )}
                   >
                     <td className="py-3 pr-4">
-                      <span className="font-medium text-slate-900">
+                      <span className="font-medium text-carbon-950">
                         {r.label}
                       </span>{" "}
-                      <span className="font-mono text-xs text-slate-400">
+                      <span className="font-mono text-xs text-carbon-400">
                         {r.modelId}
                       </span>
                       {isCheapest && (
-                        <span className="ml-2 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
+                        <span className="ml-2 rounded-full border border-emerald-500/50 bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
                           cheapest
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-slate-700">
+                    <td className="px-4 py-3 text-carbon-700">
                       {formatUsd(r.perUse)}
                     </td>
-                    <td className="px-4 py-3 font-medium text-slate-900">
+                    <td className="px-4 py-3 font-medium text-carbon-950">
                       {formatUsd(r.perMonth, 2)}
                     </td>
                   </tr>
@@ -200,7 +200,7 @@ export function CostEstimator({ models }: { models: EstimatorModel[] }) {
         </div>
       )}
 
-      <p className="mt-4 text-xs text-slate-400">
+      <p className="mt-4 text-xs text-carbon-400">
         Estimates only — every real call is logged automatically with exact
         token counts and shown in the usage dashboard below.
       </p>

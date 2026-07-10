@@ -150,16 +150,16 @@ export default function InventoryManager({ provider }: Props) {
       <section className="card">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-sky-100 text-sky-700">
+            <span className="flex h-10 w-10 items-center justify-center border border-sky-500/50 bg-sky-50 text-sky-700">
               <Plug className="h-5 w-5" aria-hidden />
             </span>
             <div>
-              <h2 className="text-sm font-semibold text-slate-900">
+              <h2 className="text-sm font-semibold text-carbon-950">
                 POS connection
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-carbon-500">
                 Provider:{" "}
-                <span className="font-semibold uppercase text-slate-700">
+                <span className="font-semibold uppercase text-carbon-700">
                   {provider}
                 </span>
               </p>
@@ -197,8 +197,8 @@ export default function InventoryManager({ provider }: Props) {
           <p
             className={
               testResult.ok
-                ? "mt-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700"
-                : "mt-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"
+                ? "mt-3  border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700"
+                : "mt-3  border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"
             }
           >
             {testResult.message}
@@ -207,13 +207,13 @@ export default function InventoryManager({ provider }: Props) {
         {syncError && (
           <p
             role="alert"
-            className="mt-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"
+            className="mt-3  border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"
           >
             {syncError}
           </p>
         )}
         {syncResult && (
-          <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700">
+          <div className="mt-3  border border-carbon-150 bg-bone-100 px-3 py-2 text-sm text-carbon-700">
             <p>
               Synced from <span className="font-semibold">{syncResult.provider}</span>:{" "}
               {syncResult.itemsFetched} POS items fetched ·{" "}
@@ -230,7 +230,7 @@ export default function InventoryManager({ provider }: Props) {
               </span>
             </p>
             {syncResult.unmatchedPosItems > 0 && (
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-1 text-xs text-carbon-500">
                 Unmatched POS items are skipped — match parts by SKU or POS
                 item id in the price list to include them.
               </p>
@@ -249,7 +249,7 @@ export default function InventoryManager({ provider }: Props) {
       {error && (
         <p
           role="alert"
-          className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"
+          className=" border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"
         >
           {error}
         </p>
@@ -257,17 +257,17 @@ export default function InventoryManager({ provider }: Props) {
 
       {/* Low stock */}
       <section className="card">
-        <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-900">
+        <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold text-carbon-950">
           <AlertTriangle className="h-4 w-4 text-amber-500" aria-hidden />
           Low stock (1 or fewer)
         </h2>
         {loading ? (
           <Loader2
-            className="h-5 w-5 animate-spin text-ccr-primary"
+            className="h-5 w-5 animate-spin text-signal-600"
             aria-hidden
           />
         ) : lowStock.length === 0 ? (
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-carbon-500">
             Nothing is running low. Nice.
           </p>
         ) : (
@@ -275,13 +275,13 @@ export default function InventoryManager({ provider }: Props) {
             {lowStock.map((part) => (
               <li
                 key={part.id}
-                className="flex items-center justify-between gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm"
+                className="flex items-center justify-between gap-2  border border-amber-200 bg-amber-50 px-3 py-2 text-sm"
               >
                 <span className="min-w-0">
-                  <span className="block truncate font-medium text-slate-900">
+                  <span className="block truncate font-medium text-carbon-950">
                     {part.brand} {part.model}
                   </span>
-                  <span className="block truncate text-xs text-slate-500">
+                  <span className="block truncate text-xs text-carbon-500">
                     {part.repairType}
                   </span>
                 </span>
@@ -296,18 +296,18 @@ export default function InventoryManager({ provider }: Props) {
 
       {/* Full stock table */}
       <section className="card overflow-hidden p-0">
-        <div className="border-b border-slate-200 px-5 py-4">
-          <h2 className="text-sm font-semibold text-slate-900">
+        <div className="border-b border-carbon-150 px-5 py-4">
+          <h2 className="text-sm font-semibold text-carbon-950">
             Stock on hand
           </h2>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-carbon-500">
             Adjust quantities directly — changes save immediately.
           </p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full min-w-[760px] text-left text-sm">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
+              <tr className="border-b border-carbon-150 bg-bone-100 text-xs uppercase tracking-wide text-carbon-500">
                 <th className="px-4 py-3 font-semibold">Part</th>
                 <th className="px-4 py-3 font-semibold">Quality</th>
                 <th className="px-4 py-3 font-semibold">SKU</th>
@@ -315,12 +315,12 @@ export default function InventoryManager({ provider }: Props) {
                 <th className="px-4 py-3 text-right font-semibold">Stock</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-carbon-150">
               {loading && (
                 <tr>
                   <td colSpan={5} className="px-4 py-10 text-center">
                     <Loader2
-                      className="mx-auto h-6 w-6 animate-spin text-ccr-primary"
+                      className="mx-auto h-6 w-6 animate-spin text-signal-600"
                       aria-hidden
                     />
                   </td>
@@ -330,7 +330,7 @@ export default function InventoryManager({ provider }: Props) {
                 <tr>
                   <td
                     colSpan={5}
-                    className="px-4 py-10 text-center text-sm text-slate-500"
+                    className="px-4 py-10 text-center text-sm text-carbon-500"
                   >
                     No active parts yet — add some in the price list.
                   </td>
@@ -340,10 +340,10 @@ export default function InventoryManager({ provider }: Props) {
                 parts.map((part) => (
                   <tr key={part.id}>
                     <td className="px-4 py-2.5">
-                      <span className="block font-medium text-slate-900">
+                      <span className="block font-medium text-carbon-950">
                         {part.brand} {part.model}
                       </span>
-                      <span className="block text-xs text-slate-500">
+                      <span className="block text-xs text-carbon-500">
                         {part.repairType}
                       </span>
                     </td>
@@ -354,10 +354,10 @@ export default function InventoryManager({ provider }: Props) {
                         ] ?? part.quality}
                       </span>
                     </td>
-                    <td className="px-4 py-2.5 text-slate-600">
+                    <td className="px-4 py-2.5 text-carbon-700">
                       {part.sku ?? "—"}
                     </td>
-                    <td className="max-w-[140px] truncate px-4 py-2.5 text-xs text-slate-500">
+                    <td className="max-w-[140px] truncate px-4 py-2.5 text-xs text-carbon-500">
                       {part.posItemId ?? "Not linked"}
                     </td>
                     <td className="px-4 py-2.5">
@@ -365,7 +365,7 @@ export default function InventoryManager({ provider }: Props) {
                         <button
                           type="button"
                           aria-label={`Decrease stock for ${part.brand} ${part.model}`}
-                          className="rounded-lg border border-slate-300 p-1.5 text-slate-600 transition hover:bg-slate-50 disabled:opacity-40"
+                          className=" border border-carbon-200 p-1.5 text-carbon-700 transition hover:bg-bone-100 disabled:opacity-40"
                           disabled={savingId === part.id || part.stockQty <= 0}
                           onClick={() =>
                             void updateStock(part, part.stockQty - 1)
@@ -398,7 +398,7 @@ export default function InventoryManager({ provider }: Props) {
                         <button
                           type="button"
                           aria-label={`Increase stock for ${part.brand} ${part.model}`}
-                          className="rounded-lg border border-slate-300 p-1.5 text-slate-600 transition hover:bg-slate-50 disabled:opacity-40"
+                          className=" border border-carbon-200 p-1.5 text-carbon-700 transition hover:bg-bone-100 disabled:opacity-40"
                           disabled={savingId === part.id}
                           onClick={() =>
                             void updateStock(part, part.stockQty + 1)

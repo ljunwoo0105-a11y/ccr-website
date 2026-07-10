@@ -1,25 +1,27 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, Manrope, Space_Grotesk } from "next/font/google";
+import { Archivo, Archivo_Black, IBM_Plex_Mono } from "next/font/google";
 import { BUSINESS, SITE_URL } from "@/lib/config";
 import "./globals.css";
 
-// Pulse type system — Space Grotesk (display), Manrope (body),
-// JetBrains Mono (the "instrument voice": labels, numbers, tables).
-const display = Space_Grotesk({
+// Manifold type system — Archivo Black (display: heavy industrial stencil
+// voice), Archivo (body), IBM Plex Mono (the drafting voice: sheet numbers,
+// dimensions, part indices — never paragraphs).
+const display = Archivo_Black({
   subsets: ["latin"],
+  weight: "400",
   variable: "--font-display",
   display: "swap",
 });
 
-const sans = Manrope({
+const sans = Archivo({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
 });
 
-const mono = JetBrains_Mono({
+const mono = IBM_Plex_Mono({
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["400", "500", "600"],
   variable: "--font-mono",
   display: "swap",
 });
@@ -38,6 +40,13 @@ export const metadata: Metadata = {
   },
 };
 
+// Resolves the theme before first paint — stored choice, else the OS
+// preference — so a dark-mode visitor never sees a bone-white flash.
+// Runs as the first thing in <body>; must stay dependency-free and tiny.
+// Only the storage read may throw (cookie-blocking modes) — the OS-preference
+// fallback and DOM writes must still run, so they live outside the try.
+const THEME_BOOT = `(function(){var t=null;try{t=localStorage.getItem("ccr-theme")}catch(e){}if(t!=="dark"&&t!=="light"){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}var d=document.documentElement;d.dataset.theme=t;d.style.colorScheme=t})()`;
+
 export default function RootLayout({
   children,
 }: {
@@ -47,8 +56,12 @@ export default function RootLayout({
     <html
       lang="en-AU"
       className={`${display.variable} ${sans.variable} ${mono.variable}`}
+      suppressHydrationWarning
     >
-      <body className="font-sans">{children}</body>
+      <body className="font-sans">
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
+        {children}
+      </body>
     </html>
   );
 }

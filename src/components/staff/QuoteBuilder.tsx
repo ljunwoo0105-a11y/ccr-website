@@ -391,16 +391,16 @@ export default function QuoteBuilder() {
   if (done) {
     return (
       <div className="card text-center">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-emerald-500/50 bg-emerald-50">
           <Check className="h-6 w-6 text-emerald-700" aria-hidden />
         </div>
-        <h2 className="mt-4 text-xl font-bold text-slate-900">
+        <h2 className="mt-4 text-xl font-bold text-carbon-950">
           Repair form saved
         </h2>
-        <p className="mt-1 text-sm text-slate-600">
+        <p className="mt-1 text-sm text-carbon-700">
           {brand} {model} · {items.length} repair{items.length === 1 ? "" : "s"}{" "}
           ·{" "}
-          <span className="font-semibold text-slate-900">
+          <span className="font-semibold text-carbon-950">
             {formatAud(done.total)}
           </span>
         </p>
@@ -412,7 +412,7 @@ export default function QuoteBuilder() {
               Saved, but the email failed: {done.emailError}
             </span>
           ) : (
-            <span className="text-slate-500">Saved (no email sent)</span>
+            <span className="text-carbon-500">Saved (no email sent)</span>
           )}
         </p>
         <button
@@ -430,7 +430,7 @@ export default function QuoteBuilder() {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {catalogError && (
-        <p className="rounded-lg bg-rose-50 px-4 py-3 text-sm text-rose-700">
+        <p className=" bg-rose-50 px-4 py-3 text-sm text-rose-700">
           {catalogError}
         </p>
       )}
@@ -454,8 +454,8 @@ export default function QuoteBuilder() {
       {/* Repairs — one device, one or more repair lines */}
       {model && (
         <div className="card space-y-4">
-          <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-ccr-primary text-[10px] font-bold text-white">
+          <h3 className="flex items-center gap-2 text-sm font-semibold text-carbon-950">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-signal-500 text-[10px] font-bold text-carbon-950">
               4
             </span>
             Repairs
@@ -463,7 +463,7 @@ export default function QuoteBuilder() {
 
           {/* Added line items */}
           {items.length > 0 && (
-            <ul className="divide-y divide-slate-100 rounded-lg border border-slate-200">
+            <ul className="divide-y divide-carbon-150  border border-carbon-150">
               {items.map((it, idx) => {
                 const net = applyDiscount(
                   it.sellPrice,
@@ -476,10 +476,10 @@ export default function QuoteBuilder() {
                   <li key={idx} className="px-4 py-3">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <span className="font-medium text-slate-900">
+                        <span className="font-medium text-carbon-950">
                           {it.repairType}
                         </span>
-                        <span className="block text-xs text-slate-500">
+                        <span className="block text-xs text-carbon-500">
                           {qualityName(it.quality)}
                           {it.colour ? ` · ${it.colour}` : ""} ·{" "}
                           {warrantyText(it.warrantyDays)}
@@ -489,10 +489,10 @@ export default function QuoteBuilder() {
                         <div className="text-right">
                           {discounted ? (
                             <>
-                              <span className="block text-xs text-slate-400 line-through">
+                              <span className="block text-xs text-carbon-400 line-through">
                                 {formatAud(it.sellPrice)}
                               </span>
-                              <span className="font-semibold text-slate-900">
+                              <span className="font-semibold text-carbon-950">
                                 {formatAud(net)}
                               </span>
                               <span className="block text-[11px] font-semibold text-emerald-600">
@@ -500,7 +500,7 @@ export default function QuoteBuilder() {
                               </span>
                             </>
                           ) : (
-                            <span className="font-semibold text-slate-900">
+                            <span className="font-semibold text-carbon-950">
                               {formatAud(net)}
                             </span>
                           )}
@@ -513,8 +513,8 @@ export default function QuoteBuilder() {
                           className={cn(
                             "rounded p-1 transition",
                             discounted || discountOpen === idx
-                              ? "text-ccr-primary"
-                              : "text-slate-400 hover:bg-slate-100 hover:text-ccr-primary"
+                              ? "text-signal-600"
+                              : "text-carbon-400 hover:bg-bone-200 hover:text-signal-600"
                           )}
                           aria-label="Discount"
                           title="Add a discount"
@@ -524,7 +524,7 @@ export default function QuoteBuilder() {
                         <button
                           type="button"
                           onClick={() => removeLine(idx)}
-                          className="rounded p-1 text-slate-400 transition hover:bg-rose-50 hover:text-rose-600"
+                          className="rounded p-1 text-carbon-400 transition hover:bg-rose-50 hover:text-rose-600"
                           aria-label={`Remove ${it.repairType}`}
                         >
                           <Trash2 className="h-4 w-4" aria-hidden />
@@ -545,13 +545,13 @@ export default function QuoteBuilder() {
           )}
 
           {/* Add a repair */}
-          <div className="rounded-lg border border-dashed border-slate-300 p-4">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <div className=" border border-dashed border-carbon-200 p-4">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-carbon-500">
               {items.length === 0 ? "Add a repair" : "Add another repair"}
             </p>
 
             {availableRepairs.length === 0 && !curRepair ? (
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-carbon-500">
                 {repairTypes.length === 0
                   ? "No catalog repairs for this device yet — add them in the Price List."
                   : "All available repairs for this device have been added."}
@@ -565,13 +565,13 @@ export default function QuoteBuilder() {
             ) : (
               <div className="space-y-4">
                 {/* current repair pill */}
-                <p className="flex items-center gap-2 text-sm font-medium text-slate-900">
+                <p className="flex items-center gap-2 text-sm font-medium text-carbon-950">
                   <Check className="h-4 w-4 text-emerald-600" aria-hidden />
                   {curRepair}
                   <button
                     type="button"
                     onClick={resetCurrentLine}
-                    className="ml-1 inline-flex items-center gap-1 text-xs font-medium text-ccr-primary hover:text-ccr-secondary"
+                    className="ml-1 inline-flex items-center gap-1 text-xs font-medium text-signal-600 hover:text-signal-600"
                   >
                     <Pencil className="h-3 w-3" aria-hidden />
                     Change
@@ -583,7 +583,7 @@ export default function QuoteBuilder() {
                   loadingParts ? (
                     <Spinner />
                   ) : qualities.length === 0 ? (
-                    <p className="text-sm text-slate-500">No parts for this repair.</p>
+                    <p className="text-sm text-carbon-500">No parts for this repair.</p>
                   ) : (
                     <div className="grid gap-3 sm:grid-cols-2">
                       {qualities.map((q) => (
@@ -591,17 +591,17 @@ export default function QuoteBuilder() {
                           key={q.quality}
                           type="button"
                           onClick={() => setCurQuality(q.quality)}
-                          className="flex items-center justify-between rounded-lg border border-slate-200 p-4 text-left transition hover:border-ccr-primary/50"
+                          className="flex items-center justify-between  border border-carbon-150 p-4 text-left transition hover:border-signal-500/50"
                         >
                           <span>
-                            <span className="block font-semibold text-slate-900">
+                            <span className="block font-semibold text-carbon-950">
                               {qualityName(q.quality)}
                             </span>
-                            <span className="block text-xs text-slate-500">
+                            <span className="block text-xs text-carbon-500">
                               {warrantyText(q.warrantyDays)}
                             </span>
                           </span>
-                          <span className="text-lg font-bold text-ccr-primary">
+                          <span className="text-lg font-bold text-signal-600">
                             {q.multiplePrices ? "from " : ""}
                             {formatAud(q.priceFrom)}
                           </span>
@@ -610,7 +610,7 @@ export default function QuoteBuilder() {
                     </div>
                   )
                 ) : (
-                  <p className="flex items-center gap-2 text-sm text-slate-700">
+                  <p className="flex items-center gap-2 text-sm text-carbon-700">
                     <Check className="h-4 w-4 text-emerald-600" aria-hidden />
                     {qualityName(curQuality)}
                     <button
@@ -619,7 +619,7 @@ export default function QuoteBuilder() {
                         setCurQuality("");
                         setCurColour("");
                       }}
-                      className="ml-1 inline-flex items-center gap-1 text-xs font-medium text-ccr-primary hover:text-ccr-secondary"
+                      className="ml-1 inline-flex items-center gap-1 text-xs font-medium text-signal-600 hover:text-signal-600"
                     >
                       <Pencil className="h-3 w-3" aria-hidden />
                       Change
@@ -638,8 +638,8 @@ export default function QuoteBuilder() {
                         className={cn(
                           "rounded-full border px-4 py-2 text-sm font-medium transition",
                           curColour === c
-                            ? "border-ccr-primary bg-ccr-primary text-white"
-                            : "border-slate-300 text-slate-700 hover:border-ccr-primary"
+                            ? "border-signal-500 bg-signal-500 text-carbon-950"
+                            : "border-carbon-200 text-carbon-700 hover:border-signal-500"
                         )}
                       >
                         {c}
@@ -665,7 +665,7 @@ export default function QuoteBuilder() {
 
           {/* Total */}
           {items.length > 0 && (
-            <div className="flex items-center justify-between rounded-lg bg-slate-900 px-5 py-4 text-white">
+            <div className="flex items-center justify-between  bg-carbon-950 px-5 py-4 text-bone-100">
               <span className="text-sm">
                 {items.length} repair{items.length === 1 ? "" : "s"} · {brand} {model}
                 {savings > 0 && (
@@ -683,8 +683,8 @@ export default function QuoteBuilder() {
       {/* Customer + condition */}
       {items.length > 0 && (
         <div className="card space-y-4">
-          <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-ccr-primary text-[10px] font-bold text-white">
+          <h3 className="flex items-center gap-2 text-sm font-semibold text-carbon-950">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-signal-500 text-[10px] font-bold text-carbon-950">
               5
             </span>
             Customer details
@@ -699,14 +699,14 @@ export default function QuoteBuilder() {
               <input id="qb-email" type="email" className="input" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="off" placeholder="customer@email.com" />
             </div>
             <div>
-              <label className="label" htmlFor="qb-phone">Phone <span className="font-normal text-slate-400">(optional)</span></label>
+              <label className="label" htmlFor="qb-phone">Phone <span className="font-normal text-carbon-400">(optional)</span></label>
               <input id="qb-phone" type="tel" className="input" value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="off" />
             </div>
           </div>
 
           <div>
             <label className="label" htmlFor="qb-notes">
-              Device condition notes <span className="font-normal text-slate-400">(optional)</span>
+              Device condition notes <span className="font-normal text-carbon-400">(optional)</span>
             </label>
             <textarea id="qb-notes" rows={2} className="input resize-y" value={conditionNotes} onChange={(e) => setConditionNotes(e.target.value)} placeholder="e.g. heavy screen cracking, rear glass intact, no water damage…" />
           </div>
@@ -715,26 +715,26 @@ export default function QuoteBuilder() {
             <button
               type="button"
               onClick={() => setIncludeCondition((v) => !v)}
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-ccr-primary hover:text-ccr-secondary"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-signal-600 hover:text-signal-600"
             >
               <Pencil className="h-3.5 w-3.5" aria-hidden />
               {includeCondition ? "Hide" : "Record"} full condition checklist
             </button>
             {includeCondition && (
-              <div className="mt-3 space-y-4 rounded-lg border border-slate-200 p-4">
+              <div className="mt-3 space-y-4  border border-carbon-150 p-4">
                 {PRE_CONDITION_GROUPS.map((group) => (
                   <fieldset key={group.title}>
-                    <legend className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    <legend className="text-xs font-semibold uppercase tracking-wide text-carbon-500">
                       {group.title}
                     </legend>
                     <div className="mt-2 grid gap-2 sm:grid-cols-2">
                       {group.fields.map((f) => (
-                        <label key={f.key} className="flex items-center gap-2 text-sm text-slate-700">
+                        <label key={f.key} className="flex items-center gap-2 text-sm text-carbon-700">
                           <input
                             type="checkbox"
                             checked={Boolean(preCondition[f.key])}
                             onChange={(e) => setCondField(f.key, e.target.checked)}
-                            className="h-4 w-4 rounded border-slate-300 text-ccr-primary focus:ring-ccr-primary"
+                            className="h-4 w-4 rounded border-carbon-200 text-signal-600 focus:ring-signal-500"
                           />
                           {f.label}
                         </label>
@@ -757,7 +757,7 @@ export default function QuoteBuilder() {
                     </select>
                   </div>
                   <div>
-                    <label className="label" htmlFor="qb-batt">Battery health % <span className="font-normal text-slate-400">(optional)</span></label>
+                    <label className="label" htmlFor="qb-batt">Battery health % <span className="font-normal text-carbon-400">(optional)</span></label>
                     <input
                       id="qb-batt"
                       type="number"
@@ -778,13 +778,13 @@ export default function QuoteBuilder() {
             )}
           </div>
 
-          <label className="flex items-center gap-2 text-sm text-slate-700">
-            <input type="checkbox" checked={sendEmail} onChange={(e) => setSendEmail(e.target.checked)} className="h-4 w-4 rounded border-slate-300 text-ccr-primary focus:ring-ccr-primary" />
+          <label className="flex items-center gap-2 text-sm text-carbon-700">
+            <input type="checkbox" checked={sendEmail} onChange={(e) => setSendEmail(e.target.checked)} className="h-4 w-4 rounded border-carbon-200 text-signal-600 focus:ring-signal-500" />
             Email this repair form to the customer
           </label>
 
           {submitError && (
-            <p className="rounded-lg bg-rose-50 px-4 py-3 text-sm text-rose-700">{submitError}</p>
+            <p className=" bg-rose-50 px-4 py-3 text-sm text-rose-700">{submitError}</p>
           )}
 
           <button type="submit" className="btn-primary w-full" disabled={!canSubmit || submitting}>
@@ -823,8 +823,8 @@ function Step({
   return (
     <div className="card">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-ccr-primary text-[10px] font-bold text-white">
+        <h3 className="flex items-center gap-2 text-sm font-semibold text-carbon-950">
+          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-signal-500 text-[10px] font-bold text-carbon-950">
             {n}
           </span>
           {title}
@@ -833,7 +833,7 @@ function Step({
           <button
             type="button"
             onClick={onEdit}
-            className="inline-flex items-center gap-1 text-xs font-medium text-ccr-primary hover:text-ccr-secondary"
+            className="inline-flex items-center gap-1 text-xs font-medium text-signal-600 hover:text-signal-600"
           >
             <Pencil className="h-3 w-3" aria-hidden />
             Change
@@ -841,7 +841,7 @@ function Step({
         )}
       </div>
       {value ? (
-        <p className="flex items-center gap-2 text-sm font-medium text-slate-900">
+        <p className="flex items-center gap-2 text-sm font-medium text-carbon-950">
           <Check className="h-4 w-4 text-emerald-600" aria-hidden />
           {value}
         </p>
@@ -863,7 +863,7 @@ function ChipGrid({
 }) {
   if (loading) return <Spinner />;
   if (options.length === 0)
-    return <p className="text-sm text-slate-500">Nothing available yet.</p>;
+    return <p className="text-sm text-carbon-500">Nothing available yet.</p>;
   return (
     <div className="flex flex-wrap gap-2">
       {options.map((opt) => (
@@ -871,10 +871,10 @@ function ChipGrid({
           key={opt}
           type="button"
           onClick={() => onPick(opt)}
-          className="inline-flex items-center gap-1 rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:border-ccr-primary hover:bg-ccr-primary/5 hover:text-ccr-primary"
+          className="inline-flex items-center gap-1  border border-carbon-200 px-4 py-2.5 text-sm font-medium text-carbon-700 transition hover:border-signal-500 hover:bg-signal-500/5 hover:text-signal-600"
         >
           {opt}
-          <ChevronRight className="h-4 w-4 text-slate-400" aria-hidden />
+          <ChevronRight className="h-4 w-4 text-carbon-400" aria-hidden />
         </button>
       ))}
     </div>
@@ -883,7 +883,7 @@ function ChipGrid({
 
 function Spinner() {
   return (
-    <div className="flex items-center gap-2 text-sm text-slate-500">
+    <div className="flex items-center gap-2 text-sm text-carbon-500">
       <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
       Loading…
     </div>
@@ -901,17 +901,17 @@ function DiscountEditor({
 }) {
   const active: DiscountType = type ?? "PERCENT";
   return (
-    <div className="mt-2 flex flex-wrap items-center gap-2 rounded-lg bg-slate-50 p-2">
-      <span className="text-xs font-medium text-slate-500">Discount</span>
-      <div className="inline-flex overflow-hidden rounded-md border border-slate-300">
+    <div className="mt-2 flex flex-wrap items-center gap-2  bg-bone-100 p-2">
+      <span className="text-xs font-medium text-carbon-500">Discount</span>
+      <div className="inline-flex overflow-hidden  border border-carbon-200">
         <button
           type="button"
           onClick={() => onChange("PERCENT", value)}
           className={cn(
             "px-3 py-1 text-xs font-semibold transition",
             active === "PERCENT"
-              ? "bg-ccr-primary text-white"
-              : "bg-white text-slate-600"
+              ? "bg-signal-500 text-carbon-950"
+              : "bg-bone-50 text-carbon-700"
           )}
         >
           %
@@ -920,10 +920,10 @@ function DiscountEditor({
           type="button"
           onClick={() => onChange("AMOUNT", value)}
           className={cn(
-            "border-l border-slate-300 px-3 py-1 text-xs font-semibold transition",
+            "border-l border-carbon-200 px-3 py-1 text-xs font-semibold transition",
             active === "AMOUNT"
-              ? "bg-ccr-primary text-white"
-              : "bg-white text-slate-600"
+              ? "bg-signal-500 text-carbon-950"
+              : "bg-bone-50 text-carbon-700"
           )}
         >
           $
@@ -944,7 +944,7 @@ function DiscountEditor({
       <button
         type="button"
         onClick={() => onChange("PERCENT", 50)}
-        className="rounded-md border border-slate-300 px-2 py-1 text-xs font-medium text-slate-600 transition hover:border-ccr-primary hover:text-ccr-primary"
+        className=" border border-carbon-200 px-2 py-1 text-xs font-medium text-carbon-700 transition hover:border-signal-500 hover:text-signal-600"
       >
         50% off
       </button>

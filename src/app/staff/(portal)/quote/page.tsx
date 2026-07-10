@@ -18,8 +18,8 @@ export default async function QuotesPage() {
     <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Repair quotes</h1>
-          <p className="text-sm text-slate-500">
+          <h1 className="text-2xl font-bold text-carbon-950">Repair quotes</h1>
+          <p className="text-sm text-carbon-500">
             In-store quotes generated for customers. Prices shown here are
             staff-only.
           </p>
@@ -32,13 +32,13 @@ export default async function QuotesPage() {
 
       <div className="card overflow-x-auto p-0">
         {forms.length === 0 ? (
-          <p className="p-6 text-sm text-slate-500">
+          <p className="p-6 text-sm text-carbon-500">
             No repair quotes yet. Create one to show a customer their price and
             email them the form.
           </p>
         ) : (
           <table className="w-full text-sm">
-            <thead className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+            <thead className="border-b border-carbon-150 bg-bone-100 text-left text-xs uppercase tracking-wide text-carbon-500">
               <tr>
                 <th className="px-4 py-3 font-semibold">Date</th>
                 <th className="px-4 py-3 font-semibold">Customer</th>
@@ -48,34 +48,34 @@ export default async function QuotesPage() {
                 <th className="px-4 py-3 font-semibold">Email</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-carbon-150">
               {forms.map((f) => (
                 <tr key={f.id} className="align-top">
-                  <td className="px-4 py-3 text-slate-500">
+                  <td className="px-4 py-3 text-carbon-500">
                     {formatDateTime(f.createdAt)}
                   </td>
                   <td className="px-4 py-3">
-                    <span className="font-medium text-slate-900">
+                    <span className="font-medium text-carbon-950">
                       {f.customerName}
                     </span>
-                    <span className="block text-xs text-slate-500">
+                    <span className="block text-xs text-carbon-500">
                       {f.customerEmail}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-slate-700">
+                  <td className="px-4 py-3 text-carbon-700">
                     {f.brand} {f.model}
                   </td>
                   <td className="px-4 py-3">
-                    <span className="text-slate-900">
+                    <span className="text-carbon-950">
                       {f.items.map((i) => i.repairType).join(", ") || "—"}
                     </span>
                     {f.items.length > 1 && (
-                      <span className="block text-xs text-slate-500">
+                      <span className="block text-xs text-carbon-500">
                         {f.items.length} repairs
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-right font-semibold text-slate-900">
+                  <td className="px-4 py-3 text-right font-semibold text-carbon-950">
                     {formatAud(f.total)}
                   </td>
                   <td className="px-4 py-3">
@@ -84,7 +84,7 @@ export default async function QuotesPage() {
                     ) : f.emailError ? (
                       <span className="text-rose-600">Failed</span>
                     ) : (
-                      <span className="text-slate-400">—</span>
+                      <span className="text-carbon-400">—</span>
                     )}
                   </td>
                 </tr>

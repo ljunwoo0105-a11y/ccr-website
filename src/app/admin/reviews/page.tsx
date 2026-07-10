@@ -15,8 +15,8 @@ export default async function AdminReviewsPage() {
   return (
     <div className="space-y-8">
       <header>
-        <h1 className="text-2xl font-bold text-slate-900">Reviews</h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <h1 className="text-2xl font-bold text-carbon-950">Reviews</h1>
+        <p className="mt-1 text-sm text-carbon-500">
           Sync Google reviews, curate what shows on the public site, and record
           genuine feedback from other channels.
         </p>

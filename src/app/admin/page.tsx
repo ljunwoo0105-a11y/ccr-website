@@ -18,7 +18,7 @@ function StatusBadge({ status }: { status: string }) {
     <span
       className={cn(
         "inline-flex rounded-full px-2 py-0.5 text-xs font-medium",
-        bad ? "bg-red-100 text-red-700" : "bg-emerald-100 text-emerald-700"
+        bad ? "bg-rose-100 text-rose-700" : "border border-emerald-500/50 bg-emerald-50 text-emerald-700"
       )}
     >
       {status}
@@ -43,8 +43,8 @@ export default async function AdminOverviewPage() {
   return (
     <div className="space-y-8">
       <header>
-        <h1 className="text-2xl font-bold text-slate-900">Overview</h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <h1 className="text-2xl font-bold text-carbon-950">Overview</h1>
+        <p className="mt-1 text-sm text-carbon-500">
           What the site and AI tools have been doing this month.
         </p>
       </header>
@@ -52,24 +52,24 @@ export default async function AdminOverviewPage() {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <div className="card">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-slate-500">
+            <p className="text-sm font-medium text-carbon-500">
               AI spend this month
             </p>
-            <Bot className="h-5 w-5 text-ccr-primary" aria-hidden />
+            <Bot className="h-5 w-5 text-signal-600" aria-hidden />
           </div>
           <p
             className={cn(
               "mt-2 text-2xl font-bold",
-              overBudget ? "text-red-600" : "text-slate-900"
+              overBudget ? "text-rose-600" : "text-carbon-950"
             )}
           >
             {formatUsd(spend, 2)}{" "}
-            <span className="text-sm font-normal text-slate-400">
+            <span className="text-sm font-normal text-carbon-400">
               / {formatUsd(budget, 2)} USD
             </span>
           </p>
           <div
-            className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100"
+            className="mt-3 h-2 w-full overflow-hidden rounded-full bg-bone-200"
             role="progressbar"
             aria-valuenow={Math.round(pct)}
             aria-valuemin={0}
@@ -80,20 +80,20 @@ export default async function AdminOverviewPage() {
               className={cn(
                 "h-full rounded-full transition-all",
                 overBudget
-                  ? "bg-red-500"
+                  ? "bg-rose-500"
                   : pct >= 80
                     ? "bg-amber-500"
-                    : "bg-ccr-primary"
+                    : "bg-signal-500"
               )}
               style={{ width: `${pct}%` }}
             />
           </div>
           {overBudget ? (
-            <p className="mt-2 text-xs font-medium text-red-600">
+            <p className="mt-2 text-xs font-medium text-rose-600">
               Budget reached — AI calls may be blocked.
             </p>
           ) : (
-            <p className="mt-2 text-xs text-slate-400">
+            <p className="mt-2 text-xs text-carbon-400">
               {pct.toFixed(0)}% of monthly budget used
             </p>
           )}
@@ -101,59 +101,59 @@ export default async function AdminOverviewPage() {
 
         <div className="card">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-slate-500">
+            <p className="text-sm font-medium text-carbon-500">
               Quote leads this month
             </p>
             <MessageSquareQuote
-              className="h-5 w-5 text-ccr-accent"
+              className="h-5 w-5 text-signal-600"
               aria-hidden
             />
           </div>
-          <p className="mt-2 text-2xl font-bold text-slate-900">{leadCount}</p>
-          <p className="mt-2 text-xs text-slate-400">
+          <p className="mt-2 text-2xl font-bold text-carbon-950">{leadCount}</p>
+          <p className="mt-2 text-xs text-carbon-400">
             Quote requests since {monthStartLabel}
           </p>
         </div>
 
         <div className="card">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-slate-500">
+            <p className="text-sm font-medium text-carbon-500">
               Visible 5★ reviews
             </p>
-            <Star className="h-5 w-5 text-orange-500" aria-hidden />
+            <Star className="h-5 w-5 text-star" aria-hidden />
           </div>
-          <p className="mt-2 text-2xl font-bold text-slate-900">
+          <p className="mt-2 text-2xl font-bold text-carbon-950">
             {reviewCount}
           </p>
-          <p className="mt-2 text-xs text-slate-400">
+          <p className="mt-2 text-xs text-carbon-400">
             Shown on the public site
           </p>
         </div>
 
         <div className="card">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-slate-500">
+            <p className="text-sm font-medium text-carbon-500">
               Active staff accounts
             </p>
-            <Users className="h-5 w-5 text-ccr-secondary" aria-hidden />
+            <Users className="h-5 w-5 text-signal-600" aria-hidden />
           </div>
-          <p className="mt-2 text-2xl font-bold text-slate-900">
+          <p className="mt-2 text-2xl font-bold text-carbon-950">
             {staffCount}
           </p>
-          <p className="mt-2 text-xs text-slate-400">
+          <p className="mt-2 text-xs text-carbon-400">
             Staff and admin logins enabled
           </p>
         </div>
       </div>
 
       <section className="card p-0">
-        <div className="border-b border-slate-200 px-6 py-4">
-          <h2 className="text-base font-semibold text-slate-900">
+        <div className="border-b border-carbon-150 px-6 py-4">
+          <h2 className="text-base font-semibold text-carbon-950">
             Recent AI activity
           </h2>
         </div>
         {recentLogs.length === 0 ? (
-          <p className="px-6 py-8 text-sm text-slate-500">
+          <p className="px-6 py-8 text-sm text-carbon-500">
             No AI calls logged yet. Usage from the staff price-check tools will
             appear here automatically.
           </p>
@@ -161,7 +161,7 @@ export default async function AdminOverviewPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-400">
+                <tr className="border-b border-carbon-150 text-xs uppercase tracking-wide text-carbon-400">
                   <th className="px-6 py-3 font-medium">Time</th>
                   <th className="px-4 py-3 font-medium">Feature</th>
                   <th className="px-4 py-3 font-medium">Model</th>
@@ -174,20 +174,20 @@ export default async function AdminOverviewPage() {
                 {recentLogs.map((log) => (
                   <tr
                     key={log.id}
-                    className="border-b border-slate-100 last:border-0"
+                    className="border-b border-carbon-150 last:border-0"
                   >
-                    <td className="whitespace-nowrap px-6 py-3 text-slate-500">
+                    <td className="whitespace-nowrap px-6 py-3 text-carbon-500">
                       {formatDateTime(log.createdAt)}
                     </td>
-                    <td className="px-4 py-3 text-slate-700">{log.feature}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-slate-600">
+                    <td className="px-4 py-3 text-carbon-700">{log.feature}</td>
+                    <td className="px-4 py-3 font-mono text-xs text-carbon-700">
                       {log.modelId}
                     </td>
-                    <td className="whitespace-nowrap px-4 py-3 text-slate-600">
+                    <td className="whitespace-nowrap px-4 py-3 text-carbon-700">
                       {log.inputTokens.toLocaleString("en-AU")} /{" "}
                       {log.outputTokens.toLocaleString("en-AU")}
                     </td>
-                    <td className="px-4 py-3 text-slate-700">
+                    <td className="px-4 py-3 text-carbon-700">
                       {formatUsd(log.costUsd)}
                     </td>
                     <td className="px-4 py-3">

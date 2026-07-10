@@ -20,7 +20,7 @@ export default function LogoutButton() {
       type="button"
       onClick={handleLogout}
       disabled={busy}
-      className="inline-flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-slate-800 hover:text-white disabled:opacity-50"
+      className="inline-flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-bone-100/70 transition-colors hover:bg-carbon-900 hover:text-bone-100 disabled:opacity-50"
     >
       <LogOut className="h-4 w-4" aria-hidden />
       {busy ? "Signing out…" : "Logout"}

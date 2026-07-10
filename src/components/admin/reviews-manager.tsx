@@ -45,8 +45,8 @@ function Stars({ rating }: { rating: number }) {
           className={cn(
             "h-4 w-4",
             i <= rating
-              ? "fill-orange-500 text-orange-500"
-              : "fill-slate-200 text-slate-200"
+              ? "fill-star text-star"
+              : "fill-carbon-200 text-carbon-400"
           )}
         />
       ))}
@@ -197,28 +197,28 @@ export function ReviewsManager({
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-6">
             <div>
-              <p className="text-sm font-medium text-slate-500">
+              <p className="text-sm font-medium text-carbon-500">
                 Google rating
               </p>
-              <p className="mt-1 flex items-center gap-2 text-2xl font-bold text-slate-900">
+              <p className="mt-1 flex items-center gap-2 text-2xl font-bold text-carbon-950">
                 {aggregate.rating.toFixed(1)}
                 <Star
-                  className="h-5 w-5 fill-orange-500 text-orange-500"
+                  className="h-5 w-5 fill-star text-star"
                   aria-hidden
                 />
               </p>
             </div>
             <div>
-              <p className="text-sm font-medium text-slate-500">
+              <p className="text-sm font-medium text-carbon-500">
                 Total Google reviews
               </p>
-              <p className="mt-1 text-2xl font-bold text-slate-900">
+              <p className="mt-1 text-2xl font-bold text-carbon-950">
                 {aggregate.reviewCount.toLocaleString("en-AU")}
               </p>
             </div>
             <div>
-              <p className="text-sm font-medium text-slate-500">Last sync</p>
-              <p className="mt-1 text-sm text-slate-700">
+              <p className="text-sm font-medium text-carbon-500">Last sync</p>
+              <p className="mt-1 text-sm text-carbon-700">
                 {lastSyncAt ? formatDateTime(lastSyncAt) : "Never synced"}
               </p>
             </div>
@@ -240,7 +240,7 @@ export function ReviewsManager({
           <p
             role="status"
             className={cn(
-              "mt-4 rounded-lg px-3 py-2 text-sm",
+              "mt-4  px-3 py-2 text-sm",
               syncMsg.ok
                 ? "bg-emerald-50 text-emerald-700"
                 : "bg-amber-50 text-amber-800"
@@ -249,15 +249,15 @@ export function ReviewsManager({
             {syncMsg.message}
           </p>
         )}
-        <p className="mt-4 rounded-lg bg-blue-50 px-3 py-2 text-sm text-blue-800">
+        <p className="mt-4  bg-sky-50 px-3 py-2 text-sm text-sky-800">
           The public site only ever shows 5-star reviews that are marked
           visible.
         </p>
       </section>
 
       <section className="card p-0">
-        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-          <h2 className="text-base font-semibold text-slate-900">
+        <div className="flex items-center justify-between border-b border-carbon-150 px-6 py-4">
+          <h2 className="text-base font-semibold text-carbon-950">
             All reviews
           </h2>
           <button
@@ -274,15 +274,15 @@ export function ReviewsManager({
         </div>
 
         {listError && (
-          <p className="border-b border-red-100 bg-red-50 px-6 py-3 text-sm text-red-700">
+          <p className="border-b border-rose-200/60 bg-rose-50 px-6 py-3 text-sm text-rose-700">
             {listError}
           </p>
         )}
 
         {reviews === null ? (
-          <p className="px-6 py-8 text-sm text-slate-500">Loading reviews…</p>
+          <p className="px-6 py-8 text-sm text-carbon-500">Loading reviews…</p>
         ) : reviews.length === 0 ? (
-          <p className="px-6 py-8 text-sm text-slate-500">
+          <p className="px-6 py-8 text-sm text-carbon-500">
             No reviews stored yet — run a Google sync or add a genuine review
             manually.
           </p>
@@ -290,7 +290,7 @@ export function ReviewsManager({
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-400">
+                <tr className="border-b border-carbon-150 text-xs uppercase tracking-wide text-carbon-400">
                   <th className="px-6 py-3 font-medium">Source</th>
                   <th className="px-4 py-3 font-medium">Author</th>
                   <th className="px-4 py-3 font-medium">Rating</th>
@@ -309,27 +309,27 @@ export function ReviewsManager({
                   return (
                     <tr
                       key={r.id}
-                      className="border-b border-slate-100 align-top last:border-0"
+                      className="border-b border-carbon-150 align-top last:border-0"
                     >
                       <td className="px-6 py-3">
                         <span
                           className={cn(
                             "inline-flex rounded-full px-2 py-0.5 text-xs font-medium",
                             r.source === "GOOGLE"
-                              ? "bg-blue-100 text-blue-700"
-                              : "bg-slate-100 text-slate-600"
+                              ? "border border-sky-500/50 bg-sky-50 text-sky-700"
+                              : "bg-bone-200 text-carbon-700"
                           )}
                         >
                           {r.source}
                         </span>
                       </td>
-                      <td className="whitespace-nowrap px-4 py-3 font-medium text-slate-900">
+                      <td className="whitespace-nowrap px-4 py-3 font-medium text-carbon-950">
                         {r.authorName}
                       </td>
                       <td className="whitespace-nowrap px-4 py-3">
                         <Stars rating={r.rating} />
                       </td>
-                      <td className="min-w-[16rem] max-w-md px-4 py-3 text-slate-600">
+                      <td className="min-w-[16rem] max-w-md px-4 py-3 text-carbon-700">
                         <p className={cn(!expanded && "line-clamp-2")}>
                           {r.text}
                         </p>
@@ -339,13 +339,13 @@ export function ReviewsManager({
                             onClick={() =>
                               setExpandedId(expanded ? null : r.id)
                             }
-                            className="mt-1 text-xs font-medium text-ccr-primary hover:underline"
+                            className="mt-1 text-xs font-medium text-signal-600 hover:underline"
                           >
                             {expanded ? "Show less" : "Show more"}
                           </button>
                         )}
                       </td>
-                      <td className="whitespace-nowrap px-4 py-3 text-slate-500">
+                      <td className="whitespace-nowrap px-4 py-3 text-carbon-500">
                         {formatDate(r.reviewedAt ?? r.createdAt)}
                       </td>
                       <td className="px-4 py-3">
@@ -361,13 +361,13 @@ export function ReviewsManager({
                             type="button"
                             onClick={() => deleteReview(r)}
                             aria-label={`Delete review from ${r.authorName}`}
-                            className="rounded p-1.5 text-slate-400 transition hover:bg-red-50 hover:text-red-600"
+                            className="rounded p-1.5 text-carbon-400 transition hover:bg-rose-50 hover:text-rose-600"
                           >
                             <Trash2 className="h-4 w-4" aria-hidden />
                           </button>
                         ) : (
                           <span
-                            className="text-xs text-slate-400"
+                            className="text-xs text-carbon-400"
                             title="Google reviews can't be deleted — use the visible toggle to hide them"
                           >
                             hide only
@@ -385,7 +385,7 @@ export function ReviewsManager({
 
       {addForm && (
         <Modal title="Add review manually" onClose={() => setAddForm(null)}>
-          <p className="mb-4 flex items-start gap-2 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          <p className="mb-4 flex items-start gap-2  bg-amber-50 px-3 py-2 text-sm text-amber-800">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
             Only add genuine customer reviews — fake reviews breach Australian
             Consumer Law.
@@ -426,22 +426,22 @@ export function ReviewsManager({
                     aria-checked={addForm.rating === i}
                     aria-label={`${i} star${i === 1 ? "" : "s"}`}
                     onClick={() => setAddForm({ ...addForm, rating: i })}
-                    className="rounded p-0.5 focus:outline-none focus:ring-2 focus:ring-ccr-primary/40"
+                    className="rounded p-0.5 focus:outline-none focus:ring-2 focus:ring-signal-500/40"
                   >
                     <Star
                       aria-hidden
                       className={cn(
                         "h-7 w-7 transition",
                         i <= addForm.rating
-                          ? "fill-orange-500 text-orange-500"
-                          : "fill-slate-200 text-slate-200 hover:fill-orange-200 hover:text-orange-200"
+                          ? "fill-star text-star"
+                          : "fill-carbon-200 text-carbon-400 hover:fill-signal-400 hover:text-signal-400"
                       )}
                     />
                   </button>
                 ))}
               </div>
               {addForm.rating < 5 && (
-                <p className="mt-1 text-xs text-slate-400">
+                <p className="mt-1 text-xs text-carbon-400">
                   Reviews under 5 stars are stored but never shown publicly.
                 </p>
               )}
@@ -464,7 +464,7 @@ export function ReviewsManager({
             <div>
               <label className="label" htmlFor="review-date">
                 Review date{" "}
-                <span className="font-normal text-slate-400">(optional)</span>
+                <span className="font-normal text-carbon-400">(optional)</span>
               </label>
               <input
                 id="review-date"
@@ -482,13 +482,13 @@ export function ReviewsManager({
                 onChange={(v) => setAddForm({ ...addForm, visible: v })}
                 label="Visible on public site"
               />
-              <span className="text-sm text-slate-700">
+              <span className="text-sm text-carbon-700">
                 Visible on the public site (5-star only)
               </span>
             </div>
 
             {addError && (
-              <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+              <p className=" bg-rose-50 px-3 py-2 text-sm text-rose-700">
                 {addError}
               </p>
             )}

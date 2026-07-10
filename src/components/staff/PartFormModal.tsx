@@ -105,20 +105,20 @@ export default function PartFormModal({ part, onSaved, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/60 p-4 sm:items-center"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-carbon-950/60 p-4 sm:items-center"
       role="dialog"
       aria-modal="true"
       aria-label={editing ? "Edit part" : "Add part"}
     >
       <div className="card w-full max-w-2xl">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-slate-900">
+          <h2 className="text-lg font-bold text-carbon-950">
             {editing ? `Edit part — ${part.brand} ${part.model}` : "Add part"}
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+            className=" p-1.5 text-carbon-400 transition hover:bg-bone-200 hover:text-carbon-700"
             aria-label="Close"
           >
             <X className="h-5 w-5" aria-hidden />
@@ -128,7 +128,7 @@ export default function PartFormModal({ part, onSaved, onClose }: Props) {
         {error && (
           <p
             role="alert"
-            className="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"
+            className="mb-4  border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700"
           >
             {error}
           </p>
@@ -217,7 +217,7 @@ export default function PartFormModal({ part, onSaved, onClose }: Props) {
           <div>
             <label htmlFor="pf-colour" className="label">
               Colour{" "}
-              <span className="text-slate-400">
+              <span className="text-carbon-400">
                 (optional — e.g. Black, White; used by the in-store quote builder)
               </span>
             </label>
@@ -294,7 +294,7 @@ export default function PartFormModal({ part, onSaved, onClose }: Props) {
           </div>
 
           {margin !== null && (
-            <p className="text-sm text-slate-600">
+            <p className="text-sm text-carbon-700">
               Margin preview:{" "}
               <span className={`font-semibold ${marginTone(margin)}`}>
                 {margin.toFixed(1)}%
@@ -305,7 +305,7 @@ export default function PartFormModal({ part, onSaved, onClose }: Props) {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div>
               <label htmlFor="pf-sku" className="label">
-                SKU <span className="text-slate-400">(optional)</span>
+                SKU <span className="text-carbon-400">(optional)</span>
               </label>
               <input
                 id="pf-sku"
@@ -316,7 +316,7 @@ export default function PartFormModal({ part, onSaved, onClose }: Props) {
             </div>
             <div>
               <label htmlFor="pf-supplier" className="label">
-                Supplier <span className="text-slate-400">(optional)</span>
+                Supplier <span className="text-carbon-400">(optional)</span>
               </label>
               <input
                 id="pf-supplier"
@@ -327,7 +327,7 @@ export default function PartFormModal({ part, onSaved, onClose }: Props) {
             </div>
             <div>
               <label htmlFor="pf-pos" className="label">
-                POS item id <span className="text-slate-400">(optional)</span>
+                POS item id <span className="text-carbon-400">(optional)</span>
               </label>
               <input
                 id="pf-pos"
@@ -340,7 +340,7 @@ export default function PartFormModal({ part, onSaved, onClose }: Props) {
 
           <div>
             <label htmlFor="pf-notes" className="label">
-              Notes <span className="text-slate-400">(optional)</span>
+              Notes <span className="text-carbon-400">(optional)</span>
             </label>
             <textarea
               id="pf-notes"
@@ -351,10 +351,10 @@ export default function PartFormModal({ part, onSaved, onClose }: Props) {
           </div>
 
           {editing && (
-            <label className="flex items-center gap-2 text-sm text-slate-700">
+            <label className="flex items-center gap-2 text-sm text-carbon-700">
               <input
                 type="checkbox"
-                className="h-4 w-4 rounded border-slate-300 text-ccr-primary focus:ring-ccr-primary"
+                className="h-4 w-4 rounded border-carbon-200 text-signal-600 focus:ring-signal-500"
                 checked={active}
                 onChange={(e) => setActive(e.target.checked)}
               />

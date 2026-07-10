@@ -56,7 +56,7 @@ export default function Scanline({
             className="absolute left-0 right-0 h-px shadow-gold-glow"
             style={{
               background:
-                "linear-gradient(90deg, transparent, #00D9FF 30%, #00D9FF 70%, transparent)",
+                "linear-gradient(90deg, transparent, rgb(var(--signal-500)) 30%, rgb(var(--signal-500)) 70%, transparent)",
             }}
             initial={{ top: "0%", opacity: 0 }}
             animate={{
