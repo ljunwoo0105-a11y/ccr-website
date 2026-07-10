@@ -8,15 +8,23 @@
 // tilts toward the pointer like a board on a inspection jig.
 // ---------------------------------------------------------------------------
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type MutableRefObject,
+} from "react";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
   Edges,
   Environment,
   Html,
   Lightformer,
   Line,
+  OrbitControls,
   PerspectiveCamera,
   RoundedBox,
 } from "@react-three/drei";
@@ -26,10 +34,18 @@ import useDocTheme from "./useDocTheme";
 import { useDemandLoop, DemandDriver } from "./useDemandLoop";
 import { BOARD_ICS, type BoardIcId } from "./board-data";
 import IcDetailPanel from "./IcDetailPanel";
+import { BoardZoomControls } from "./BoardZoomControls";
 
 const BOARD_W = 7.2;
 const BOARD_D = 4.7;
 const SURF = 0.075; // top surface height
+const BOARD_CAMERA_TARGET = new THREE.Vector3(0, 0, -0.2);
+const BOARD_CAMERA_POSITION = new THREE.Vector3(0, 5.7, 5.1);
+const BOARD_CAMERA_DISTANCE = BOARD_CAMERA_POSITION.distanceTo(BOARD_CAMERA_TARGET);
+const MIN_ZOOM_PCT = 70;
+const MAX_ZOOM_PCT = 160;
+const ZOOM_STEP_PCT = 15;
+const DEFAULT_ZOOM_PCT = 100;
 
 /** Deterministic RNG — the board must not change between builds. */
 function mulberry32(seed: number) {
@@ -478,12 +494,41 @@ function Board({
   );
 }
 
+function BoardCameraZoom({
+  zoomPct,
+  controlsRef,
+  onInteract,
+}: {
+  readonly zoomPct: number;
+  readonly controlsRef: MutableRefObject<OrbitControlsImpl | null>;
+  readonly onInteract: () => void;
+}) {
+  const camera = useThree((state) => state.camera);
+
+  useEffect(() => {
+    const controls = controlsRef.current;
+    if (!controls || !(camera instanceof THREE.PerspectiveCamera)) return;
+
+    const offset = camera.position.clone().sub(controls.target);
+    if (offset.lengthSq() === 0) offset.copy(BOARD_CAMERA_POSITION).sub(BOARD_CAMERA_TARGET);
+    offset.setLength(BOARD_CAMERA_DISTANCE * (DEFAULT_ZOOM_PCT / zoomPct));
+    camera.position.copy(controls.target).add(offset);
+    camera.updateProjectionMatrix();
+    controls.update();
+    onInteract();
+  }, [camera, controlsRef, onInteract, zoomPct]);
+
+  return null;
+}
+
 export default function SchematicBoard() {
   const wrapRef = useRef<HTMLDivElement>(null);
+  const orbitControlsRef = useRef<OrbitControlsImpl | null>(null);
   // Render immediately and let the observer PARK the loop when scrolled away —
   // failing safe (a delayed/absent observer must never leave the scene blank).
   // The eager-GL-context problem is handled by MountWhenNear in loaders.tsx.
   const [inView, setInView] = useState(true);
+  const [zoomPct, setZoomPct] = useState(DEFAULT_ZOOM_PCT);
   const dark = useDocTheme() === "dark";
   const reduced = useReducedMotion();
   const demand = useDemandLoop();
@@ -526,6 +571,10 @@ export default function SchematicBoard() {
     setSelectedIc(null);
     demand.wake();
   };
+  const setZoom = (pct: number) => {
+    setZoomPct(THREE.MathUtils.clamp(pct, MIN_ZOOM_PCT, MAX_ZOOM_PCT));
+    demand.wake();
+  };
   // Close from the panel: return focus to the matching legend chip so
   // keyboard users aren't dropped to <body>.
   const closePanel = () => {
@@ -558,9 +607,25 @@ export default function SchematicBoard() {
         <DemandDriver bind={demand} />
         <PerspectiveCamera
           makeDefault
-          position={[0, 5.7, 5.1]}
+          position={BOARD_CAMERA_POSITION}
           fov={38}
           onUpdate={(c) => c.lookAt(0, 0, -0.2)}
+        />
+        <OrbitControls
+          ref={orbitControlsRef}
+          makeDefault
+          enableZoom={false}
+          enablePan={false}
+          minPolarAngle={Math.PI * 0.18}
+          maxPolarAngle={Math.PI * 0.58}
+          dampingFactor={0.08}
+          target={BOARD_CAMERA_TARGET}
+          onChange={demand.wake}
+        />
+        <BoardCameraZoom
+          zoomPct={zoomPct}
+          controlsRef={orbitControlsRef}
+          onInteract={demand.wake}
         />
         <ambientLight intensity={0.75} color="#FFF4E4" />
         <directionalLight position={[4, 8, 3]} intensity={1.3} />
@@ -602,8 +667,16 @@ export default function SchematicBoard() {
         <span className="mnl-dim">BOARD-LEVEL · LIVE NETS</span>
       </div>
       <div className="pointer-events-none absolute bottom-4 right-4 hidden text-carbon-500 sm:block">
-        <span className="mnl-dim">MICRO-SOLDERING BAY · CCR-K1</span>
+        <span className="mnl-dim">MICRO-SOLDERING BAY · CCR-K1 / ZOOM {zoomPct}%</span>
       </div>
+      <BoardZoomControls
+        zoomPct={zoomPct}
+        canZoomIn={zoomPct < MAX_ZOOM_PCT}
+        canZoomOut={zoomPct > MIN_ZOOM_PCT}
+        onZoomIn={() => setZoom(zoomPct + ZOOM_STEP_PCT)}
+        onZoomOut={() => setZoom(zoomPct - ZOOM_STEP_PCT)}
+        onResetZoom={() => setZoom(DEFAULT_ZOOM_PCT)}
+      />
 
       {/* IC legend — the keyboard/touch path to selection (3D meshes are
           unreachable by keyboard and tiny tap targets). */}
