@@ -5,8 +5,9 @@
   "description": "CCR (Cool Case Repair) - Springfield Central QLD. Public marketing site, gated quote system, staff portal and admin AI console.",
   "scripts": {
     "dev": "next dev",
-    "build": "npm run validate:bay && next build",
-    "build:sites": "npm run validate:bay && node scripts/build-sites.mjs",
+    "build": "npm run build:sites",
+    "build:next": "npm run validate:bay && next build",
+    "build:sites": "node scripts/build-sites.mjs",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",

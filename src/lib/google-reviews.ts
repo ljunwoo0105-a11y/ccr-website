@@ -28,6 +28,17 @@ interface PlaceDetails {
   reviews?: PlacesReview[];
 }
 
+async function withPublicReviewFallback<T>(
+  read: () => Promise<T>,
+  fallback: T
+): Promise<T> {
+  try {
+    return await read();
+  } catch {
+    return fallback;
+  }
+}
+
 export interface ReviewSyncResult {
   ok: boolean;
   message: string;
@@ -123,7 +134,10 @@ export async function syncGoogleReviewsIfStale(): Promise<ReviewSyncResult> {
     };
   }
 
-  const lastSyncAt = await getSetting<string | null>("google.lastSyncAt", null);
+  const lastSyncAt = await withPublicReviewFallback(
+    () => getSetting<string | null>("google.lastSyncAt", null),
+    null
+  );
   if (
     !shouldSyncGoogleReviews({
       hasApiKey: true,
@@ -144,12 +158,24 @@ export async function getAggregateRating(): Promise<{
   rating: number;
   reviewCount: number;
 }> {
-  return {
-    rating: await getSetting<number>("google.rating", BUSINESS.defaultRating),
-    reviewCount: await getSetting<number>(
-      "google.reviewCount",
+  const [rating, reviewCount] = await Promise.all([
+    withPublicReviewFallback(
+      () => getSetting<number>("google.rating", BUSINESS.defaultRating),
+      BUSINESS.defaultRating
+    ),
+    withPublicReviewFallback(
+      () =>
+        getSetting<number>(
+          "google.reviewCount",
+          BUSINESS.defaultReviewCount
+        ),
       BUSINESS.defaultReviewCount
     ),
+  ]);
+
+  return {
+    rating,
+    reviewCount,
   };
 }
 
@@ -158,23 +184,27 @@ export async function getAggregateRating(): Promise<{
  * single query the public site is allowed to read reviews through.
  */
 export async function getPublicReviews(limit = 12) {
-  return db.review.findMany({
-    where: {
-      visible: true,
-      rating: 5,
-      source: "GOOGLE",
-      externalId: { not: null },
-      NOT: { externalId: { startsWith: "seed-" } },
-    },
-    orderBy: [{ reviewedAt: "desc" }, { createdAt: "desc" }],
-    take: limit,
-    select: {
-      id: true,
-      authorName: true,
-      rating: true,
-      text: true,
-      reviewedAt: true,
-      source: true,
-    },
-  });
+  return withPublicReviewFallback(
+    () =>
+      db.review.findMany({
+        where: {
+          visible: true,
+          rating: 5,
+          source: "GOOGLE",
+          externalId: { not: null },
+          NOT: { externalId: { startsWith: "seed-" } },
+        },
+        orderBy: [{ reviewedAt: "desc" }, { createdAt: "desc" }],
+        take: limit,
+        select: {
+          id: true,
+          authorName: true,
+          rating: true,
+          text: true,
+          reviewedAt: true,
+          source: true,
+        },
+      }),
+    []
+  );
 }
