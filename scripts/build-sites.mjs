@@ -1,4 +1,4 @@
-import { cp, mkdir, readdir, rm, writeFile } from "node:fs/promises";
+import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import { join } from "node:path";
 
@@ -77,7 +77,10 @@ await rm(
 await mkdir(distHostingDir, { recursive: true });
 await cp(hostingConfig, join(distHostingDir, "hosting.json"));
 await mkdir(serverDir, { recursive: true });
+const workerSource = await readFile(join(distDir, "worker.js"), "utf8");
 await writeFile(
   join(serverDir, "index.js"),
-  'export { default } from "../worker.js";\n',
+  workerSource
+    .replaceAll('from "./', 'from "../')
+    .replaceAll('import("./', 'import("../'),
 );
