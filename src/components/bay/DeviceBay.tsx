@@ -14,8 +14,9 @@ import {
   useState,
   type MutableRefObject,
 } from "react";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
   ContactShadows,
   Edges,
@@ -35,6 +36,7 @@ import { useDemandLoop, DemandDriver } from "./useDemandLoop";
 import { useDiagnosis, type RankInfo } from "./useDiagnosis";
 import DiagnosePanel from "./DiagnosePanel";
 import DiagnosisLinks from "./DiagnosisLinks";
+import BayControlDeck from "./BayControlDeck";
 import {
   DEVICES,
   getDevice,
@@ -78,6 +80,10 @@ const BONE_EDGE = new THREE.Color("#EDE9DC");
 // Bench tones non-suspects gray toward while a verdict is highlighted.
 const DIM_LIGHT = new THREE.Color("#ECE7DA");
 const DIM_DARK = new THREE.Color("#131210");
+const MIN_ZOOM_PCT = 70;
+const MAX_ZOOM_PCT = 160;
+const ZOOM_STEP_PCT = 15;
+const DEFAULT_ZOOM_PCT = 100;
 
 /** Mutable per-frame control state shared with the canvas without re-renders. */
 interface BayControls {
@@ -476,8 +482,38 @@ function PartMesh({
 
 // --- Scene ------------------------------------------------------------------
 
+function CameraZoom({
+  baseDistance,
+  zoomPct,
+  controlsRef,
+  onInteract,
+}: {
+  baseDistance: number;
+  zoomPct: number;
+  controlsRef: MutableRefObject<OrbitControlsImpl | null>;
+  onInteract?: () => void;
+}) {
+  const camera = useThree((state) => state.camera);
+
+  useEffect(() => {
+    const controls = controlsRef.current;
+    if (!controls || !(camera instanceof THREE.PerspectiveCamera)) return;
+
+    const offset = camera.position.clone().sub(controls.target);
+    if (offset.lengthSq() === 0) offset.set(0, 0, 1);
+    offset.setLength(baseDistance * (DEFAULT_ZOOM_PCT / zoomPct));
+    camera.position.copy(controls.target).add(offset);
+    camera.updateProjectionMatrix();
+    controls.update();
+    onInteract?.();
+  }, [baseDistance, camera, controlsRef, onInteract, zoomPct]);
+
+  return null;
+}
+
 function BayScene({
   device,
+  zoomPct,
   controls,
   rig,
   xray,
@@ -489,6 +525,7 @@ function BayScene({
   chain,
 }: {
   device: DeviceDef;
+  zoomPct: number;
   controls: MutableRefObject<BayControls>;
   rig: RigState;
   xray: boolean;
@@ -500,6 +537,7 @@ function BayScene({
   chain: readonly string[] | null;
 }) {
   const reduced = useReducedMotion();
+  const orbitControlsRef = useRef<OrbitControlsImpl | null>(null);
   const camPos = useMemo<Vec3>(() => {
     const [el, az] = [device.baseTilt[0], device.baseTilt[1]];
     const r = device.camZ;
@@ -515,6 +553,7 @@ function BayScene({
       <PerspectiveCamera makeDefault key={device.id} position={camPos} fov={34} />
       <OrbitControls
         key={`${device.id}-controls`}
+        ref={orbitControlsRef}
         makeDefault
         enableZoom={false}
         enablePan={false}
@@ -524,6 +563,12 @@ function BayScene({
         maxPolarAngle={Math.PI * 0.62}
         dampingFactor={0.08}
         onChange={onInteract}
+      />
+      <CameraZoom
+        baseDistance={device.camZ}
+        zoomPct={zoomPct}
+        controlsRef={orbitControlsRef}
+        onInteract={onInteract}
       />
 
       <ambientLight intensity={0.85} color="#FFF6E8" />
@@ -615,6 +660,7 @@ function BayScene({
 export default function DeviceBay() {
   const [deviceId, setDeviceId] = useState<DeviceDef["id"]>("phone");
   const [explodePct, setExplodePct] = useState(62);
+  const [zoomPct, setZoomPct] = useState(DEFAULT_ZOOM_PCT);
   const [xray, setXray] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
@@ -675,6 +721,10 @@ export default function DeviceBay() {
   const setExplode = (pct: number) => {
     setExplodePct(pct);
     controls.current.explode = pct / 100;
+    demand.wake();
+  };
+  const setZoom = (pct: number) => {
+    setZoomPct(Math.min(MAX_ZOOM_PCT, Math.max(MIN_ZOOM_PCT, pct)));
     demand.wake();
   };
 
@@ -749,6 +799,7 @@ export default function DeviceBay() {
           <BayScene
             key={device.id}
             device={device}
+            zoomPct={zoomPct}
             controls={controls}
             rig={rig}
             xray={xray}
@@ -768,11 +819,12 @@ export default function DeviceBay() {
         </div>
         <div className="pointer-events-none absolute right-4 top-4 hidden text-carbon-500 sm:block">
           <span className="mnl-dim">
-            {xray ? "VIEW · X-RAY" : "VIEW · ISO"} / DRAG TO ORBIT
+            {xray ? "VIEW · X-RAY" : "VIEW · ISO"} / DRAG TO ORBIT / ZOOM{" "}
+            {zoomPct}%
           </span>
         </div>
         <div
-          className="pointer-events-none absolute bottom-[4.5rem] left-4 text-carbon-500 lg:bottom-4"
+          className="pointer-events-none absolute bottom-[7.25rem] left-4 text-carbon-500 sm:bottom-[4.5rem] lg:bottom-4"
           aria-hidden="true"
         >
           <span className="mnl-dim">
@@ -780,43 +832,22 @@ export default function DeviceBay() {
           </span>
         </div>
 
-        {/* Control deck */}
-        <div className="absolute inset-x-0 bottom-0 flex flex-wrap items-center gap-2 border-t border-carbon-950 bg-bone-50/90 px-3 py-2.5 backdrop-blur-sm lg:gap-3 lg:px-4">
-          <label className="flex min-w-[10rem] flex-1 items-center gap-3">
-            <span className="mnl-dim shrink-0 text-carbon-700">Teardown</span>
-            <input
-              type="range"
-              min={0}
-              max={100}
-              value={explodePct}
-              onChange={(e) => setExplode(Number(e.target.value))}
-              className="mnl-range w-full"
-              aria-label="Explode the device into parts"
-            />
-            <span className="mnl-dim mnl-num w-10 shrink-0 text-right text-signal-600">
-              {explodePct}%
-            </span>
-          </label>
-          <button
-            type="button"
-            className="mnl-chip"
-            data-active={xray}
-            onClick={toggleXray}
-            aria-pressed={xray}
-          >
-            X-Ray
-          </button>
-          <button
-            type="button"
-            className="mnl-chip"
-            onClick={() => {
-              setExplode(0);
-              clearSelect();
-            }}
-          >
-            Assemble
-          </button>
-        </div>
+        <BayControlDeck
+          explodePct={explodePct}
+          zoomPct={zoomPct}
+          xray={xray}
+          canZoomIn={zoomPct < MAX_ZOOM_PCT}
+          canZoomOut={zoomPct > MIN_ZOOM_PCT}
+          onExplodeChange={setExplode}
+          onToggleXray={toggleXray}
+          onAssemble={() => {
+            setExplode(0);
+            clearSelect();
+          }}
+          onZoomIn={() => setZoom(zoomPct + ZOOM_STEP_PCT)}
+          onZoomOut={() => setZoom(zoomPct - ZOOM_STEP_PCT)}
+          onResetZoom={() => setZoom(DEFAULT_ZOOM_PCT)}
+        />
       </div>
 
       {/* ------------------------------------------------ BOM inspector */}
