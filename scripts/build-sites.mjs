@@ -5,6 +5,8 @@ import { join } from "node:path";
 const distDir = join(process.cwd(), "dist");
 const openNextDir = join(process.cwd(), ".open-next");
 const serverDir = join(distDir, "server");
+const hostingConfig = join(process.cwd(), ".openai", "hosting.json");
+const distHostingDir = join(distDir, ".openai");
 const npm = process.platform === "win32" ? "npm.cmd" : "npm";
 const openNext = process.platform === "win32"
   ? "opennextjs-cloudflare.cmd"
@@ -72,6 +74,8 @@ await rm(
   ),
   { force: true },
 );
+await mkdir(distHostingDir, { recursive: true });
+await cp(hostingConfig, join(distHostingDir, "hosting.json"));
 await mkdir(serverDir, { recursive: true });
 await writeFile(
   join(serverDir, "index.js"),
