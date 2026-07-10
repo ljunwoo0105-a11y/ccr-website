@@ -81,4 +81,18 @@ for (const entry of ["cloudflare", "middleware", "server-functions", ".build"]) 
   await cp(join(distDir, entry), join(serverDir, entry), { recursive: true });
 }
 const workerSource = await readFile(join(distDir, "worker.js"), "utf8");
-await writeFile(join(serverDir, "index.js"), workerSource);
+await writeFile(
+  join(distDir, "cloudflare", "next-env.mjs"),
+  "export const production = {};\nexport const development = {};\nexport const test = {};\n",
+);
+await writeFile(
+  join(serverDir, "cloudflare", "next-env.mjs"),
+  "export const production = {};\nexport const development = {};\nexport const test = {};\n",
+);
+await writeFile(
+  join(serverDir, "index.js"),
+  workerSource
+    .replace(/^.*DOQueueHandler.*\n/gm, "")
+    .replace(/^.*DOShardedTagCache.*\n/gm, "")
+    .replace(/^.*BucketCachePurge.*\n/gm, ""),
+);
