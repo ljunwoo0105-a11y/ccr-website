@@ -1,5 +1,4 @@
 import "server-only";
-import { db, getSetting, setSetting } from "@/lib/db";
 import { BUSINESS } from "@/lib/config";
 import { shouldSyncGoogleReviews } from "@/lib/google-review-sync-policy";
 
@@ -28,12 +27,31 @@ interface PlaceDetails {
   reviews?: PlacesReview[];
 }
 
+type DatabaseModule = typeof import("@/lib/db");
+
+async function getDatabase(): Promise<DatabaseModule | null> {
+  if (!process.env.DATABASE_URL?.trim()) {
+    return null;
+  }
+
+  try {
+    return await import("@/lib/db");
+  } catch {
+    return null;
+  }
+}
+
 async function withPublicReviewFallback<T>(
-  read: () => Promise<T>,
+  read: (database: DatabaseModule) => Promise<T>,
   fallback: T
 ): Promise<T> {
+  const database = await getDatabase();
+  if (!database) {
+    return fallback;
+  }
+
   try {
-    return await read();
+    return await read(database);
   } catch {
     return fallback;
   }
@@ -76,6 +94,15 @@ export async function syncGoogleReviews(): Promise<ReviewSyncResult> {
   }
 
   const place = (await res.json()) as PlaceDetails;
+  const database = await getDatabase();
+  if (!database) {
+    return {
+      ok: false,
+      message: "DATABASE_URL is not configured. Add it before syncing reviews.",
+    };
+  }
+
+  const { db, setSetting } = database;
   let upserted = 0;
 
   for (const review of place.reviews ?? []) {
@@ -135,7 +162,7 @@ export async function syncGoogleReviewsIfStale(): Promise<ReviewSyncResult> {
   }
 
   const lastSyncAt = await withPublicReviewFallback(
-    () => getSetting<string | null>("google.lastSyncAt", null),
+    ({ getSetting }) => getSetting<string | null>("google.lastSyncAt", null),
     null
   );
   if (
@@ -160,11 +187,12 @@ export async function getAggregateRating(): Promise<{
 }> {
   const [rating, reviewCount] = await Promise.all([
     withPublicReviewFallback(
-      () => getSetting<number>("google.rating", BUSINESS.defaultRating),
+      ({ getSetting }) =>
+        getSetting<number>("google.rating", BUSINESS.defaultRating),
       BUSINESS.defaultRating
     ),
     withPublicReviewFallback(
-      () =>
+      ({ getSetting }) =>
         getSetting<number>(
           "google.reviewCount",
           BUSINESS.defaultReviewCount
@@ -185,7 +213,7 @@ export async function getAggregateRating(): Promise<{
  */
 export async function getPublicReviews(limit = 12) {
   return withPublicReviewFallback(
-    () =>
+    ({ db }) =>
       db.review.findMany({
         where: {
           visible: true,
