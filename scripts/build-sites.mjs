@@ -77,9 +77,11 @@ await rm(
 await mkdir(distHostingDir, { recursive: true });
 await cp(hostingConfig, join(distHostingDir, "hosting.json"));
 await mkdir(serverDir, { recursive: true });
-for (const entry of ["cloudflare", "middleware", "server-functions", ".build"]) {
+for (const entry of ["cloudflare", "middleware", "server-functions"]) {
   await cp(join(distDir, entry), join(serverDir, entry), { recursive: true });
 }
+await rm(join(distDir, ".build"), { recursive: true, force: true });
+await rm(join(serverDir, ".build"), { recursive: true, force: true });
 const workerSource = await readFile(join(distDir, "worker.js"), "utf8");
 await writeFile(
   join(distDir, "cloudflare", "next-env.mjs"),
