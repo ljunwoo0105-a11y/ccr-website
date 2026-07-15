@@ -42,7 +42,7 @@ The `ink-*`, `gold-*`, `pulse-*`, `star`, `paper`, `stone`, `line`, `status-*`, 
 
 - `signal-500` is the primary action accent in Manifold buttons and staff/admin active states (`src/app/globals.css:479`, `src/components/staff/SidebarNav.tsx:55`, `src/components/admin/admin-nav.tsx:46`).
 - Carbon-on-bone is the default text and border pairing (`src/app/globals.css:405`, `src/app/staff/(portal)/layout.tsx:22`, `src/app/admin/layout.tsx:31`).
-- Dark theme is token-driven through `[data-theme="dark"]`, bootstrapped before first paint in `src/app/layout.tsx:48`.
+- Dark theme is token-driven through `[data-theme="dark"]`, bootstrapped as the default before first paint in `src/app/layout.tsx:48`.
 - Stamp plates deepen signal values in dark mode to preserve contrast (`src/app/globals.css:722`).
 
 ## 3. Typography
@@ -242,7 +242,7 @@ Only patterns present in source are listed. Components used at least twice are d
 - Reveal primitives are once-only viewport animations (`src/components/motion/Reveal.tsx:36`, `src/components/motion/Reveal.tsx:73`).
 - The current motion vocabulary is mostly transform, opacity, color, box-shadow, and focus rings; `Collapse` intentionally animates height for auto-height accordions (`src/components/motion/Collapse.tsx:27`).
 - Continuous motion exists in marquee/status-pulse/spinners; marquee has motion-reduce handling in sheet ticker (`src/components/sheet/SpecStrip.tsx:33`), and legacy ticker has motion-reduce behavior in `src/components/public/TickerBand.tsx:28`.
-- Theme interaction is a persisted `.mnl-chip` toggle that writes `data-theme` and `colorScheme` (`src/components/sheet/ThemeToggle.tsx:8`, `src/components/sheet/ThemeToggle.tsx:93`).
+- Theme interaction is a persisted `.mnl-chip` toggle that writes `data-theme` and `colorScheme`; when no visitor preference is saved, dark is the default (`src/components/sheet/ThemeToggle.tsx:8`, `src/components/sheet/ThemeToggle.tsx:93`).
 
 ## 7. Depth & Surface
 

@@ -40,12 +40,11 @@ export const metadata: Metadata = {
   },
 };
 
-// Resolves the theme before first paint — stored choice, else the OS
-// preference — so a dark-mode visitor never sees a bone-white flash.
+// Resolves the theme before first paint — stored choice, else dark.
 // Runs as the first thing in <body>; must stay dependency-free and tiny.
-// Only the storage read may throw (cookie-blocking modes) — the OS-preference
-// fallback and DOM writes must still run, so they live outside the try.
-const THEME_BOOT = `(function(){var t=null;try{t=localStorage.getItem("ccr-theme")}catch(e){}if(t!=="dark"&&t!=="light"){t=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"}var d=document.documentElement;d.dataset.theme=t;d.style.colorScheme=t})()`;
+// Only the storage read may throw (cookie-blocking modes); the dark fallback
+// and DOM writes must still run, so they live outside the try.
+const THEME_BOOT = `(function(){var t=null;try{t=localStorage.getItem("ccr-theme")}catch(e){}if(t!=="dark"&&t!=="light"){t="dark"}var d=document.documentElement;d.dataset.theme=t;d.style.colorScheme=t})()`;
 
 export default function RootLayout({
   children,

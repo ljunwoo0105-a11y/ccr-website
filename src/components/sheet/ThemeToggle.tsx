@@ -4,22 +4,33 @@ import { useEffect, useState } from "react";
 import { Moon, Sun, SunMoon } from "lucide-react";
 
 const STORAGE_KEY = "ccr-theme";
+const DEFAULT_THEME = "dark";
 
-function applyTheme(theme: "light" | "dark") {
+type Theme = "light" | "dark";
+
+function applyTheme(theme: Theme) {
   const el = document.documentElement;
   el.dataset.theme = theme;
   el.style.colorScheme = theme;
 }
 
+function readStoredTheme(): Theme {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored === "dark" || stored === "light" ? stored : DEFAULT_THEME;
+  } catch {
+    return DEFAULT_THEME;
+  }
+}
+
 /**
  * Light/dark switch for the manual — day bench or night bench. The boot
  * script in the root layout resolves the initial theme before first paint
- * (stored choice, else system preference); this chip just flips and
- * persists it. Renders a neutral icon until mounted so server and client
- * markup agree.
+ * (stored choice, else dark); this chip just flips and persists it. Renders
+ * a neutral icon until mounted so server and client markup agree.
  */
 export default function ThemeToggle() {
-  const [theme, setTheme] = useState<"light" | "dark" | null>(null);
+  const [theme, setTheme] = useState<Theme | null>(null);
 
   useEffect(() => {
     const readDom = () =>
@@ -28,63 +39,26 @@ export default function ThemeToggle() {
       );
     readDom();
 
-    // No explicit choice stored → keep following the OS while the tab lives.
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
-    const onSystemChange = (e: MediaQueryListEvent) => {
-      try {
-        if (localStorage.getItem(STORAGE_KEY)) return;
-      } catch {
-        /* storage unavailable — still follow the OS */
-      }
-      const next = e.matches ? "dark" : "light";
-      applyTheme(next);
-      setTheme(next);
-    };
-    // Safari < 14 has MediaQueryList without EventTarget — use addListener.
-    const legacyMedia = media as MediaQueryList & {
-      addListener?: (cb: (e: MediaQueryListEvent) => void) => void;
-      removeListener?: (cb: (e: MediaQueryListEvent) => void) => void;
-    };
-    if (typeof media.addEventListener === "function") {
-      media.addEventListener("change", onSystemChange);
-    } else {
-      legacyMedia.addListener?.(onSystemChange);
-    }
-
     // A toggle in another tab, or a bfcache restore after one, must re-sync.
     const onStorage = (e: StorageEvent) => {
       if (e.key !== STORAGE_KEY) return;
       if (e.newValue === "dark" || e.newValue === "light") {
         applyTheme(e.newValue);
         setTheme(e.newValue);
+      } else {
+        applyTheme(DEFAULT_THEME);
+        setTheme(DEFAULT_THEME);
       }
     };
     const onPageShow = (e: PageTransitionEvent) => {
       if (!e.persisted) return;
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored === "dark" || stored === "light") {
-          applyTheme(stored);
-        } else {
-          // No explicit choice — re-resolve the OS preference, which may have
-          // flipped while the page sat frozen in the bfcache.
-          applyTheme(media.matches ? "dark" : "light");
-        }
-      } catch {
-        // storage unavailable — follow the OS preference.
-        applyTheme(media.matches ? "dark" : "light");
-      }
+      applyTheme(readStoredTheme());
       readDom();
     };
     window.addEventListener("storage", onStorage);
     window.addEventListener("pageshow", onPageShow);
 
     return () => {
-      if (typeof media.removeEventListener === "function") {
-        media.removeEventListener("change", onSystemChange);
-      } else {
-        legacyMedia.removeListener?.(onSystemChange);
-      }
       window.removeEventListener("storage", onStorage);
       window.removeEventListener("pageshow", onPageShow);
     };
