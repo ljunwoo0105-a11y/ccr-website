@@ -10,6 +10,10 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   output: "standalone",
+  webpack(config) {
+    config.output.hashSalt = "ccr-dark-default-v2";
+    return config;
+  },
   async headers() {
     return [
       {
