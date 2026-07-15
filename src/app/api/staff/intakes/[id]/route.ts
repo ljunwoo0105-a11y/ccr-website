@@ -8,13 +8,14 @@ export const dynamic = "force-dynamic";
 /** Full intake record, including the customer and the staff member's name. */
 export async function GET(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { error } = await guard();
   if (error) return error;
+  const { id } = await params;
 
   const intake = await db.repairIntake.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       customer: true,
       staff: { select: { id: true, name: true } },
@@ -28,16 +29,17 @@ export async function GET(
 /** Status transitions; COLLECTED also stamps completedAt. */
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { error } = await guard();
   if (error) return error;
+  const { id } = await params;
 
   const parsed = await parseBody(req, intakeStatusSchema);
   if (parsed.error) return parsed.error;
 
   const existing = await db.repairIntake.findUnique({
-    where: { id: params.id },
+    where: { id },
   });
   if (!existing) return fail("Intake not found", 404);
 
@@ -45,7 +47,7 @@ export async function PATCH(
   if (parsed.data.status === "COLLECTED") data.completedAt = new Date();
 
   const intake = await db.repairIntake.update({
-    where: { id: params.id },
+    where: { id },
     data,
   });
 

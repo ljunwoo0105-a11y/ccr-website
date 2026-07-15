@@ -9,15 +9,16 @@ const reviewPatchSchema = z.object({
 /** Show/hide a review on the public site. */
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { error } = await guard("ADMIN");
   if (error) return error;
+  const { id } = await params;
 
   const body = await parseBody(req, reviewPatchSchema);
   if (body.error) return body.error;
 
-  const review = await db.review.findUnique({ where: { id: params.id } });
+  const review = await db.review.findUnique({ where: { id } });
   if (!review) return fail("Review not found", 404);
 
   const updated = await db.review.update({
@@ -30,12 +31,13 @@ export async function PATCH(
 /** Delete a manual review. Google reviews can only be hidden, not deleted. */
 export async function DELETE(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { error } = await guard("ADMIN");
   if (error) return error;
+  const { id } = await params;
 
-  const review = await db.review.findUnique({ where: { id: params.id } });
+  const review = await db.review.findUnique({ where: { id } });
   if (!review) return fail("Review not found", 404);
 
   if (review.source !== "MANUAL") {

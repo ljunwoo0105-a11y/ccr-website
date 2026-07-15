@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { ok, fail, guard } from "@/lib/api";
+import { guard, privateFail, privateOk } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 
@@ -33,7 +33,7 @@ export async function GET(req: Request) {
         select: { deviceType: true },
         orderBy: { deviceType: "asc" },
       });
-      return ok({ deviceTypes: rows.map((r) => r.deviceType) });
+      return privateOk({ deviceTypes: rows.map((r) => r.deviceType) });
     }
     if (!brand) {
       const rows = await db.part.findMany({
@@ -42,7 +42,7 @@ export async function GET(req: Request) {
         select: { brand: true },
         orderBy: { brand: "asc" },
       });
-      return ok({ brands: rows.map((r) => r.brand) });
+      return privateOk({ brands: rows.map((r) => r.brand) });
     }
     if (!model) {
       const rows = await db.part.findMany({
@@ -51,7 +51,7 @@ export async function GET(req: Request) {
         select: { model: true },
         orderBy: { model: "asc" },
       });
-      return ok({ models: rows.map((r) => r.model) });
+      return privateOk({ models: rows.map((r) => r.model) });
     }
     if (!repairType) {
       const rows = await db.part.findMany({
@@ -60,7 +60,7 @@ export async function GET(req: Request) {
         select: { repairType: true },
         orderBy: { repairType: "asc" },
       });
-      return ok({ repairTypes: rows.map((r) => r.repairType) });
+      return privateOk({ repairTypes: rows.map((r) => r.repairType) });
     }
 
     const parts = await db.part.findMany({
@@ -75,8 +75,8 @@ export async function GET(req: Request) {
       },
       orderBy: [{ sellPrice: "asc" }],
     });
-    return ok({ parts });
+    return privateOk({ parts });
   } catch {
-    return fail("Something went wrong", 500);
+    return privateFail("Something went wrong", 500);
   }
 }

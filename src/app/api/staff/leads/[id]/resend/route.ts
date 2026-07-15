@@ -14,12 +14,13 @@ export const dynamic = "force-dynamic";
  */
 export async function POST(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { error } = await guard();
   if (error) return error;
+  const { id } = await params;
 
-  const lead = await db.quoteRequest.findUnique({ where: { id: params.id } });
+  const lead = await db.quoteRequest.findUnique({ where: { id } });
   if (!lead) return fail("Lead not found", 404);
 
   const part = await findCheapestPart({

@@ -53,7 +53,12 @@ export const partSchema = z.object({
   notes: z.string().trim().max(1000).optional().nullable(),
   active: z.boolean().optional(),
 });
-export const partUpdateSchema = partSchema.partial();
+export const partUpdateSchema = partSchema
+  .partial()
+  .refine((input) => Object.keys(input).length > 0, {
+    message: "Update at least one part field",
+    path: ["body"],
+  });
 
 // --- Customer intake -----------------------------------------------------
 export const preConditionSchema = z.object({

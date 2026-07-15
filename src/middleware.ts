@@ -10,6 +10,13 @@ import { jwtVerify } from "jose";
  */
 
 const SESSION_COOKIE = "ccr_session";
+const PRIVATE_CACHE_CONTROL = "private, no-store";
+
+function privateResponse(response: NextResponse): NextResponse {
+  response.headers.set("Cache-Control", PRIVATE_CACHE_CONTROL);
+  response.headers.set("Vary", "Cookie");
+  return response;
+}
 
 async function verify(token: string) {
   try {
@@ -33,7 +40,7 @@ export async function middleware(req: NextRequest) {
 
   // The login screen and login API are the only unauthenticated staff routes.
   if (pathname === "/staff/login" || pathname === "/api/staff/login") {
-    return NextResponse.next();
+    return privateResponse(NextResponse.next());
   }
 
   const token = req.cookies.get(SESSION_COOKIE)?.value;
@@ -41,21 +48,21 @@ export async function middleware(req: NextRequest) {
 
   if (!session?.sub) {
     if (pathname.startsWith("/api/")) {
-      return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
+      return privateResponse(NextResponse.json({ error: "Unauthorised" }, { status: 401 }));
     }
     const login = new URL("/staff/login", req.url);
     login.searchParams.set("next", pathname);
-    return NextResponse.redirect(login);
+    return privateResponse(NextResponse.redirect(login));
   }
 
   if (isAdminArea && session.role !== "ADMIN") {
     if (pathname.startsWith("/api/")) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      return privateResponse(NextResponse.json({ error: "Forbidden" }, { status: 403 }));
     }
-    return NextResponse.redirect(new URL("/staff", req.url));
+    return privateResponse(NextResponse.redirect(new URL("/staff", req.url)));
   }
 
-  return NextResponse.next();
+  return privateResponse(NextResponse.next());
 }
 
 export const config = {

@@ -1,10 +1,20 @@
 import IntakeForm from "@/components/staff/IntakeForm";
+import { parseIntakePrefill } from "@/components/staff/intake/prefill";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = { title: "New Intake", robots: { index: false } };
 
-export default function NewIntakePage() {
+type NewIntakePageProps = {
+  readonly searchParams?: Promise<
+    Readonly<Record<string, string | readonly string[] | undefined>>
+  >;
+};
+
+export default async function NewIntakePage(props: NewIntakePageProps) {
+  const searchParams = await props.searchParams;
+  const prefill = parseIntakePrefill(searchParams ?? {});
+
   return (
     <div className="space-y-6">
       <header>
@@ -14,7 +24,7 @@ export default function NewIntakePage() {
           starts.
         </p>
       </header>
-      <IntakeForm />
+      <IntakeForm prefill={prefill} />
     </div>
   );
 }

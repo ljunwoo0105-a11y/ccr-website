@@ -19,7 +19,7 @@ export default function GlowCard({
   as?: "div" | "article" | "li";
 }) {
   const ref = useRef<HTMLElement | null>(null);
-  const frame = useRef<number>();
+  const frame = useRef<number | undefined>(undefined);
   const enabled = useRef(false);
 
   useEffect(() => {

@@ -12,6 +12,7 @@ import Procedure from "@/components/sheet/Procedure";
 import QcLog from "@/components/sheet/QcLog";
 import FieldNotes from "@/components/sheet/FieldNotes";
 import Depot from "@/components/sheet/Depot";
+import StaffPricingWorkbench from "@/components/staff/StaffPricingWorkbench";
 
 export const revalidate = 3600;
 
@@ -41,6 +42,7 @@ export default async function HomePage() {
       <SpecStrip rating={rating} reviewCount={reviewCount} />
       <WorkOrders />
       <CircuitSheet />
+      <StaffPricingWorkbench />
       <Procedure />
       <QcLog reviews={reviews} rating={rating} reviewCount={reviewCount} />
       <FieldNotes />

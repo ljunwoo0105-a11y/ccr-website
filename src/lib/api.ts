@@ -3,6 +3,20 @@ import { NextResponse } from "next/server";
 import { ZodError, type ZodSchema } from "zod";
 import { requireUser, type Role } from "@/lib/auth";
 
+const PRIVATE_CACHE_CONTROL = "private, no-store";
+
+function withPrivateCacheHeaders(init?: ResponseInit): ResponseInit {
+  const headers = new Headers(init?.headers);
+  headers.set("Cache-Control", PRIVATE_CACHE_CONTROL);
+  const vary = headers.get("Vary");
+  if (!vary) {
+    headers.set("Vary", "Cookie");
+  } else if (!vary.toLowerCase().split(",").map((item) => item.trim()).includes("cookie")) {
+    headers.set("Vary", `${vary}, Cookie`);
+  }
+  return { ...init, headers };
+}
+
 /** Standard JSON success envelope. */
 export function ok<T>(data: T, init?: ResponseInit) {
   return NextResponse.json({ ok: true, data }, init);
@@ -11,6 +25,14 @@ export function ok<T>(data: T, init?: ResponseInit) {
 /** Standard JSON error envelope. Never leak internals in `message`. */
 export function fail(message: string, status = 400, extra?: ResponseInit) {
   return NextResponse.json({ ok: false, error: message }, { status, ...extra });
+}
+
+export function privateOk<T>(data: T, init?: ResponseInit) {
+  return ok(data, withPrivateCacheHeaders(init));
+}
+
+export function privateFail(message: string, status = 400, extra?: ResponseInit) {
+  return fail(message, status, withPrivateCacheHeaders(extra));
 }
 
 /** Parse + validate a JSON body against a Zod schema. */
@@ -44,7 +66,7 @@ export async function guard(minRole: Role = "STAFF") {
   if (!user) {
     return {
       user: null,
-      error: fail(minRole === "ADMIN" ? "Forbidden" : "Unauthorised", minRole === "ADMIN" ? 403 : 401),
+      error: privateFail(minRole === "ADMIN" ? "Forbidden" : "Unauthorised", minRole === "ADMIN" ? 403 : 401),
     };
   }
   return { user, error: null };

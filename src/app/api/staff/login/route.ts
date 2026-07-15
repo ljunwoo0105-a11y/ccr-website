@@ -71,7 +71,8 @@ export async function POST(req: Request) {
     name: user.name,
     role: user.role as Role,
   });
-  cookies().set(SESSION_COOKIE, token, sessionCookieOptions());
+  const cookieStore = await cookies();
+  cookieStore.set(SESSION_COOKIE, token, sessionCookieOptions());
 
   if (data.wantsHtmlRedirect) return loginRedirect(req, data);
   return ok({ role: user.role });

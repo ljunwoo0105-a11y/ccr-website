@@ -59,7 +59,7 @@ export async function GET(req: Request) {
 
 /** Create a part (price list row). */
 export async function POST(req: Request) {
-  const { error } = await guard();
+  const { error } = await guard("ADMIN");
   if (error) return error;
 
   const parsed = await parseBody(req, partSchema);

@@ -1,4 +1,5 @@
 import { ZodError, z } from "zod";
+import { safeLoginDestination } from "@/lib/login-destination";
 import { loginSchema } from "@/lib/validation";
 
 const loginRequestSchema = loginSchema.extend({
@@ -28,11 +29,6 @@ function validationMessage(error: ZodError): string {
     .join("; ");
 }
 
-function safeNext(value: string | null | undefined): string | null {
-  if (!value) return null;
-  return value.startsWith("/staff") || value.startsWith("/admin") ? value : null;
-}
-
 export function redirectUrlForRequest(req: Request, path: string): URL {
   const origin = req.headers.get("origin");
   if (origin) return new URL(path, origin);
@@ -58,7 +54,7 @@ function parsedResult(
   const parsed = loginRequestSchema.safeParse(raw);
   const next =
     typeof raw === "object" && raw !== null && "next" in raw
-      ? safeNext(String(raw.next ?? ""))
+      ? safeLoginDestination(String(raw.next ?? ""))
       : null;
 
   if (!parsed.success) {
@@ -76,7 +72,7 @@ function parsedResult(
     data: {
       email: parsed.data.email.toLowerCase(),
       password: parsed.data.password,
-      next: safeNext(parsed.data.next),
+      next: safeLoginDestination(parsed.data.next),
       wantsHtmlRedirect,
     },
   };

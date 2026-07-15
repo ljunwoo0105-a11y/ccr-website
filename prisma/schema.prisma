@@ -14,16 +14,17 @@ datasource db {
 // Staff & admin accounts. Roles: "ADMIN" | "STAFF" (validated in src/lib/auth.ts)
 // ---------------------------------------------------------------------------
 model User {
-  id           String         @id @default(cuid())
-  email        String         @unique
-  name         String
-  passwordHash String
-  role         String         @default("STAFF")
-  active       Boolean        @default(true)
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  intakes      RepairIntake[]
-  repairForms  RepairForm[]
+  id              String           @id @default(cuid())
+  email           String           @unique
+  name            String
+  passwordHash    String
+  role            String           @default("STAFF")
+  active          Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  intakes         RepairIntake[]
+  repairForms     RepairForm[]
+  priceAccessLogs PriceAccessLog[]
 }
 
 // ---------------------------------------------------------------------------
@@ -31,25 +32,26 @@ model User {
 // "GENUINE" | "OEM" | "PREMIUM" | "AFTERMARKET" (cheapest)
 // ---------------------------------------------------------------------------
 model Part {
-  id           String   @id @default(cuid())
-  deviceType   String // Phone | Tablet | Computer | Drone | Watch | Other
-  brand        String
-  model        String
-  repairType   String // e.g. "Screen Replacement"
-  quality      String
-  colour       String? // device/part colour, when it affects the part (e.g. screen colour)
-  costPrice    Float // what CCR pays (staff/admin only)
-  sellPrice    Float // what the customer pays
-  warrantyDays Int      @default(90)
-  stockQty     Int      @default(0)
-  sku          String?
-  supplier     String?
-  posItemId    String? // link to POS (e.g. Loyverse item id)
-  notes        String?
-  active       Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id              String           @id @default(cuid())
+  deviceType      String // Phone | Tablet | Computer | Drone | Watch | Other
+  brand           String
+  model           String
+  repairType      String // e.g. "Screen Replacement"
+  quality         String
+  colour          String? // device/part colour, when it affects the part (e.g. screen colour)
+  costPrice       Float // what CCR pays (staff/admin only)
+  sellPrice       Float // what the customer pays
+  warrantyDays    Int              @default(90)
+  stockQty        Int              @default(0)
+  sku             String?
+  supplier        String?
+  posItemId       String? // link to POS (e.g. Loyverse item id)
+  notes           String?
+  active          Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
   repairFormItems RepairFormItem[]
+  matchedIntakes  RepairIntake[]   @relation("RepairIntakeMatchedPart")
 
   @@index([brand, model, repairType])
   @@index([posItemId])
@@ -102,32 +104,100 @@ model Customer {
 }
 
 model RepairIntake {
-  id                String    @id @default(cuid())
-  customerId        String
-  customer          Customer  @relation(fields: [customerId], references: [id])
-  staffId           String
-  staff             User      @relation(fields: [staffId], references: [id])
-  deviceType        String
-  brand             String
-  model             String
-  imei              String?
-  serialNo          String?
-  repairTypes       String // JSON array of repair type strings
-  preCondition      String // JSON object — checklist captured before repair (see src/lib/validation.ts)
-  accessories       String? // what the customer left with the device
-  conditionNotes    String?
-  partQuality       String? // tier chosen for the job
-  warrantyDays      Int?
-  quotedPrice       Float?
-  depositPaid       Float?
-  status            String    @default("CHECKED_IN") // CHECKED_IN | IN_REPAIR | READY | COLLECTED | CANCELLED
-  customerSignature String? // typed-name acknowledgement of pre-condition record
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  completedAt       DateTime?
+  id                           String         @id @default(cuid())
+  customerId                   String
+  customer                     Customer       @relation(fields: [customerId], references: [id])
+  staffId                      String
+  staff                        User           @relation(fields: [staffId], references: [id])
+  deviceType                   String
+  brand                        String
+  model                        String
+  imei                         String?
+  serialNo                     String?
+  repairTypes                  String // JSON array of repair type strings
+  preCondition                 String // JSON object — checklist captured before repair (see src/lib/validation.ts)
+  accessories                  String? // what the customer left with the device
+  conditionNotes               String?
+  partQuality                  String? // tier chosen for the job
+  warrantyDays                 Int?
+  quotedPrice                  Float?
+  depositPaid                  Float?
+  status                       String         @default("CHECKED_IN") // CHECKED_IN | IN_REPAIR | READY | COLLECTED | CANCELLED
+  customerSignature            String? // typed-name acknowledgement of pre-condition record
+  matchedPartId                String?
+  matchedPart                  Part?          @relation("RepairIntakeMatchedPart", fields: [matchedPartId], references: [id], onDelete: SetNull)
+  diagnosisRuleId              String?
+  diagnosisRule                DiagnosisRule? @relation(fields: [diagnosisRuleId], references: [id], onDelete: SetNull)
+  diagnosisCode                String?
+  diagnosisLabel               String?
+  diagnosisOutcome             String?
+  pricingSource                String         @default("MANUAL")
+  agreementSnapshot            Json?
+  policyAcknowledgements       Json?
+  agreementAcceptedAt          DateTime?
+  preConditionAccuracyAccepted Boolean        @default(false)
+  createdAt                    DateTime       @default(now())
+  updatedAt                    DateTime       @updatedAt
+  completedAt                  DateTime?
 
   @@index([status])
   @@index([customerId])
+  @@index([matchedPartId])
+  @@index([diagnosisRuleId])
+  @@index([agreementAcceptedAt])
+}
+
+model DiagnosisRule {
+  id           String         @id @default(cuid())
+  deviceType   String
+  brand        String?
+  model        String?
+  symptomCode  String
+  symptomLabel String
+  repairType   String
+  outcome      String
+  priority     Int            @default(0)
+  active       Boolean        @default(true)
+  notes        String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  intakes      RepairIntake[]
+
+  @@index([deviceType, brand, model, active])
+  @@index([symptomCode, active])
+  @@index([repairType, active])
+}
+
+model PolicyDocument {
+  id        String   @id @default(cuid())
+  category  String
+  version   String
+  title     String
+  body      String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([category, version])
+  @@index([category, active])
+}
+
+model PriceAccessLog {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  deviceType     String?
+  brand          String?
+  model          String?
+  symptomCode    String?
+  outcome        String
+  matchedPartIds Json
+  ipHash         String
+  userAgent      String?
+  createdAt      DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([userId, createdAt])
 }
 
 // ---------------------------------------------------------------------------
@@ -164,9 +234,9 @@ model RepairForm {
 // One repair line on a RepairForm (e.g. "Screen Replacement", "Battery").
 // A single quote/form can hold many — one device, multiple repairs.
 model RepairFormItem {
-  id           String     @id @default(cuid())
-  repairFormId String
-  repairForm   RepairForm @relation(fields: [repairFormId], references: [id], onDelete: Cascade)
+  id            String     @id @default(cuid())
+  repairFormId  String
+  repairForm    RepairForm @relation(fields: [repairFormId], references: [id], onDelete: Cascade)
   repairType    String
   quality       String
   colour        String?

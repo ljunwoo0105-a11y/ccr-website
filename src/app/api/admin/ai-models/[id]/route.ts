@@ -7,16 +7,17 @@ const aiModelPatchSchema = aiModelSchema.partial();
 /** Update a registry model (any subset of fields, including the enabled toggle). */
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { error } = await guard("ADMIN");
   if (error) return error;
+  const { id } = await params;
 
   const body = await parseBody(req, aiModelPatchSchema);
   if (body.error) return body.error;
   const data = body.data;
 
-  const model = await db.aiModel.findUnique({ where: { id: params.id } });
+  const model = await db.aiModel.findUnique({ where: { id } });
   if (!model) return fail("Model not found", 404);
 
   if (data.modelId && data.modelId !== model.modelId) {
@@ -43,12 +44,13 @@ export async function PATCH(
 /** Delete a registry model — blocked while it is one of the configured defaults. */
 export async function DELETE(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { error } = await guard("ADMIN");
   if (error) return error;
+  const { id } = await params;
 
-  const model = await db.aiModel.findUnique({ where: { id: params.id } });
+  const model = await db.aiModel.findUnique({ where: { id } });
   if (!model) return fail("Model not found", 404);
 
   const [pricingDefault, researchDefault] = await Promise.all([

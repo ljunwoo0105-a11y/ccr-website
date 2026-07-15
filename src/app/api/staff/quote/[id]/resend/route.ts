@@ -8,13 +8,14 @@ export const dynamic = "force-dynamic";
 /** Re-email a saved repair form (with all its line items) to its customer. */
 export async function POST(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { error } = await guard();
   if (error) return error;
+  const { id } = await params;
 
   const form = await db.repairForm.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: { items: true },
   });
   if (!form) return fail("Repair form not found", 404);

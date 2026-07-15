@@ -12,11 +12,12 @@ export const metadata: Metadata = {
  * authenticated shell (which redirects guests here) never wraps it. Uses the
  * light staff/admin theme, not the dark public marketing theme.
  */
-export default function StaffLoginPage({
+export default async function StaffLoginPage({
   searchParams,
 }: {
-  searchParams: { next?: string };
+  searchParams: Promise<{ next?: string }>;
 }) {
+  const { next } = await searchParams;
   return (
     <main className="mnl-page flex min-h-screen items-center justify-center px-6 py-20">
       <div className="w-full max-w-[400px]">
@@ -43,7 +44,7 @@ export default function StaffLoginPage({
             Staff &amp; admin portal · authorised access
           </p>
           <div className="mt-7">
-            <LoginForm next={searchParams.next} />
+            <LoginForm next={next} />
           </div>
         </div>
         <p className="mt-6 text-center">

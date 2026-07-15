@@ -2,11 +2,27 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ArrowLeft, Bot, LayoutDashboard, Star, Users } from "lucide-react";
+import {
+  ArrowLeft,
+  Bot,
+  ClipboardList,
+  FileText,
+  LayoutDashboard,
+  PackageSearch,
+  ShieldCheck,
+  Star,
+  Stethoscope,
+  Users,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
+  { href: "/admin/catalog", label: "Catalog", icon: PackageSearch },
+  { href: "/admin/diagnoses", label: "Diagnoses", icon: Stethoscope },
+  { href: "/admin/policies", label: "Policies", icon: FileText },
+  { href: "/admin/records", label: "Records", icon: ClipboardList },
+  { href: "/admin/price-access", label: "Price Access", icon: ShieldCheck },
   { href: "/admin/ai", label: "AI Console", icon: Bot },
   { href: "/admin/reviews", label: "Reviews", icon: Star },
   { href: "/admin/users", label: "Users", icon: Users },
@@ -31,7 +47,7 @@ export function AdminNav() {
                 : "text-bone-100/70 hover:bg-carbon-900 hover:text-bone-100"
             )}
           >
-            <Icon className="h-4 w-4" aria-hidden />
+            <Icon className="h-4 w-4 shrink-0" aria-hidden />
             {label}
           </Link>
         );
@@ -41,7 +57,7 @@ export function AdminNav() {
         href="/staff"
         className="flex items-center gap-3 px-3 py-2 text-sm font-medium text-bone-100/70 transition-colors hover:bg-carbon-900 hover:text-bone-100"
       >
-        <ArrowLeft className="h-4 w-4" aria-hidden />
+        <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden />
         Staff Portal
       </Link>
     </nav>

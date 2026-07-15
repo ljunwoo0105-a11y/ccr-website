@@ -1,20 +1,23 @@
-/**
- * Database seed.
- *
- * - Creates the initial ADMIN account (password from SEED_ADMIN_PASSWORD, or
- *   a random one printed ONCE to the console — change it after first login).
- * - Registers the current Anthropic models with their USD/MTok pricing.
- * - Loads a SAMPLE parts price list (placeholder pricing — replace with real
- *   numbers in the staff portal).
- * - Seeds real Google review snippets verified during research (June 2026).
- *   Once GOOGLE_PLACES_API_KEY is configured, the admin "Sync Google reviews"
- *   action replaces these with live, authoritative data.
- */
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { randomBytes } from "crypto";
 
 const db = new PrismaClient();
+
+const policyDocuments = [
+  { id: "policy-terms-current", category: "TERMS", version: "2026-07-10.1", title: "Repair terms", body: "Customer authorises CCR to inspect and repair the device, accepts that further faults may be found during repair, and agrees that quoted work may require staff confirmation before parts are ordered.", active: true },
+  { id: "policy-warranty-current", category: "WARRANTY", version: "2026-07-10.1", title: "Warranty policy", body: "Warranty applies to the specific repair and part supplied by CCR for the stated warranty period. Warranty excludes impact damage, liquid damage, unrelated faults, software issues, misuse, and customer-supplied parts.", active: true },
+  { id: "policy-data-current", category: "DATA", version: "2026-07-10.1", title: "Data and device access", body: "Customer remains responsible for backing up data. CCR takes reasonable care but cannot guarantee data retention during diagnosis, repair, testing, software work, or device reset requests.", active: true },
+] as const;
+
+const diagnosisRules = [
+  { id: "rule-phone-screen-cracked", deviceType: "Phone", brand: null, model: null, symptomCode: "screen-cracked", symptomLabel: "Cracked or damaged screen", repairType: "Screen Replacement", outcome: "PART", priority: 100, active: true },
+  { id: "rule-phone-battery-service", deviceType: "Phone", brand: null, model: null, symptomCode: "battery-service", symptomLabel: "Battery drains quickly or needs service", repairType: "Battery Replacement", outcome: "PART", priority: 90, active: true },
+  { id: "rule-phone-charging-port", deviceType: "Phone", brand: null, model: null, symptomCode: "charging-port", symptomLabel: "Charging port fault", repairType: "Charging Port Repair", outcome: "PART", priority: 80, active: true },
+  { id: "rule-liquid-damage-inspection", deviceType: "Phone", brand: null, model: null, symptomCode: "liquid-damage", symptomLabel: "Liquid damage or corrosion", repairType: "Inspection", outcome: "INSPECTION", priority: 70, active: true },
+  { id: "rule-phone-data-recovery", deviceType: "Phone", brand: null, model: null, symptomCode: "data-recovery", symptomLabel: "Data recovery assessment", repairType: "Data Recovery", outcome: "DATA_RECOVERY", priority: 65, active: true },
+  { id: "rule-board-level-inspection", deviceType: "Computer", brand: null, model: null, symptomCode: "board-level", symptomLabel: "Board-level fault diagnosis", repairType: "Board-Level Repair", outcome: "MAINBOARD", priority: 60, active: true },
+] as const;
 
 function randomPassword(): string {
   return randomBytes(9).toString("base64url");
@@ -22,40 +25,36 @@ function randomPassword(): string {
 
 async function seedUsers() {
   const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "coolcaserepair@gmail.com";
-  const existing = await db.user.findUnique({ where: { email: adminEmail } });
-  if (existing) {
-    console.log(`Admin ${adminEmail} already exists — skipping.`);
-    return;
-  }
   const adminPassword = process.env.SEED_ADMIN_PASSWORD || randomPassword();
-  const staffPassword = randomPassword();
+  const staffEmail = process.env.SEED_STAFF_EMAIL ?? "staff@ccr.local";
+  const staffPassword = process.env.SEED_STAFF_PASSWORD || randomPassword();
 
-  await db.user.create({
-    data: {
+  await db.user.upsert({
+    where: { email: adminEmail },
+    update: {},
+    create: {
       email: adminEmail,
       name: "CCR Owner",
       role: "ADMIN",
       passwordHash: await bcrypt.hash(adminPassword, 12),
     },
   });
-  await db.user.create({
-    data: {
-      email: "staff@ccr.local",
+  await db.user.upsert({
+    where: { email: staffEmail },
+    update: {},
+    create: {
+      email: staffEmail,
       name: "Front Counter",
       role: "STAFF",
       passwordHash: await bcrypt.hash(staffPassword, 12),
     },
   });
 
-  console.log("==============================================");
-  console.log("  Initial logins (CHANGE THESE AFTER FIRST USE)");
-  console.log(`  ADMIN  ${adminEmail} / ${adminPassword}`);
-  console.log(`  STAFF  staff@ccr.local / ${staffPassword}`);
-  console.log("==============================================");
+  console.log(`Seeded users for ${adminEmail} and ${staffEmail}.`);
+  console.log("Initial credentials are supplied by env or generated silently.");
 }
 
 async function seedAiModels() {
-  // USD per million tokens — current Anthropic price list (June 2026).
   const models = [
     { label: "Claude Fable 5", modelId: "claude-fable-5", inputPerMTok: 10, outputPerMTok: 50, notes: "Most capable tier" },
     { label: "Claude Opus 4.8", modelId: "claude-opus-4-8", inputPerMTok: 5, outputPerMTok: 25, notes: "Recommended default" },
@@ -94,9 +93,57 @@ async function seedSettings() {
   console.log("Seeded settings.");
 }
 
+async function seedPolicyDocuments() {
+  for (const policy of policyDocuments) {
+    await db.$transaction([
+      db.policyDocument.updateMany({
+        where: {
+          category: policy.category,
+          version: { not: policy.version },
+        },
+        data: { active: false },
+      }),
+      db.policyDocument.upsert({
+        where: {
+          category_version: {
+            category: policy.category,
+            version: policy.version,
+          },
+        },
+        update: {
+          title: policy.title,
+          body: policy.body,
+          active: true,
+        },
+        create: policy,
+      }),
+    ]);
+  }
+  console.log(`Seeded ${policyDocuments.length} policy documents.`);
+}
+
+async function seedDiagnosisRules() {
+  for (const rule of diagnosisRules) {
+    await db.diagnosisRule.upsert({
+      where: { id: rule.id },
+      update: {
+        deviceType: rule.deviceType,
+        brand: rule.brand,
+        model: rule.model,
+        symptomCode: rule.symptomCode,
+        symptomLabel: rule.symptomLabel,
+        repairType: rule.repairType,
+        outcome: rule.outcome,
+        priority: rule.priority,
+        active: rule.active,
+      },
+      create: rule,
+    });
+  }
+  console.log(`Seeded ${diagnosisRules.length} diagnosis rules.`);
+}
+
 async function seedReviews() {
-  // Real Google review snippets found during research (Birdeye mirror of the
-  // Google listing, June 2026). Replaced by live data after Places API sync.
   const reviews = [
     { authorName: "Lee Lumayag", text: "They had everything that I needed.", rating: 5 },
     { authorName: "Matt Breakspear", text: "Easy and happy service", rating: 5 },
@@ -117,11 +164,10 @@ async function seedReviews() {
 async function seedParts() {
   const count = await db.part.count();
   if (count > 0) {
-    console.log("Parts already present — skipping sample catalog.");
+    console.log("Parts already present; skipping sample catalog.");
     return;
   }
 
-  // SAMPLE pricing only (AUD) — replace with real numbers in the staff portal.
   type Tier = { quality: string; cost: number; sell: number; warranty: number };
   const screenTiers = (base: number): Tier[] => [
     { quality: "AFTERMARKET", cost: base * 0.35, sell: base, warranty: 90 },
@@ -179,7 +225,6 @@ async function seedParts() {
     });
   }
 
-  // iPhone back glass + a few tablets/watches so every device type has data.
   rows.push(
     { deviceType: "Phone", brand: "Apple", model: "iPhone 13", repairType: "Back Glass Replacement", quality: "PREMIUM", costPrice: 45, sellPrice: 129, warrantyDays: 180, stockQty: 2 },
     { deviceType: "Phone", brand: "Apple", model: "iPhone 14", repairType: "Back Glass Replacement", quality: "PREMIUM", costPrice: 55, sellPrice: 149, warrantyDays: 180, stockQty: 2 },
@@ -194,15 +239,17 @@ async function seedParts() {
   );
 
   await db.part.createMany({
-    data: rows.map((r) => ({ ...r, notes: "Sample seed pricing — replace with real pricing" })),
+    data: rows.map((r) => ({ ...r, notes: "Sample seed pricing; replace with real pricing" })),
   });
-  console.log(`Seeded ${rows.length} sample parts (placeholder pricing).`);
+  console.log(`Seeded ${rows.length} sample parts.`);
 }
 
 async function main() {
   await seedUsers();
   await seedAiModels();
   await seedSettings();
+  await seedPolicyDocuments();
+  await seedDiagnosisRules();
   await seedReviews();
   await seedParts();
 }

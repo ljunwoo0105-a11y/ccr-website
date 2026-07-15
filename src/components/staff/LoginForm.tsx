@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import type { ApiEnvelope } from "@/components/staff/types";
+import { safeLoginDestination } from "@/lib/login-destination";
 
 interface Props {
   /** Optional ?next= destination passed through from the login page. */
@@ -12,10 +13,7 @@ interface Props {
 
 export default function LoginForm({ next }: Props) {
   const router = useRouter();
-  const safeNext =
-    next && (next.startsWith("/staff") || next.startsWith("/admin"))
-      ? next
-      : "";
+  const safeNext = safeLoginDestination(next) ?? "";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);

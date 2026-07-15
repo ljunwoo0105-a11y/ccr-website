@@ -28,8 +28,8 @@ export default async function AdminLayout({
     .toUpperCase();
 
   return (
-    <div className="flex min-h-screen bg-bone-100">
-      <aside className="sticky top-0 flex h-screen w-60 shrink-0 flex-col overflow-y-auto bg-carbon-950 text-bone-100/70">
+    <div className="min-h-screen overflow-x-hidden bg-bone-100 lg:flex">
+      <aside className="flex w-full flex-col bg-carbon-950 text-bone-100/70 lg:sticky lg:top-0 lg:h-dvh lg:w-[15rem] lg:shrink-0 lg:overflow-y-auto">
         <div className="flex items-center gap-2.5 border-b border-bone-100/15 px-5 py-5">
           <span
             className="flex h-9 w-9 shrink-0 items-center justify-center border border-signal-500 bg-bone-100 font-display text-base leading-none text-carbon-950"
@@ -60,7 +60,9 @@ export default async function AdminLayout({
           <LogoutButton />
         </div>
       </aside>
-      <main className="min-w-0 flex-1 px-6 py-8 lg:px-10">{children}</main>
+      <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-8">
+        {children}
+      </main>
     </div>
   );
 }

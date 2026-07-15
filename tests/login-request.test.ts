@@ -3,6 +3,23 @@ import test from "node:test";
 
 import { parseLoginRequest, redirectUrlForRequest } from "../src/lib/login-request";
 
+async function parsedNextFor(next: string): Promise<string | null> {
+  const req = new Request("http://127.0.0.1:3000/api/staff/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: "staff@ccr.local",
+      password: "CCRLocal2026!",
+      next,
+    }),
+  });
+
+  const result = await parseLoginRequest(req);
+
+  if (result.ok) return result.data.next;
+  assert.fail(result.message);
+}
+
 test("parses form login requests when JavaScript submit does not run", async () => {
   const body = new URLSearchParams({
     email: " STAFF@CCR.LOCAL ",
@@ -59,4 +76,55 @@ test("builds login redirects from the browser origin when present", () => {
   const url = redirectUrlForRequest(req, "/staff");
 
   assert.equal(url.href, "http://127.0.0.1:3000/staff");
+});
+
+test("accepts only root and staff/admin descendants as shared login destinations", async () => {
+  // Given: login destinations that are allowed to survive every auth boundary.
+  const destinations = [
+    "/",
+    "/staff",
+    "/staff/intake/new?from=login",
+    "/admin",
+    "/admin/users#invite",
+  ];
+  const parsedDestinations: Array<readonly [string, string | null]> = [];
+
+  // When: each destination is submitted through the public login request parser.
+  for (const destination of destinations) {
+    parsedDestinations.push([destination, await parsedNextFor(destination)]);
+  }
+
+  // Then: the shared safe-destination contract preserves each permitted path.
+  assert.deepEqual(parsedDestinations, [
+    ["/", "/"],
+    ["/staff", "/staff"],
+    ["/staff/intake/new?from=login", "/staff/intake/new?from=login"],
+    ["/admin", "/admin"],
+    ["/admin/users#invite", "/admin/users#invite"],
+  ]);
+});
+
+test("rejects external, encoded, backslash, and lookalike login destinations", async () => {
+  // Given: malformed next values that must not cross the login boundary.
+  const rejectedDestinations = [
+    "https://evil.example/staff",
+    "//evil.example/staff",
+    "\\\\evil.example\\staff",
+    "/\\evil",
+    "/%2fadmin",
+    "/admin%2fusers",
+    "/staff%5creports",
+    "/staff.evil.example",
+    "/staffish",
+    "/administrator",
+  ];
+
+  // When/Then: each value is parsed to a null destination, never a redirect.
+  for (const destination of rejectedDestinations) {
+    assert.equal(
+      await parsedNextFor(destination),
+      null,
+      `${destination} should be rejected as an unsafe login destination`
+    );
+  }
 });

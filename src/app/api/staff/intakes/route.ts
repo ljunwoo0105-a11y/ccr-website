@@ -1,8 +1,16 @@
 import type { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
-import { ok, parseBody, guard } from "@/lib/api";
-import { intakeSchema } from "@/lib/validation";
-import { QUALITY_DEFAULT_WARRANTY } from "@/lib/config";
+import { ok, fail, parseBody, guard } from "@/lib/api";
+import {
+  IntakeSubmissionValidationError,
+  createIntakeSubmission,
+  intakeSubmissionSchema,
+  type IntakeSubmissionRepository,
+  type IntakeSubmissionTransaction,
+  type PersistedIntakeDraft,
+  type PolicyAcknowledgement,
+} from "@/lib/intakes/submission";
+import type { AgreementPolicyCategory } from "@/lib/intake-agreement";
 
 export const dynamic = "force-dynamic";
 
@@ -56,50 +64,173 @@ export async function POST(req: Request) {
   const { user, error } = await guard();
   if (error) return error;
 
-  const parsed = await parseBody(req, intakeSchema);
+  const parsed = await parseBody(req, intakeSubmissionSchema);
   if (parsed.error) return parsed.error;
-  const data = parsed.data;
-
-  let customer = await db.customer.findFirst({
-    where: { phone: data.customer.phone },
-  });
-  if (!customer) {
-    customer = await db.customer.create({
-      data: {
-        name: data.customer.name,
-        phone: data.customer.phone,
-        email: data.customer.email ? data.customer.email : null,
-        suburb: data.customer.suburb ? data.customer.suburb : null,
-      },
-    });
-  }
-
-  const warrantyDays =
-    data.warrantyDays ??
-    (data.partQuality
-      ? QUALITY_DEFAULT_WARRANTY[data.partQuality] ?? null
-      : null);
-
-  const intake = await db.repairIntake.create({
-    data: {
-      customerId: customer.id,
+  try {
+    const intake = await createIntakeSubmission({
       staffId: user.id,
-      deviceType: data.deviceType,
-      brand: data.brand,
-      model: data.model,
-      imei: data.imei ? data.imei : null,
-      serialNo: data.serialNo ? data.serialNo : null,
-      repairTypes: JSON.stringify(data.repairTypes),
-      preCondition: JSON.stringify(data.preCondition),
-      accessories: data.accessories ? data.accessories : null,
-      conditionNotes: data.conditionNotes ? data.conditionNotes : null,
-      partQuality: data.partQuality ?? null,
-      warrantyDays,
-      quotedPrice: data.quotedPrice ?? null,
-      depositPaid: data.depositPaid ?? null,
-      customerSignature: data.customerSignature,
+      acceptedAt: new Date().toISOString(),
+      input: parsed.data,
+      repository: prismaIntakeSubmissionRepository,
+    });
+
+    return ok({ id: intake.id });
+  } catch (caught) {
+    if (caught instanceof IntakeSubmissionValidationError) {
+      return fail(caught.message, 422);
+    }
+    throw caught;
+  }
+}
+
+const prismaIntakeSubmissionRepository: IntakeSubmissionRepository = {
+  withTransaction: (work) =>
+    db.$transaction((transaction) =>
+      work(prismaIntakeSubmissionTransaction(transaction))
+    ),
+};
+
+function prismaIntakeSubmissionTransaction(
+  transaction: Prisma.TransactionClient
+): IntakeSubmissionTransaction {
+  return {
+    findCustomerByPhone: (phone) =>
+      transaction.customer.findFirst({ where: { phone } }),
+    createCustomer: (customer) => transaction.customer.create({ data: customer }),
+    findActivePartById: (partId) =>
+      transaction.part.findFirst({
+        where: { id: partId, active: true },
+        select: {
+          id: true,
+          deviceType: true,
+          brand: true,
+          model: true,
+          repairType: true,
+          quality: true,
+          sellPrice: true,
+          warrantyDays: true,
+          active: true,
+        },
+      }),
+    findActiveDiagnosisRuleById: (ruleId) =>
+      transaction.diagnosisRule.findFirst({
+        where: { id: ruleId, active: true },
+        select: {
+          id: true,
+          deviceType: true,
+          brand: true,
+          model: true,
+          symptomCode: true,
+          symptomLabel: true,
+          repairType: true,
+          outcome: true,
+          active: true,
+        },
+      }),
+    listActivePolicies: () =>
+      listActivePolicies(transaction),
+    createIntake: async (draft) => {
+      const intake = await transaction.repairIntake.create({
+        data: {
+          customerId: draft.customerId,
+          staffId: draft.staffId,
+          deviceType: draft.deviceType,
+          brand: draft.brand,
+          model: draft.model,
+          imei: draft.imei,
+          serialNo: draft.serialNo,
+          repairTypes: JSON.stringify(draft.repairTypes),
+          preCondition: JSON.stringify(draft.preCondition),
+          accessories: draft.accessories,
+          conditionNotes: draft.conditionNotes,
+          partQuality: draft.partQuality,
+          warrantyDays: draft.warrantyDays,
+          quotedPrice: draft.quotedPrice,
+          depositPaid: draft.depositPaid,
+          customerSignature: draft.customerSignature,
+          matchedPartId: draft.matchedPartId,
+          diagnosisRuleId: draft.diagnosisRuleId,
+          diagnosisCode: draft.diagnosisCode,
+          diagnosisLabel: draft.diagnosisLabel,
+          diagnosisOutcome: draft.diagnosisOutcome,
+          pricingSource: draft.pricingSource,
+          agreementSnapshot: agreementSnapshotJson(draft.agreementSnapshot),
+          policyAcknowledgements: policyAcknowledgementsJson(
+            draft.policyAcknowledgements
+          ),
+          agreementAcceptedAt: new Date(draft.agreementAcceptedAt),
+          preConditionAccuracyAccepted: draft.preConditionAccuracyAccepted,
+        },
+      });
+
+      return { id: intake.id, ...draft };
     },
+  };
+}
+
+async function listActivePolicies(
+  transaction: Prisma.TransactionClient
+): Promise<
+  readonly {
+    readonly id: string;
+    readonly category: AgreementPolicyCategory;
+    readonly version: string;
+    readonly title: string;
+    readonly body: string;
+    readonly active: boolean;
+  }[]
+> {
+  const rows = await transaction.policyDocument.findMany({
+    where: { active: true },
   });
 
-  return ok({ id: intake.id });
+  return rows.map((row) => ({
+    id: row.id,
+    category: policyCategory(row.category),
+    version: row.version,
+    title: row.title,
+    body: row.body,
+    active: row.active,
+  }));
+}
+
+function policyCategory(category: string): AgreementPolicyCategory {
+  if (
+    category === "TERMS" ||
+    category === "WARRANTY" ||
+    category === "DATA"
+  ) {
+    return category;
+  }
+  throw new IntakeSubmissionValidationError(
+    `Unsupported active policy category ${category}.`
+  );
+}
+
+function agreementSnapshotJson(
+  snapshot: PersistedIntakeDraft["agreementSnapshot"]
+): Prisma.InputJsonObject {
+  return {
+    acceptedAt: snapshot.acceptedAt,
+    preConditionAccuracyAccepted: snapshot.preConditionAccuracyAccepted,
+    warrantyDays: snapshot.warrantyDays,
+    policies: snapshot.policies.map((policy) => ({
+      id: policy.id,
+      category: policy.category,
+      version: policy.version,
+      title: policy.title,
+      body: policy.body,
+    })),
+  };
+}
+
+function policyAcknowledgementsJson(
+  acknowledgements: readonly PolicyAcknowledgement[]
+): Prisma.InputJsonArray {
+  return acknowledgements.map((acknowledgement) => ({
+    policyId: acknowledgement.policyId,
+    category: acknowledgement.category,
+    version: acknowledgement.version,
+    acceptedAt: acknowledgement.acceptedAt,
+  }));
 }

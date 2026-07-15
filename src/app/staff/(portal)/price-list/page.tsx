@@ -10,11 +10,11 @@ export default function PriceListPage() {
       <header>
         <h1 className="text-2xl font-bold text-carbon-950">Price list</h1>
         <p className="text-sm text-carbon-500">
-          Parts, costs, sell prices and margins. Use the AI price check to
-          benchmark against the local market.
+          Current sell prices for active catalog parts. Management actions are
+          available in the admin catalog.
         </p>
       </header>
-      <PriceListTable />
+      <PriceListTable mode="staff" />
     </div>
   );
 }

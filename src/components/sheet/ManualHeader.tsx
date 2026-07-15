@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, Phone, X } from "lucide-react";
+import { Menu, Phone, ShieldCheck, X } from "lucide-react";
 import { BUSINESS } from "@/lib/config";
 import { SECTIONS } from "./sections";
 import ThemeToggle from "./ThemeToggle";
@@ -25,12 +25,12 @@ export default function ManualHeader() {
     };
   }, [open]);
 
-  // The toggle and the overlay are both lg:hidden, so at >=lg they vanish via
+  // The toggle and the overlay are both xl:hidden, so at >=xl they vanish via
   // CSS while `open` can still be true — leaving the scroll lock stuck with no
-  // control to release it. Close the menu once the viewport reaches lg; the
+  // control to release it. Close the menu once the viewport reaches xl; the
   // effect above then restores overflow.
   useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
+    const mq = window.matchMedia("(min-width: 1280px)");
     if (mq.matches) setOpen(false);
     const onChange = (e: MediaQueryListEvent) => {
       if (e.matches) setOpen(false);
@@ -81,7 +81,7 @@ export default function ManualHeader() {
           </Link>
 
           <nav
-            className="hidden items-center gap-5 lg:flex"
+            className="hidden items-center gap-5 xl:flex"
             aria-label="Manual sections"
           >
             {SECTIONS.slice(1).map((s) => (
@@ -100,12 +100,20 @@ export default function ManualHeader() {
 
           <div className="flex items-center gap-3">
             <ThemeToggle />
+            <Link
+              href="/staff/login?next=/"
+              className="mnl-chip hidden md:inline-flex"
+              aria-label="Staff sign in"
+            >
+              <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+              Staff
+            </Link>
             <Link href="/quote" className="mnl-btn mnl-btn-sm hidden sm:inline-flex">
               Free quote
             </Link>
             <button
               type="button"
-              className="mnl-chip lg:hidden"
+              className="mnl-chip xl:hidden"
               onClick={() => setOpen((v) => !v)}
               aria-expanded={open}
               aria-label={open ? "Close the section index" : "Open the section index"}
@@ -123,7 +131,7 @@ export default function ManualHeader() {
 
       {/* Mobile index sheet */}
       {open ? (
-        <div className="absolute inset-x-0 top-full max-h-[calc(100vh-6rem)] overflow-y-auto border-b border-carbon-950 bg-bone-100 shadow-[0_14px_0_0_rgb(var(--carbon-950)/0.08)] lg:hidden">
+        <div className="absolute inset-x-0 top-full max-h-[calc(100vh-6rem)] overflow-y-auto border-b border-carbon-950 bg-bone-100 shadow-[0_14px_0_0_rgb(var(--carbon-950)/0.08)] xl:hidden">
           <nav className="mnl-container py-4" aria-label="Manual sections">
             <ul className="divide-y divide-carbon-150">
               {SECTIONS.map((s) => (
@@ -154,6 +162,13 @@ export default function ManualHeader() {
               <a href={BUSINESS.phoneHref} className="mnl-btn-ghost">
                 Call us
               </a>
+              <Link
+                href="/staff/login?next=/"
+                className="mnl-btn-ghost col-span-2"
+                onClick={() => setOpen(false)}
+              >
+                Staff sign in
+              </Link>
             </div>
           </nav>
         </div>

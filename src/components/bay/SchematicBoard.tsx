@@ -664,7 +664,10 @@ export default function SchematicBoard() {
 
       <div className="pointer-events-none absolute left-4 top-4 flex items-center gap-3 text-carbon-500">
         <span className="mnl-reg" aria-hidden="true" />
-        <span className="mnl-dim">BOARD-LEVEL · LIVE NETS</span>
+        <span className="mnl-dim">
+          BOARD-LEVEL
+          <span className="hidden sm:inline"> · LIVE NETS</span>
+        </span>
       </div>
       <div className="pointer-events-none absolute bottom-4 right-4 hidden text-carbon-500 sm:block">
         <span className="mnl-dim">MICRO-SOLDERING BAY · CCR-K1 / ZOOM {zoomPct}%</span>

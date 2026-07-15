@@ -9,12 +9,13 @@ import { fail, guard, ok } from "@/lib/api";
  */
 export async function POST(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { error } = await guard("ADMIN");
   if (error) return error;
+  const { id } = await params;
 
-  const target = await db.user.findUnique({ where: { id: params.id } });
+  const target = await db.user.findUnique({ where: { id } });
   if (!target) return fail("User not found", 404);
 
   const tempPassword = randomBytes(9).toString("base64url"); // 12 chars

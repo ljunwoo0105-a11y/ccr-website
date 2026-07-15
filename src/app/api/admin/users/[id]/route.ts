@@ -13,10 +13,11 @@ const updateUserSchema = z.object({
  */
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await guard("ADMIN");
   if (auth.error) return auth.error;
+  const { id } = await params;
 
   const body = await parseBody(req, updateUserSchema);
   if (body.error) return body.error;
@@ -27,13 +28,13 @@ export async function PATCH(
   }
 
   if (
-    params.id === auth.user.id &&
+    id === auth.user.id &&
     (data.active === false || data.role === "STAFF")
   ) {
     return fail("You can't deactivate or demote your own account", 409);
   }
 
-  const target = await db.user.findUnique({ where: { id: params.id } });
+  const target = await db.user.findUnique({ where: { id } });
   if (!target) return fail("User not found", 404);
 
   const updated = await db.user.update({

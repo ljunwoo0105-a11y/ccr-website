@@ -1,0 +1,52 @@
+{
+  "customer": {
+    "name": "Ada Lovelace",
+    "phone": "0452 385 321",
+    "email": "ada@example.com",
+    "suburb": "Springfield Central"
+  },
+  "deviceType": "Phone",
+  "brand": "Apple",
+  "model": "iPhone 14 Pro",
+  "imei": "359881234567890",
+  "serialNo": "C39YW0ABCDEF",
+  "repairTypes": [
+    "Screen Replacement",
+    "Back Glass Replacement",
+    "Custom Microsoldering"
+  ],
+  "preCondition": {
+    "powersOn": true,
+    "screenCracked": true,
+    "touchWorks": true,
+    "frontCameraWorks": true,
+    "rearCameraWorks": true,
+    "speakerWorks": true,
+    "microphoneWorks": true,
+    "chargingPortWorks": true,
+    "buttonsWork": true,
+    "faceOrTouchIdWorks": true,
+    "waterDamageSuspected": false,
+    "previousRepairs": true,
+    "findMyDisabled": false,
+    "dataBackedUp": false,
+    "simRemoved": false,
+    "cosmeticGrade": "WORN",
+    "batteryHealthPct": 88
+  },
+  "accessories": "Case, SIM tray pin",
+  "conditionNotes": "Hairline crack near top speaker",
+  "partQuality": "PREMIUM",
+  "warrantyDays": 180,
+  "quotedPrice": 329.95,
+  "depositPaid": 50,
+  "customerSignature": "Ada Lovelace",
+  "partId": "clxstaffpart000001",
+  "diagnosisRuleId": "rule-screen-glass",
+  "acceptedPolicyIds": [
+    "policy-terms",
+    "policy-warranty",
+    "policy-data"
+  ],
+  "preConditionAccuracyAccepted": true
+}
