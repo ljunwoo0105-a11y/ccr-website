@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Moon, Sun, SunMoon } from "lucide-react";
 
-const STORAGE_KEY = "ccr-theme";
+const STORAGE_KEY = "ccr-theme-v2";
 const DEFAULT_THEME = "dark";
 
 type Theme = "light" | "dark";

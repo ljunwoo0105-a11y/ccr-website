@@ -10,5 +10,5 @@ test("uses a deterministic asset hash salt for Sites static chunks", async () =>
 
   // When: the Next build emits shared runtime chunks.
   // Then: their names include the current deployment salt and bypass stale 404s.
-  assert.match(source, /hashSalt = "ccr-dark-default-v2"/);
+  assert.match(source, /hashSalt = "ccr-dark-default-v3"/);
 });

@@ -44,7 +44,7 @@ export const metadata: Metadata = {
 // Runs as the first thing in <body>; must stay dependency-free and tiny.
 // Only the storage read may throw (cookie-blocking modes); the dark fallback
 // and DOM writes must still run, so they live outside the try.
-const THEME_BOOT = `(function(){var t=null;try{t=localStorage.getItem("ccr-theme")}catch(e){}if(t!=="dark"&&t!=="light"){t="dark"}var d=document.documentElement;d.dataset.theme=t;d.style.colorScheme=t})()`;
+const THEME_BOOT = `(function(){var t=null;try{t=localStorage.getItem("ccr-theme-v2")}catch(e){}if(t!=="dark"&&t!=="light"){t="dark"}var d=document.documentElement;d.dataset.theme=t;d.style.colorScheme=t})()`;
 
 export default function RootLayout({
   children,

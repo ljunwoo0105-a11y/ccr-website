@@ -11,7 +11,7 @@ const nextConfig = {
   poweredByHeader: false,
   output: "standalone",
   webpack(config) {
-    config.output.hashSalt = "ccr-dark-default-v2";
+    config.output.hashSalt = "ccr-dark-default-v3";
     return config;
   },
   async headers() {
