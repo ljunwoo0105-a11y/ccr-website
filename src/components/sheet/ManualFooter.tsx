@@ -53,13 +53,13 @@ export default function ManualFooter() {
           <ul className="mt-4 space-y-2.5">
             {SECTIONS.map((s) => (
               <li key={s.id}>
-                <a
+                <Link
                   href={`/#${s.id}`}
                   className="mnl-dim flex items-baseline gap-2 text-bone-100/70 transition-colors hover:text-bone-100"
                 >
                   <span className="mnl-num text-signal-400/70">{s.no}</span>
                   {s.title}
-                </a>
+                </Link>
               </li>
             ))}
             <li>
@@ -79,12 +79,12 @@ export default function ManualFooter() {
           <ul className="mt-4 space-y-2.5">
             {SERVICES.map((svc) => (
               <li key={svc.anchor}>
-                <a
+                <Link
                   href="/#services"
                   className="mnl-dim block text-bone-100/70 transition-colors hover:text-bone-100"
                 >
                   {svc.name}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
