@@ -68,7 +68,7 @@ export const intakePatchSchema = z
     partQuality: z.string().trim().max(80).nullable().optional(),
     warrantyDays: z.number().int().min(0).max(3650).nullable().optional(),
     quotedPrice: money.optional(),
-    depositPaid: money.optional(),
+    depositPaid: z.boolean().optional(),
     diagnosisRuleId: z.string().trim().min(1).nullable().optional(),
     diagnosisCode: z.string().trim().max(120).nullable().optional(),
     diagnosisLabel: z.string().trim().max(200).nullable().optional(),

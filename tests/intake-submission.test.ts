@@ -39,7 +39,7 @@ function input(overrides: Partial<IntakeSubmissionInput> = {}): IntakeSubmission
     partQuality: "AFTERMARKET",
     warrantyDays: 30,
     quotedPrice: 1,
-    depositPaid: 50,
+    depositPaid: true,
     customerSignature: "Ada Lovelace",
     partId: "part-screen-genuine",
     diagnosisRuleId: "rule-screen",

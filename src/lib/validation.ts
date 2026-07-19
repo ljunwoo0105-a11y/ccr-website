@@ -104,7 +104,9 @@ export const intakeSchema = z.object({
   partQuality: qualitySchema.optional(),
   warrantyDays: z.number().int().min(0).max(3650).optional(),
   quotedPrice: z.number().min(0).max(100000).optional(),
-  depositPaid: z.number().min(0).max(100000).optional(),
+  // Whether a deposit was taken, not how much — the counter never recorded
+  // an amount, and staff only tick that one was paid.
+  depositPaid: z.boolean().optional(),
   customerSignature: trimmed(100), // typed full name = acknowledgement
 });
 export type IntakeInput = z.infer<typeof intakeSchema>;

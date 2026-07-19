@@ -62,7 +62,7 @@ export interface IntakeRow {
   partQuality: string | null;
   warrantyDays: number | null;
   quotedPrice: number | null;
-  depositPaid: number | null;
+  depositPaid: boolean;
   status: string;
   customerSignature: string | null;
   createdAt: string;

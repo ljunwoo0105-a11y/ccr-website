@@ -19,7 +19,7 @@ export type IntakeFormState = {
   readonly partQuality: IntakeInput["partQuality"] | "";
   readonly warrantyDays: string;
   readonly quotedPrice: string;
-  readonly depositPaid: string;
+  readonly depositPaid: boolean;
   readonly signature: string;
   readonly acceptedPolicyIds?: readonly string[];
   readonly preConditionAccuracyAccepted?: boolean;
@@ -68,9 +68,7 @@ export function buildIntakePayload(state: IntakeFormState): StaffIntakePayload {
     ...(state.quotedPrice.trim() !== ""
       ? { quotedPrice: Number(state.quotedPrice) }
       : {}),
-    ...(state.depositPaid.trim() !== ""
-      ? { depositPaid: Number(state.depositPaid) }
-      : {}),
+    ...(state.depositPaid ? { depositPaid: true } : {}),
     customerSignature: state.signature.trim(),
     ...(state.partId ? { partId: state.partId } : {}),
     ...(state.diagnosisRuleId

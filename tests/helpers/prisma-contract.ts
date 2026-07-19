@@ -18,7 +18,7 @@ type MigrationContract = {
   readonly foreignKeys: readonly ForeignKeyContract[];
 };
 
-const repairIntakeFields = fields("id String @id @default(cuid())|customerId String|customer Customer @relation(fields: [customerId], references: [id])|staffId String|staff User @relation(fields: [staffId], references: [id])|deviceType String|brand String|model String|imei String?|serialNo String?|repairTypes String|preCondition String|accessories String?|conditionNotes String?|partQuality String?|warrantyDays Int?|quotedPrice Float?|depositPaid Float?|status String @default(\"CHECKED_IN\")|customerSignature String?|matchedPartId String?|matchedPart Part? @relation(\"RepairIntakeMatchedPart\", fields: [matchedPartId], references: [id], onDelete: SetNull)|diagnosisRuleId String?|diagnosisRule DiagnosisRule? @relation(fields: [diagnosisRuleId], references: [id], onDelete: SetNull)|diagnosisCode String?|diagnosisLabel String?|diagnosisOutcome String?|pricingSource String @default(\"MANUAL\")|agreementSnapshot Json?|policyAcknowledgements Json?|agreementAcceptedAt DateTime?|preConditionAccuracyAccepted Boolean @default(false)|createdAt DateTime @default(now())|updatedAt DateTime @updatedAt|completedAt DateTime?");
+const repairIntakeFields = fields("id String @id @default(cuid())|customerId String|customer Customer @relation(fields: [customerId], references: [id])|staffId String|staff User @relation(fields: [staffId], references: [id])|deviceType String|brand String|model String|imei String?|serialNo String?|repairTypes String|preCondition String|accessories String?|conditionNotes String?|partQuality String?|warrantyDays Int?|quotedPrice Float?|depositPaid Boolean @default(false)|status String @default(\"CHECKED_IN\")|customerSignature String?|matchedPartId String?|matchedPart Part? @relation(\"RepairIntakeMatchedPart\", fields: [matchedPartId], references: [id], onDelete: SetNull)|diagnosisRuleId String?|diagnosisRule DiagnosisRule? @relation(fields: [diagnosisRuleId], references: [id], onDelete: SetNull)|diagnosisCode String?|diagnosisLabel String?|diagnosisOutcome String?|pricingSource String @default(\"MANUAL\")|agreementSnapshot Json?|policyAcknowledgements Json?|agreementAcceptedAt DateTime?|preConditionAccuracyAccepted Boolean @default(false)|createdAt DateTime @default(now())|updatedAt DateTime @updatedAt|completedAt DateTime?");
 
 const modelContracts = {
   RepairIntake: {
@@ -122,7 +122,10 @@ function attributeLines(lines: readonly string[]): readonly string[] {
 }
 
 function compactLine(line: string): string {
-  return line.replace(/\s+\/\/.*$/, "").trim().replace(/\s+/g, " ");
+  // Trim BEFORE stripping the comment: on a CRLF checkout the line ends in
+  // "\r", and JS "." never matches a carriage return, so /\s+\/\/.*$/ could
+  // not reach the end anchor and every commented field looked like drift.
+  return line.trim().replace(/\s+\/\/.*$/, "").trim().replace(/\s+/g, " ");
 }
 
 function parseMigration(migration: string): MigrationContract {

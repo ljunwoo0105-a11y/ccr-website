@@ -121,7 +121,7 @@ model RepairIntake {
   partQuality                  String? // tier chosen for the job
   warrantyDays                 Int?
   quotedPrice                  Float?
-  depositPaid                  Float?
+  depositPaid                  Boolean        @default(false)
   status                       String         @default("CHECKED_IN") // CHECKED_IN | IN_REPAIR | READY | COLLECTED | CANCELLED
   customerSignature            String? // typed-name acknowledgement of pre-condition record
   matchedPartId                String?

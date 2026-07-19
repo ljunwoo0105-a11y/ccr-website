@@ -60,7 +60,7 @@ export type PersistedIntakeDraft = {
   readonly partQuality: string | null;
   readonly warrantyDays: number | null;
   readonly quotedPrice: number | null;
-  readonly depositPaid: number | null;
+  readonly depositPaid: boolean;
   readonly customerSignature: string;
   readonly matchedPartId: string | null;
   readonly diagnosisRuleId: string | null;

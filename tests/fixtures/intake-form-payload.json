@@ -39,7 +39,7 @@
   "partQuality": "PREMIUM",
   "warrantyDays": 180,
   "quotedPrice": 329.95,
-  "depositPaid": 50,
+  "depositPaid": true,
   "customerSignature": "Ada Lovelace",
   "partId": "clxstaffpart000001",
   "diagnosisRuleId": "rule-screen-glass",

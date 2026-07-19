@@ -90,7 +90,7 @@ export async function createIntakeSubmission(input: {
       partQuality: pricing.partQuality,
       warrantyDays: pricing.warrantyDays,
       quotedPrice: pricing.quotedPrice,
-      depositPaid: input.input.depositPaid ?? null,
+      depositPaid: input.input.depositPaid ?? false,
       customerSignature: input.input.customerSignature.trim(),
       matchedPartId: part?.id ?? null,
       diagnosisRuleId: diagnosis?.id ?? null,

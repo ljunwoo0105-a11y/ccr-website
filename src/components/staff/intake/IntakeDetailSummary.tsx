@@ -26,7 +26,7 @@ type JobSummary = {
   readonly quotedPrice: number | null;
   readonly pricingSource: string;
   readonly matchedPartId: string | null;
-  readonly depositPaid: number | null;
+  readonly depositPaid: boolean;
   readonly status: string;
   readonly completedAt: Date | null;
   readonly staffName: string;
@@ -123,7 +123,7 @@ function JobSection({ job }: { readonly job: JobSummary }) {
         )}
         <IntakeDetailRow
           label="Deposit paid"
-          value={job.depositPaid !== null ? formatAud(job.depositPaid) : "\u2014"}
+          value={job.depositPaid ? "Yes" : "No"}
         />
         <IntakeDetailRow label="Status" value={statusLabel(job.status)} />
         <IntakeDetailRow

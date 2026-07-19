@@ -42,7 +42,7 @@ test("builds the staff intake payload JSON from representative form state", () =
     partQuality: "PREMIUM",
     warrantyDays: "180",
     quotedPrice: "329.95",
-    depositPaid: "50",
+    depositPaid: true,
     signature: " Ada Lovelace ",
     partId: "clxstaffpart000001",
     diagnosisRuleId: "rule-screen-glass",
@@ -80,7 +80,7 @@ test("builds a matched prefill payload accepted by the strict intake submission 
     partQuality: "PREMIUM",
     warrantyDays: "180",
     quotedPrice: "329.95",
-    depositPaid: "",
+    depositPaid: false,
     signature: "Ada Lovelace",
     partId: "clxstaffpart000001",
     diagnosisRuleId: "rule-screen-glass",
@@ -120,16 +120,18 @@ test("omits optional payload fields while preserving required blank-derived valu
     partQuality: "",
     warrantyDays: "",
     quotedPrice: "",
-    depositPaid: "not-a-number",
+    depositPaid: false,
     signature: " Ada Lovelace ",
   };
 
   // When: the submit payload is stringified exactly as fetch receives it.
   const json = JSON.stringify(buildIntakePayload(state));
 
-  // Then: blanks are omitted and legacy malformed numeric JSON coercion is retained.
+  // Then: blanks are omitted, batteryHealth keeps its legacy malformed-number
+  // coercion, and an unticked deposit drops out of the payload entirely —
+  // a checkbox has no malformed state to coerce.
   assert.equal(
     json,
-    '{"customer":{"name":"Ada Lovelace","phone":"0452 385 321"},"deviceType":"Phone","brand":"Apple","model":"iPhone 14 Pro","repairTypes":["Screen Replacement"],"preCondition":{"powersOn":true,"screenCracked":false,"touchWorks":true,"frontCameraWorks":true,"rearCameraWorks":true,"speakerWorks":true,"microphoneWorks":true,"chargingPortWorks":true,"buttonsWork":true,"faceOrTouchIdWorks":true,"waterDamageSuspected":false,"previousRepairs":false,"findMyDisabled":false,"dataBackedUp":false,"simRemoved":false,"cosmeticGrade":"GOOD","batteryHealthPct":null},"depositPaid":null,"customerSignature":"Ada Lovelace"}'
+    '{"customer":{"name":"Ada Lovelace","phone":"0452 385 321"},"deviceType":"Phone","brand":"Apple","model":"iPhone 14 Pro","repairTypes":["Screen Replacement"],"preCondition":{"powersOn":true,"screenCracked":false,"touchWorks":true,"frontCameraWorks":true,"rearCameraWorks":true,"speakerWorks":true,"microphoneWorks":true,"chargingPortWorks":true,"buttonsWork":true,"faceOrTouchIdWorks":true,"waterDamageSuspected":false,"previousRepairs":false,"findMyDisabled":false,"dataBackedUp":false,"simRemoved":false,"cosmeticGrade":"GOOD","batteryHealthPct":null},"customerSignature":"Ada Lovelace"}'
   );
 });

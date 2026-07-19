@@ -10,11 +10,11 @@ type JobSectionProps = {
   readonly partQuality: PartQualitySelection;
   readonly warrantyDays: string;
   readonly quotedPrice: string;
-  readonly depositPaid: string;
+  readonly depositPaid: boolean;
   readonly onPartQualityChange: (value: PartQualitySelection) => void;
   readonly onWarrantyDaysChange: (value: string) => void;
   readonly onQuotedPriceChange: (value: string) => void;
-  readonly onDepositPaidChange: (value: string) => void;
+  readonly onDepositPaidChange: (value: boolean) => void;
 };
 
 export function JobSection(props: JobSectionProps) {
@@ -78,18 +78,20 @@ export function JobSection(props: JobSectionProps) {
           />
         </div>
         <div>
-          <label htmlFor="in-deposit" className="label">
-            Deposit paid (AUD)
+          <span className="label">Deposit</span>
+          <label
+            htmlFor="in-deposit"
+            className="mt-1 flex cursor-pointer items-center gap-2 border border-carbon-150 px-3 py-2.5"
+          >
+            <input
+              id="in-deposit"
+              type="checkbox"
+              className="h-4 w-4"
+              checked={props.depositPaid}
+              onChange={(event) => props.onDepositPaidChange(event.target.checked)}
+            />
+            <span className="text-sm text-carbon-700">Deposit paid</span>
           </label>
-          <input
-            id="in-deposit"
-            className="input"
-            type="number"
-            min={0}
-            step="0.01"
-            value={props.depositPaid}
-            onChange={(event) => props.onDepositPaidChange(event.target.value)}
-          />
         </div>
       </div>
     </section>
