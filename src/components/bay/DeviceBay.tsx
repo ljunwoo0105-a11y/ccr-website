@@ -1062,15 +1062,9 @@ export default function DeviceBay() {
                     pricing={selectedPartPricing}
                     onConfirmQuote={prices.enabled ? confirmQuote : undefined}
                   />
-                  {prices.enabled ? (
-                    <button
-                      type="button"
-                      className="mnl-btn mnl-btn-sm mt-4 w-full"
-                      onClick={() => setIntakeOpen(true)}
-                    >
-                      Check this device in →
-                    </button>
-                  ) : (
+                  {/* Staff check a device in by confirming a price tier above,
+                      so no separate CTA here — only the public quote link. */}
+                  {prices.enabled ? null : (
                     <Link
                       href="/quote"
                       className="mnl-btn mnl-btn-sm mt-4 w-full"
