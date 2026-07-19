@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import LoginForm from "@/components/staff/LoginForm";
+import { requireUser } from "@/lib/auth";
+import { defaultLoginDestination } from "@/lib/login-destination";
 
 export const metadata: Metadata = {
   title: "Staff Login",
   robots: { index: false, follow: false },
 };
+
+export const dynamic = "force-dynamic";
 
 /**
  * Staff portal login. Lives outside the (portal) route group so the
@@ -18,6 +23,11 @@ export default async function StaffLoginPage({
   searchParams: Promise<{ next?: string; error?: string }>;
 }) {
   const { next, error } = await searchParams;
+
+  // Already signed in? Showing a blank form here reads as "login is broken",
+  // so send them where that session belongs instead.
+  const user = await requireUser();
+  if (user) redirect(defaultLoginDestination(user.role));
   return (
     <main className="mnl-page flex min-h-screen items-center justify-center px-6 py-20">
       <div className="w-full max-w-[400px]">

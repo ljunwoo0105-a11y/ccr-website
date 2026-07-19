@@ -101,7 +101,7 @@ export default function ManualHeader() {
           <div className="flex items-center gap-3">
             <ThemeToggle />
             <Link
-              href="/staff/login?next=/"
+              href="/staff/login"
               className="mnl-chip hidden md:inline-flex"
               aria-label="Staff sign in"
             >
@@ -163,7 +163,7 @@ export default function ManualHeader() {
                 Call us
               </a>
               <Link
-                href="/staff/login?next=/"
+                href="/staff/login"
                 className="mnl-btn-ghost col-span-2"
                 onClick={() => setOpen(false)}
               >
