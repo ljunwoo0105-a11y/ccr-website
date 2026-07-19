@@ -22,8 +22,8 @@ const asyncContextConsumers = [
   "src/app/api/staff/leads/[id]/route.ts",
   "src/app/api/staff/parts/[id]/route.ts",
   "src/app/api/staff/quote/[id]/resend/route.ts",
-  "src/app/staff/(portal)/intake/[id]/page.tsx",
-  "src/app/staff/(portal)/intake/new/page.tsx",
+  "src/app/admin/intake/[id]/page.tsx",
+  "src/app/admin/intake/new/page.tsx",
   "src/app/staff/login/page.tsx",
 ] as const;
 

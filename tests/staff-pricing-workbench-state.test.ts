@@ -110,7 +110,7 @@ test("intake and board routing preserve bounded diagnosis display", () => {
   // Then: intake carries ids plus bounded display, and board outcomes route to #circuit.
   assert.equal(
     href,
-    "/staff/intake/new?partId=part-screen&diagnosisRuleId=rule-screen&diagnosis=Cracked+screen+with+top+speaker+glass+lift"
+    "/admin/intake/new?partId=part-screen&diagnosisRuleId=rule-screen&diagnosis=Cracked+screen+with+top+speaker+glass+lift"
   );
   assert.equal(boundedDiagnosisDisplay("x".repeat(121)), null);
   assert.equal(shouldShowBoardReference({ outcome: "mainboard_required" }), true);

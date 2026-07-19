@@ -24,7 +24,7 @@ export default async function QuotesPage() {
             staff-only.
           </p>
         </div>
-        <Link href="/staff/quote/new" className="btn-primary">
+        <Link href="/admin/quote/new" className="btn-primary">
           <Plus className="h-4 w-4" aria-hidden />
           New quote
         </Link>

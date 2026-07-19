@@ -100,20 +100,45 @@ test("admin shell and nav expose responsive catalog destinations", () => {
   assert.match(layout, /lg:sticky/);
   assert.match(layout, /overflow-x-hidden/);
 
-  for (const label of ["Catalog", "Diagnoses", "Policies", "Records", "Price Access"]) {
+  for (const label of [
+    "Catalog & Pricing",
+    "Diagnoses",
+    "Policies",
+    "Records",
+    "Price Access",
+  ]) {
     assert.match(nav, new RegExp(`label: "${label}"`));
   }
 });
 
-test("admin catalog manages parts while staff price list is read-only", () => {
+test("the console is the single catalog surface and manages parts", () => {
+  // The staff portal folded into the console, so /admin/catalog is the only
+  // page that renders the price list — there is no second read-only copy.
   assert.equal(existsSync(ADMIN_CATALOG_PAGE), true);
+  assert.equal(existsSync(STAFF_PRICE_PAGE), false);
   assert.match(source(ADMIN_CATALOG_PAGE), /mode="admin"/);
-  assert.match(source(STAFF_PRICE_PAGE), /mode="staff"/);
 
+  // The read-only mode remains available in the component contract even
+  // though nothing renders it today.
   const table = `${source(PRICE_TABLE)}\n${source(PART_CATALOG)}`;
   assert.match(table, /mode: "admin" \| "staff"/);
   assert.match(table, /mode === "admin"/);
-  assert.doesNotMatch(source(STAFF_PRICE_PAGE), /costs|margins|AI price check/i);
+});
+
+test("the merged nav carries the former staff portal sections", () => {
+  const nav = source(ADMIN_NAV);
+  for (const label of [
+    "Workshop",
+    "Customer Intake",
+    "Quote Builder",
+    "Quote Leads",
+    "Inventory",
+  ]) {
+    assert.match(nav, new RegExp(`label: "${label}"`));
+  }
+  // Nothing should link back out to a portal that no longer exists.
+  assert.doesNotMatch(nav, /href: "\/staff/);
+  assert.doesNotMatch(nav, /href="\/staff/);
 });
 
 test("catalog mutations surface failed responses before any reload", () => {

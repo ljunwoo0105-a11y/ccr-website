@@ -179,7 +179,7 @@ export default function IntakeTable() {
                     </td>
                     <td className="px-4 py-2.5 text-right">
                       <Link
-                        href={`/staff/intake/${intake.id}`}
+                        href={`/admin/intake/${intake.id}`}
                         className="inline-flex items-center gap-1 text-sm font-semibold text-signal-600 hover:underline"
                       >
                         Open <ArrowRight className="h-3.5 w-3.5" aria-hidden />

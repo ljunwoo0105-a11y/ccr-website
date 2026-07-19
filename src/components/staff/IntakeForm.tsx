@@ -41,9 +41,9 @@ export default function IntakeForm(props: IntakeFormProps) {
   const router = useRouter();
   const prefill = props.prefill ?? {};
   const handleCreated =
-    props.onCreated ?? ((id: string) => router.push(`/staff/intake/${id}`));
+    props.onCreated ?? ((id: string) => router.push(`/admin/intake/${id}`));
   const handleCancel =
-    props.onCancel ?? (() => router.push("/staff/intake"));
+    props.onCancel ?? (() => router.push("/admin/intake"));
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");

@@ -18,9 +18,9 @@ import { parseJsonStringArray } from "@/components/staff/types";
 
 export const dynamic = "force-dynamic";
 
-export const metadata = { title: "Staff Dashboard", robots: { index: false } };
+export const metadata = { title: "Workshop", robots: { index: false } };
 
-export default async function StaffDashboardPage() {
+export default async function WorkshopPage() {
   const [newLeads, activeRepairs, lowStock, aiSpend, recentLeads, recentIntakes] =
     await Promise.all([
       db.quoteRequest.count({ where: { status: "NEW" } }),
@@ -41,28 +41,28 @@ export default async function StaffDashboardPage() {
     {
       label: "New leads",
       value: String(newLeads),
-      href: "/staff/leads",
+      href: "/admin/leads",
       icon: Inbox,
       tone: "border border-signal-500/50 bg-signal-100 text-signal-600",
     },
     {
       label: "Active repairs",
       value: String(activeRepairs),
-      href: "/staff/intake",
+      href: "/admin/intake",
       icon: Wrench,
       tone: "border border-sky-500/50 bg-sky-50 text-sky-700",
     },
     {
       label: "Low stock parts",
       value: String(lowStock),
-      href: "/staff/inventory",
+      href: "/admin/inventory",
       icon: PackageOpen,
       tone: "border border-amber-500/50 bg-amber-50 text-amber-700",
     },
     {
       label: "AI spend this month",
       value: `US$${aiSpend.toFixed(2)}`,
-      href: "/staff/price-list",
+      href: "/admin/catalog",
       icon: Sparkles,
       tone: "border border-violet-500/50 bg-violet-50 text-violet-700",
     },
@@ -107,7 +107,7 @@ export default async function StaffDashboardPage() {
               Recent quote leads
             </h2>
             <Link
-              href="/staff/leads"
+              href="/admin/leads"
               className="inline-flex items-center gap-1 text-xs font-semibold text-signal-600 hover:underline"
             >
               All leads <ArrowRight className="h-3 w-3" aria-hidden />
@@ -143,7 +143,7 @@ export default async function StaffDashboardPage() {
               Recent intakes
             </h2>
             <Link
-              href="/staff/intake"
+              href="/admin/intake"
               className="inline-flex items-center gap-1 text-xs font-semibold text-signal-600 hover:underline"
             >
               All intakes <ArrowRight className="h-3 w-3" aria-hidden />
@@ -157,7 +157,7 @@ export default async function StaffDashboardPage() {
                 <li key={intake.id} className="flex items-center gap-3 px-5 py-3">
                   <div className="min-w-0 flex-1">
                     <Link
-                      href={`/staff/intake/${intake.id}`}
+                      href={`/admin/intake/${intake.id}`}
                       className="block truncate text-sm font-medium text-carbon-950 hover:text-signal-600"
                     >
                       {intake.customer.name} — {intake.brand} {intake.model}

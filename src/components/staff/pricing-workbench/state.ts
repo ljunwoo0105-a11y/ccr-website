@@ -144,7 +144,7 @@ export function buildIntakeHref(input: {
     diagnosisRuleId: input.diagnosisRuleId,
     diagnosis: boundedDiagnosisDisplay(input.diagnosis) ?? "Diagnosis matched",
   });
-  return `/staff/intake/new?${params.toString()}`;
+  return `/admin/intake/new?${params.toString()}`;
 }
 
 export function selectedDiagnosisLabel(state: WorkbenchState): string {

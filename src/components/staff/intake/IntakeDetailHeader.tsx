@@ -15,7 +15,7 @@ export function IntakeDetailHeader(props: IntakeDetailHeaderProps) {
     <>
       <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
         <Link
-          href="/staff/intake"
+          href="/admin/intake"
           className="inline-flex items-center gap-1.5 text-sm font-semibold text-carbon-700 hover:text-carbon-950"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden />

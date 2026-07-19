@@ -16,7 +16,7 @@ export default function IntakeListPage() {
             Pre-repair condition records for every device checked in.
           </p>
         </div>
-        <Link href="/staff/intake/new" className="btn-secondary px-4 py-2.5">
+        <Link href="/admin/intake/new" className="btn-secondary px-4 py-2.5">
           <Plus className="h-4 w-4" aria-hidden />
           New intake
         </Link>

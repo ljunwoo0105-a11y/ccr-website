@@ -4,7 +4,7 @@ import test from "node:test";
 
 const DASHBOARD_FILES = [
   "src/app/admin/page.tsx",
-  "src/app/staff/(portal)/page.tsx",
+  "src/app/admin/workshop/page.tsx",
 ] as const;
 
 test("dashboard routes avoid importing the full AI client for spend totals", () => {
