@@ -18,10 +18,14 @@ export default function WorkbenchControls({
     <>
       <div className="flex flex-wrap items-start justify-between gap-4 border-b border-carbon-950 pb-4">
         <div>
-          <p className="mnl-dim text-signal-600">STAFF PRICE BENCH</p>
+          <p className="mnl-dim text-signal-600">STAFF · PRE-ORDER</p>
           <h2 className="mnl-display mt-1 text-3xl text-carbon-950 sm:text-4xl">
-            Protected quote match
+            Order a repair service
           </h2>
+          <p className="mt-1.5 max-w-xl text-sm text-carbon-600">
+            Pick the device and fault, choose a part tier, then take the
+            customer&apos;s details. The price is the catalog price.
+          </p>
         </div>
         <button
           type="button"
@@ -130,7 +134,7 @@ function StatusLine(props: {
   return (
     <p className="mb-4 flex items-center gap-2 text-sm text-carbon-600">
       <ShieldCheck className="h-4 w-4 text-signal-600" aria-hidden="true" />
-      Staff-only data loads after authenticated session check.
+      Staff pricing — never shown to public visitors.
     </p>
   );
 }

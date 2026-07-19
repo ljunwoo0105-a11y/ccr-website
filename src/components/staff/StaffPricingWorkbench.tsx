@@ -16,7 +16,11 @@ import {
 } from "./pricing-workbench/state";
 import ResultPanel from "./pricing-workbench/ResultPanel";
 import WorkbenchControls from "./pricing-workbench/WorkbenchControls";
-import type { WorkbenchSelection } from "./pricing-workbench/types";
+import BayIntakeModal from "@/components/bay/BayIntakeModal";
+import type {
+  PricedPart,
+  WorkbenchSelection,
+} from "./pricing-workbench/types";
 
 const browserFetch = globalThis.fetch.bind(globalThis);
 
@@ -29,6 +33,9 @@ export default function StaffPricingWorkbench() {
   const selectedDiagnosis = state.diagnoses.find(
     (diagnosis) => diagnosis.id === state.selectedDiagnosisId
   );
+  // The tier the staff member pre-ordered. Its id is the whole quote — the
+  // server re-derives quality, warranty and price from it.
+  const [preOrdered, setPreOrdered] = useState<PricedPart | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -133,20 +140,52 @@ export default function StaffPricingWorkbench() {
           <ResultPanel
             result={state.match}
             diagnosisLabel={selectedDiagnosisLabel(state)}
-            selectedPartId={state.selectedPartId}
-            onSelectPart={(value) => dispatch({ type: "SELECT_PART", value })}
-            canStartIntake={state.role === "ADMIN"}
+            onPreOrder={setPreOrdered}
           />
         ) : null}
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-carbon-150 pt-4">
           <p className="mnl-dim text-carbon-500">
-            Repair prices are shown in the teardown bay — pick a part or run a
-            diagnosis.
+            Prices also appear on each part in the teardown bay below.
           </p>
           <StaffSignOut />
         </div>
       </div>
+
+      {preOrdered ? (
+        <BayIntakeModal
+          prefill={{
+            partId: preOrdered.id,
+            seedDeviceType: state.selection.deviceType,
+            seedBrand: state.selection.brand,
+            seedModel: state.selection.model,
+            seedPartQuality: preOrdered.quality,
+            seedQuotedPrice: String(preOrdered.sellPrice),
+            ...(state.match?.repairType
+              ? { seedRepairType: state.match.repairType }
+              : {}),
+            ...(state.match?.diagnosisRuleId
+              ? { diagnosisRuleId: state.match.diagnosisRuleId }
+              : {}),
+            diagnosis: selectedDiagnosisLabel(state),
+          }}
+          deviceLabel={[
+            `${state.selection.brand} ${state.selection.model}`.trim(),
+            state.match?.repairType,
+          ]
+            .filter(Boolean)
+            .join(" · ")}
+          confirmedQuote={{
+            id: preOrdered.id,
+            quality: preOrdered.quality,
+            colour: preOrdered.colour,
+            sellPrice: preOrdered.sellPrice,
+            warrantyDays: preOrdered.warrantyDays,
+            stockQty: preOrdered.stockQty,
+          }}
+          onClose={() => setPreOrdered(null)}
+        />
+      ) : null}
     </section>
   );
 }

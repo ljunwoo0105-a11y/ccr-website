@@ -38,11 +38,15 @@ export default async function HomePage() {
       <JsonLd data={localBusinessSchema(rating, reviewCount)} />
       <JsonLd data={faqPageSchema(HOME_FAQS)} />
 
+      {/* Staff land here to start a job, so the pre-order bench sits above the
+          marketing sheet. It renders nothing at all for public visitors, who
+          still open on the teardown hero. */}
+      <StaffPricingWorkbench />
+
       <HeroBay rating={rating} reviewCount={reviewCount} />
       <SpecStrip rating={rating} reviewCount={reviewCount} />
       <WorkOrders />
       <CircuitSheet />
-      <StaffPricingWorkbench />
       <Procedure />
       <QcLog reviews={reviews} rating={rating} reviewCount={reviewCount} />
       <FieldNotes />
