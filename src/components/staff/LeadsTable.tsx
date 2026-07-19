@@ -10,6 +10,7 @@ import {
   Send,
 } from "lucide-react";
 import { REFERRAL_SOURCES } from "@/lib/config";
+import { apiJson } from "@/lib/api-client";
 import { formatAud, formatDateTime, cn } from "@/lib/utils";
 import type { ApiEnvelope, LeadRow } from "@/components/staff/types";
 
@@ -89,11 +90,10 @@ export default function LeadsTable() {
     setBusyId(lead.id);
     setRowMessage(null);
     try {
-      const res = await fetch(`/api/staff/leads/${lead.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: next }),
-      });
+      const res = await fetch(
+        `/api/staff/leads/${lead.id}`,
+        apiJson("PATCH", { status: next })
+      );
       const json = (await res.json()) as ApiEnvelope<LeadRow>;
       if (!res.ok || !json.ok || !json.data) {
         setRowMessage({

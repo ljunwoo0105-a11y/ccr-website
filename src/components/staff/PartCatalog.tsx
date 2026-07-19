@@ -10,6 +10,7 @@ import {
 import { responseErrorMessage } from "@/components/staff/part-catalog-api";
 import { PartCatalogTable } from "@/components/staff/PartCatalogTable";
 import { PartCatalogToolbar } from "@/components/staff/PartCatalogToolbar";
+import { apiJson } from "@/lib/api-client";
 
 type CatalogMode = "admin" | "staff";
 type ModalState =
@@ -42,9 +43,7 @@ function mutationRequest(action: MutationAction, part: CatalogPartRow): RequestI
     case "reactivate":
       return {
         url: `/api/staff/parts/${part.id}`,
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ active: true }),
+        ...apiJson("PATCH", { active: true }),
       };
   }
 }

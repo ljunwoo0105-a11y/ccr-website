@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { QUALITY_DEFAULT_WARRANTY } from "../../lib/config";
+import { apiJson } from "../../lib/api-client";
 import type { IntakeInput, PreCondition } from "../../lib/validation";
 import {
   defaultPreCondition,
@@ -140,11 +141,10 @@ export default function IntakeForm(props: IntakeFormProps) {
         preConditionAccuracyAccepted:
           acknowledgements.state.preConditionAccuracyAccepted,
       });
-      const response = await fetch("/api/staff/intakes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const response = await fetch(
+        "/api/staff/intakes",
+        apiJson("POST", payload)
+      );
       const json: unknown = await response.json();
       if (
         !response.ok ||

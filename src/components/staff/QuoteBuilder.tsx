@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { QUALITY_LABELS } from "@/lib/config";
 import { formatAud, cn, applyDiscount, discountLabel } from "@/lib/utils";
+import { apiJson } from "@/lib/api-client";
 
 type DiscountType = "PERCENT" | "AMOUNT";
 import {
@@ -344,10 +345,9 @@ export default function QuoteBuilder() {
     setSubmitError(null);
     setSubmitting(true);
     try {
-      const res = await fetch("/api/staff/quote", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const res = await fetch(
+        "/api/staff/quote",
+        apiJson("POST", {
           customer: {
             name: name.trim(),
             email: email.trim(),
@@ -368,8 +368,8 @@ export default function QuoteBuilder() {
           preCondition: includeCondition ? preCondition : undefined,
           conditionNotes: conditionNotes.trim() || undefined,
           sendEmail,
-        }),
-      });
+        })
+      );
       const json = (await res.json()) as ApiEnvelope<{
         total: number;
         emailed: boolean;

@@ -33,11 +33,4 @@ export async function apiFetch<T>(
   }
 }
 
-/** RequestInit for a JSON body request. */
-export function apiJson(method: string, body: unknown): RequestInit {
-  return {
-    method,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  };
-}
+export { apiJson } from "@/lib/api-client";

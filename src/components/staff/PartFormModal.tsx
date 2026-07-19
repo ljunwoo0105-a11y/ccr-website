@@ -9,6 +9,7 @@ import {
   QUALITY_DEFAULT_WARRANTY,
 } from "@/lib/config";
 import { marginPct, marginTone } from "@/components/staff/ui";
+import { apiJson } from "@/lib/api-client";
 import type { ApiEnvelope, PartRow } from "@/components/staff/types";
 import type { CatalogPartRow } from "@/components/staff/part-catalog-schema";
 
@@ -85,11 +86,7 @@ export default function PartFormModal({ part, onSaved, onClose }: Props) {
       };
       const res = await fetch(
         editing ? `/api/staff/parts/${part.id}` : "/api/staff/parts",
-        {
-          method: editing ? "PATCH" : "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
+        apiJson(editing ? "PATCH" : "POST", payload)
       );
       const json = (await res.json()) as ApiEnvelope<PartRow>;
       if (!res.ok || !json.ok || !json.data) {

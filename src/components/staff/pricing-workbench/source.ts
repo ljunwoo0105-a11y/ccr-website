@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { apiJson } from "@/lib/api-client";
 import type {
   CatalogKey,
   DiagnosisOption,
@@ -146,9 +147,7 @@ export async function fetchPricingMatch(
   signal: AbortSignal
 ): Promise<MatchResult> {
   const response = await fetcher("/api/staff/pricing/match", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(criteria),
+    ...apiJson("POST", criteria),
     signal,
   });
   const json: unknown = await response.json();

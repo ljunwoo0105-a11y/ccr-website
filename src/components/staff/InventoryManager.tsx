@@ -10,6 +10,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { QUALITY_LABELS } from "@/lib/config";
+import { apiJson } from "@/lib/api-client";
 import { qualityBadge, stockBadge } from "@/components/staff/ui";
 import type {
   ApiEnvelope,
@@ -114,11 +115,10 @@ export default function InventoryManager({ provider }: Props) {
       prev.map((p) => (p.id === part.id ? { ...p, stockQty } : p))
     );
     try {
-      const res = await fetch(`/api/staff/parts/${part.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ stockQty }),
-      });
+      const res = await fetch(
+        `/api/staff/parts/${part.id}`,
+        apiJson("PATCH", { stockQty })
+      );
       const json = (await res.json()) as ApiEnvelope<PartRow>;
       if (!res.ok || !json.ok || !json.data) {
         setParts((prev) =>

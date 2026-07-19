@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, Loader2, Printer, Wrench, XCircle } from "lucide-react";
 import type { ApiEnvelope } from "@/components/staff/types";
+import { apiJson } from "@/lib/api-client";
 
 interface Props {
   id: string;
@@ -20,11 +21,10 @@ export default function IntakeActions({ id, status }: Props) {
     setError(null);
     setBusy(next);
     try {
-      const res = await fetch(`/api/staff/intakes/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: next }),
-      });
+      const res = await fetch(
+        `/api/staff/intakes/${id}`,
+        apiJson("PATCH", { status: next })
+      );
       const json = (await res.json()) as ApiEnvelope<unknown>;
       if (!res.ok || !json.ok) {
         setError(json.error ?? "Could not update the status");
