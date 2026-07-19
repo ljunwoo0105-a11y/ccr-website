@@ -3,6 +3,14 @@ export type IntakePrefill = {
   readonly diagnosisRuleId?: string;
   readonly diagnosis?: string;
   readonly display?: string;
+  // Device seed values, deliberately NOT named deviceType/brand/model: the
+  // form spreads this prefill over its own state when building the payload,
+  // so a matching name would silently overwrite whatever staff typed. These
+  // only seed the opening state and never reach the submission schema.
+  readonly seedDeviceType?: string;
+  readonly seedBrand?: string;
+  readonly seedModel?: string;
+  readonly seedRepairType?: string;
 };
 
 type QueryValue = string | readonly string[] | undefined;

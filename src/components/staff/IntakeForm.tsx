@@ -28,22 +28,36 @@ import { buildIntakePayload } from "./intake/payload";
 
 type IntakeFormProps = {
   readonly prefill?: IntakePrefill;
+  /**
+   * What to do once the intake is filed. Defaults to opening the new record
+   * in the portal — which only admins can reach, so the bay (where staff run
+   * intake) supplies its own handler instead.
+   */
+  readonly onCreated?: (intakeId: string) => void;
+  readonly onCancel?: () => void;
 };
 
 export default function IntakeForm(props: IntakeFormProps) {
   const router = useRouter();
   const prefill = props.prefill ?? {};
+  const handleCreated =
+    props.onCreated ?? ((id: string) => router.push(`/staff/intake/${id}`));
+  const handleCancel =
+    props.onCancel ?? (() => router.push("/staff/intake"));
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [suburb, setSuburb] = useState("");
-  const [deviceType, setDeviceType] =
-    useState<IntakeInput["deviceType"]>("Phone");
-  const [brand, setBrand] = useState("");
-  const [model, setModel] = useState("");
+  const [deviceType, setDeviceType] = useState<IntakeInput["deviceType"]>(
+    (prefill.seedDeviceType as IntakeInput["deviceType"]) ?? "Phone"
+  );
+  const [brand, setBrand] = useState(prefill.seedBrand ?? "");
+  const [model, setModel] = useState(prefill.seedModel ?? "");
   const [imei, setImei] = useState("");
   const [serialNo, setSerialNo] = useState("");
-  const [repairs, setRepairs] = useState<string[]>([]);
+  const [repairs, setRepairs] = useState<string[]>(
+    prefill.seedRepairType ? [prefill.seedRepairType] : []
+  );
   const [customRepair, setCustomRepair] = useState("");
   const [preCondition, setPreCondition] =
     useState<PreCondition>(() => defaultPreCondition());
@@ -156,7 +170,7 @@ export default function IntakeForm(props: IntakeFormProps) {
         setBusy(false);
         return;
       }
-      router.push(`/staff/intake/${json.data.id}`);
+      handleCreated(json.data.id);
     } catch (caught) {
       if (!(caught instanceof Error)) throw caught;
       setError("Network error — try again");
@@ -248,7 +262,7 @@ export default function IntakeForm(props: IntakeFormProps) {
       <FormActions
         busy={busy}
         disabled={acknowledgements.readiness.kind === "blocked"}
-        onCancel={() => router.push("/staff/intake")}
+        onCancel={handleCancel}
       />
     </form>
   );

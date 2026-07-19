@@ -27,6 +27,7 @@ export default function DiagnosePanel({
   onPickSuspect,
   onHoverSuspect,
   partPrice,
+  onCheckIn,
 }: {
   diag: Diagnosis;
   /** Resolve a partId to its display name (from the device's parts). */
@@ -36,6 +37,8 @@ export default function DiagnosePanel({
   onHoverSuspect: (partId: string | null) => void;
   /** Staff-only pricing for a suspect part; empty for public visitors. */
   partPrice: (partId: string) => PartPricing;
+  /** Set for a staff session: check the device in instead of quoting it. */
+  onCheckIn?: () => void;
 }) {
   const headingRef = useRef<HTMLHeadingElement>(null);
 
@@ -235,9 +238,19 @@ export default function DiagnosePanel({
       <div className="flex shrink-0 gap-2 border-t border-carbon-950 p-3">
         {diag.phase === "verdict" ? (
           <>
-            <Link href="/quote" className="mnl-btn mnl-btn-sm flex-1">
-              Get this fixed →
-            </Link>
+            {onCheckIn ? (
+              <button
+                type="button"
+                className="mnl-btn mnl-btn-sm flex-1"
+                onClick={onCheckIn}
+              >
+                Check this device in →
+              </button>
+            ) : (
+              <Link href="/quote" className="mnl-btn mnl-btn-sm flex-1">
+                Get this fixed →
+              </Link>
+            )}
             <button type="button" className="mnl-chip" onClick={diag.restart}>
               ⟲ Again
             </button>

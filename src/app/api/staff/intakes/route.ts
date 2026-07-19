@@ -59,9 +59,13 @@ export async function GET(req: Request) {
 /**
  * Create a repair intake (pre-repair condition record). Reuses an existing
  * customer when the phone number matches exactly, otherwise creates one.
+ *
+ * STAFF-writable: checking a walk-in device in at the counter is the front
+ * desk's job, and it is the one record staff create. Reading the intake list
+ * back (GET above) stays ADMIN — staff file records, they don't browse them.
  */
 export async function POST(req: Request) {
-  const { user, error } = await guard("ADMIN");
+  const { user, error } = await guard();
   if (error) return error;
 
   const parsed = await parseBody(req, intakeSubmissionSchema);

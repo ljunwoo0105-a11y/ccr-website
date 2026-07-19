@@ -39,6 +39,7 @@ import DiagnosisLinks from "./DiagnosisLinks";
 import BayControlDeck from "./BayControlDeck";
 import StaffPriceTag from "./StaffPriceTag";
 import StaffModelPicker from "./StaffModelPicker";
+import BayIntakeModal from "./BayIntakeModal";
 import { useStaffPrices } from "./useStaffPrices";
 import { CATALOG_DEVICE_TYPE, repairTypeForPart } from "./part-repair-map";
 import {
@@ -732,6 +733,26 @@ export default function DeviceBay() {
     ? priceForPart(selectedPart.id)
     : { repairType: null, quotes: [], band: null, modelLabel: null };
 
+  // Walk-in intake, launched from the fault card. Staff replace the public
+  // "free quote" CTA — they are standing at the counter with the device, so
+  // the useful action is checking it in, not requesting a quote by email.
+  const [intakeOpen, setIntakeOpen] = useState(false);
+  const intakePrefill = {
+    ...(selectedPartPricing.quotes.length === 1
+      ? { partId: selectedPartPricing.quotes[0].id }
+      : {}),
+    ...(selectedPartPricing.repairType
+      ? { seedRepairType: selectedPartPricing.repairType }
+      : {}),
+    seedDeviceType: catalogDeviceType,
+    ...(priceBrand ? { seedBrand: priceBrand } : {}),
+    ...(priceModel ? { seedModel: priceModel } : {}),
+    ...(selectedPart ? { display: selectedPart.name } : {}),
+  };
+  const intakeLabel = [modelLabel, selectedPartPricing.repairType]
+    .filter(Boolean)
+    .join(" · ");
+
   // Pause the render loop entirely when the bay scrolls out of view.
   useEffect(() => {
     const el = wrapRef.current;
@@ -1018,12 +1039,22 @@ export default function DeviceBay() {
                     ))}
                   </ul>
                   <StaffPriceTag pricing={selectedPartPricing} />
-                  <Link
-                    href="/quote"
-                    className="mnl-btn mnl-btn-sm mt-4 w-full"
-                  >
-                    Get this fixed →
-                  </Link>
+                  {prices.enabled ? (
+                    <button
+                      type="button"
+                      className="mnl-btn mnl-btn-sm mt-4 w-full"
+                      onClick={() => setIntakeOpen(true)}
+                    >
+                      Check this device in →
+                    </button>
+                  ) : (
+                    <Link
+                      href="/quote"
+                      className="mnl-btn mnl-btn-sm mt-4 w-full"
+                    >
+                      Get this fixed →
+                    </Link>
+                  )}
                 </div>
               ) : (
                 <p className="font-mono text-xs leading-relaxed text-carbon-500">
@@ -1042,9 +1073,18 @@ export default function DeviceBay() {
             onPickSuspect={wakeSelect}
             onHoverSuspect={wakeHover}
             partPrice={priceForPart}
+            onCheckIn={prices.enabled ? () => setIntakeOpen(true) : undefined}
           />
         )}
       </div>
+
+      {intakeOpen && prices.enabled ? (
+        <BayIntakeModal
+          prefill={intakePrefill}
+          deviceLabel={intakeLabel || null}
+          onClose={() => setIntakeOpen(false)}
+        />
+      ) : null}
 
       {/* ------------------------------------------------ Device switcher */}
       <div className="col-span-full flex flex-wrap gap-2 border-t border-carbon-950 bg-bone-200 px-3 py-3 lg:px-4">
