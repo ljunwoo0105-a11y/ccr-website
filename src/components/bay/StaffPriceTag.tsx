@@ -1,52 +1,126 @@
 "use client";
 
 // ---------------------------------------------------------------------------
-// The staff-only price band shown against a bay part or a diagnosis suspect.
-// Renders nothing at all when there is no band, so a public visitor and a
-// staff member looking at unpriced bench work see exactly the same markup.
+// The staff-only price shown against a bay part or a diagnosis suspect.
+//
+// With a model picked this is the ACCURATE quote: one line per quality tier
+// straight from the catalog row, with its warranty and stock. Without one it
+// degrades to a spread across models, clearly marked as such so nobody reads
+// an orientation figure as a quote. Renders nothing at all for public
+// visitors, so their DOM is unchanged.
 // ---------------------------------------------------------------------------
 
+import { QUALITY_LABELS } from "@/lib/config";
 import { formatAud } from "@/lib/utils";
-import type { PriceBand } from "./useStaffPrices";
+import { warrantyLabel } from "@/components/staff/ui";
+import type { PriceBand, PriceQuote } from "./useStaffPrices";
+
+export interface PartPricing {
+  readonly repairType: string | null;
+  readonly quotes: readonly PriceQuote[];
+  readonly band: PriceBand | null;
+  /** "Apple iPhone 15" when a model is picked, else null. */
+  readonly modelLabel: string | null;
+}
+
+function qualityLabel(quality: string): string {
+  return QUALITY_LABELS[quality as keyof typeof QUALITY_LABELS] ?? quality;
+}
 
 export default function StaffPriceTag({
-  repairType,
-  band,
+  pricing,
   compact = false,
 }: {
-  readonly repairType: string | null;
-  readonly band: PriceBand | null;
-  /** Tighter single-line form for the diagnosis suspect list. */
+  readonly pricing: PartPricing;
+  /** Tighter form for the diagnosis suspect list. */
   readonly compact?: boolean;
 }) {
-  if (!repairType || !band) return null;
+  const { repairType, quotes, band, modelLabel } = pricing;
+  if (!repairType) return null;
 
-  const range =
-    band.min === band.max
-      ? formatAud(band.min)
-      : `${formatAud(band.min)} – ${formatAud(band.max)}`;
+  // A model is picked but this repair has no row for it — say so rather than
+  // silently falling back to a spread from other models.
+  if (modelLabel && quotes.length === 0) {
+    return compact ? (
+      <span className="mnl-dim mt-1 block text-carbon-500">
+        NO CATALOG ROW FOR {modelLabel.toUpperCase()}
+      </span>
+    ) : (
+      <div className="mt-3 border border-carbon-150 bg-bone-200 px-3 py-2">
+        <p className="mnl-dim text-carbon-500">{repairType}</p>
+        <p className="mt-1 text-xs leading-relaxed text-carbon-700">
+          No catalog row for {modelLabel}. Quote from the bench after
+          inspection.
+        </p>
+      </div>
+    );
+  }
 
   if (compact) {
+    if (quotes.length > 0) {
+      const cheapest = quotes[0];
+      return (
+        <span className="mnl-num mt-1 block text-[0.6875rem] text-signal-600">
+          {formatAud(cheapest.sellPrice)}
+          <span className="mnl-dim ml-1.5 text-carbon-500">
+            {qualityLabel(cheapest.quality).toUpperCase()}
+            {quotes.length > 1 ? ` +${quotes.length - 1} TIER` : ""}
+          </span>
+        </span>
+      );
+    }
+    if (!band) return null;
     return (
       <span className="mnl-num mt-1 block text-[0.6875rem] text-signal-600">
-        {range}
-        <span className="mnl-dim ml-1.5 text-carbon-500">STAFF</span>
+        {formatAud(band.min)} – {formatAud(band.max)}
+        <span className="mnl-dim ml-1.5 text-carbon-500">RANGE</span>
       </span>
     );
   }
 
+  if (quotes.length > 0) {
+    return (
+      <div className="mt-3 border border-signal-500 bg-signal-100">
+        <p className="mnl-dim flex items-center justify-between border-b border-signal-500/40 px-3 py-1.5 text-signal-600">
+          <span className="truncate">{repairType}</span>
+          <span className="shrink-0 text-carbon-500">{modelLabel}</span>
+        </p>
+        <ul className="divide-y divide-signal-500/30">
+          {quotes.map((q) => (
+            <li
+              key={q.id}
+              className="flex items-baseline justify-between gap-3 px-3 py-1.5"
+            >
+              <span className="min-w-0">
+                <span className="block truncate font-mono text-[0.6875rem] font-semibold text-carbon-950">
+                  {qualityLabel(q.quality)}
+                </span>
+                <span className="mnl-dim text-carbon-500">
+                  {warrantyLabel(q.warrantyDays)} · STOCK {q.stockQty}
+                </span>
+              </span>
+              <span className="mnl-num shrink-0 text-base leading-none text-carbon-950">
+                {formatAud(q.sellPrice)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+
+  if (!band) return null;
   return (
-    <div className="mt-3 border border-signal-500 bg-signal-100 px-3 py-2">
-      <p className="mnl-dim flex items-center justify-between text-signal-600">
+    <div className="mt-3 border border-carbon-150 bg-bone-200 px-3 py-2">
+      <p className="mnl-dim flex items-center justify-between text-carbon-500">
         <span>{repairType}</span>
-        <span className="text-carbon-500">STAFF PRICE</span>
+        <span>RANGE ONLY</span>
       </p>
       <p className="mnl-num mt-1 text-lg leading-none text-carbon-950">
-        {range}
+        {formatAud(band.min)} – {formatAud(band.max)}
       </p>
       <p className="mnl-dim mt-1.5 text-carbon-500">
-        {band.count} catalog {band.count === 1 ? "row" : "rows"} · model &amp;
-        tier dependent
+        Across {band.count} rows · pick a model above for the exact price
       </p>
     </div>
   );

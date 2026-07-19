@@ -38,6 +38,7 @@ import DiagnosePanel from "./DiagnosePanel";
 import DiagnosisLinks from "./DiagnosisLinks";
 import BayControlDeck from "./BayControlDeck";
 import StaffPriceTag from "./StaffPriceTag";
+import StaffModelPicker from "./StaffModelPicker";
 import { useStaffPrices } from "./useStaffPrices";
 import { CATALOG_DEVICE_TYPE, repairTypeForPart } from "./part-repair-map";
 import {
@@ -690,17 +691,46 @@ export default function DeviceBay() {
   // bearing branch below collapses to the same markup the public already saw.
   const prices = useStaffPrices();
   const catalogDeviceType = CATALOG_DEVICE_TYPE[deviceId];
+  const [priceBrand, setPriceBrand] = useState("");
+  const [priceModel, setPriceModel] = useState("");
+
+  // The catalog brands/models depend on the rig, so switching device must not
+  // leave an iPhone selected on the drone bay.
+  useEffect(() => {
+    setPriceBrand("");
+    setPriceModel("");
+  }, [deviceId]);
+
+  const priceBrands = prices.brands(catalogDeviceType);
+  const priceModels = priceBrand
+    ? prices.models(catalogDeviceType, priceBrand)
+    : [];
+  const modelLabel =
+    priceBrand && priceModel ? `${priceBrand} ${priceModel}` : null;
+
   const priceForPart = (partId: string) => {
     const repairType = repairTypeForPart(deviceId, partId);
-    if (!repairType) return { repairType: null, band: null };
+    if (!repairType) {
+      return { repairType: null, quotes: [], band: null, modelLabel: null };
+    }
     return {
       repairType,
-      band: prices.lookup(catalogDeviceType, repairType),
+      quotes:
+        priceBrand && priceModel
+          ? prices.quotes(
+              catalogDeviceType,
+              priceBrand,
+              priceModel,
+              repairType
+            )
+          : [],
+      band: prices.band(catalogDeviceType, repairType),
+      modelLabel,
     };
   };
-  const selectedPartPrice = selectedPart
+  const selectedPartPricing = selectedPart
     ? priceForPart(selectedPart.id)
-    : { repairType: null, band: null };
+    : { repairType: null, quotes: [], band: null, modelLabel: null };
 
   // Pause the render loop entirely when the bay scrolls out of view.
   useEffect(() => {
@@ -911,6 +941,18 @@ export default function DeviceBay() {
           </span>
         </div>
 
+        <StaffModelPicker
+          brands={priceBrands}
+          models={priceModels}
+          brand={priceBrand}
+          model={priceModel}
+          onBrand={(value) => {
+            setPriceBrand(value);
+            setPriceModel("");
+          }}
+          onModel={setPriceModel}
+        />
+
         {bomTab === "parts" ? (
           <div
             role="tabpanel"
@@ -975,10 +1017,7 @@ export default function DeviceBay() {
                       </li>
                     ))}
                   </ul>
-                  <StaffPriceTag
-                    repairType={selectedPartPrice.repairType}
-                    band={selectedPartPrice.band}
-                  />
+                  <StaffPriceTag pricing={selectedPartPricing} />
                   <Link
                     href="/quote"
                     className="mnl-btn mnl-btn-sm mt-4 w-full"
