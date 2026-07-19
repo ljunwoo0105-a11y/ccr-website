@@ -37,6 +37,9 @@ import { useDiagnosis, type RankInfo } from "./useDiagnosis";
 import DiagnosePanel from "./DiagnosePanel";
 import DiagnosisLinks from "./DiagnosisLinks";
 import BayControlDeck from "./BayControlDeck";
+import StaffPriceTag from "./StaffPriceTag";
+import { useStaffPrices } from "./useStaffPrices";
+import { CATALOG_DEVICE_TYPE, repairTypeForPart } from "./part-repair-map";
 import {
   DEVICES,
   getDevice,
@@ -683,6 +686,22 @@ export default function DeviceBay() {
   const device = getDevice(deviceId);
   const selectedPart = device.parts.find((p) => p.id === selected) ?? null;
 
+  // Staff-only pricing. Fails closed for public visitors, so every price-
+  // bearing branch below collapses to the same markup the public already saw.
+  const prices = useStaffPrices();
+  const catalogDeviceType = CATALOG_DEVICE_TYPE[deviceId];
+  const priceForPart = (partId: string) => {
+    const repairType = repairTypeForPart(deviceId, partId);
+    if (!repairType) return { repairType: null, band: null };
+    return {
+      repairType,
+      band: prices.lookup(catalogDeviceType, repairType),
+    };
+  };
+  const selectedPartPrice = selectedPart
+    ? priceForPart(selectedPart.id)
+    : { repairType: null, band: null };
+
   // Pause the render loop entirely when the bay scrolls out of view.
   useEffect(() => {
     const el = wrapRef.current;
@@ -956,6 +975,10 @@ export default function DeviceBay() {
                       </li>
                     ))}
                   </ul>
+                  <StaffPriceTag
+                    repairType={selectedPartPrice.repairType}
+                    band={selectedPartPrice.band}
+                  />
                   <Link
                     href="/quote"
                     className="mnl-btn mnl-btn-sm mt-4 w-full"
@@ -979,6 +1002,7 @@ export default function DeviceBay() {
             selected={selected}
             onPickSuspect={wakeSelect}
             onHoverSuspect={wakeHover}
+            partPrice={priceForPart}
           />
         )}
       </div>

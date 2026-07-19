@@ -9,6 +9,9 @@ const SOURCE_SURFACES = [
   "src/components/sheet",
   "src/components/staff/StaffPricingWorkbench.tsx",
   "src/components/staff/pricing-workbench",
+  // The teardown bay renders staff price bands behind a session check, so it
+  // is a public surface that must never carry hardcoded catalog prices.
+  "src/components/bay",
 ] as const;
 
 const BUILD_SURFACES = ["dist/assets"] as const;

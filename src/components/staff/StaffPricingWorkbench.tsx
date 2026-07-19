@@ -2,7 +2,6 @@
 
 import { useEffect, useReducer, useRef, useState } from "react";
 import { LogOut } from "lucide-react";
-import PriceListTable from "@/components/staff/PriceListTable";
 import {
   fetchCatalogOptions,
   fetchDiagnoses,
@@ -140,18 +139,23 @@ export default function StaffPricingWorkbench() {
           />
         ) : null}
 
-        <StaffPriceListPanel />
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-carbon-150 pt-4">
+          <p className="mnl-dim text-carbon-500">
+            Repair prices are shown in the teardown bay — pick a part or run a
+            diagnosis.
+          </p>
+          <StaffSignOut />
+        </div>
       </div>
     </section>
   );
 }
 
 /**
- * Full price list for every repair on file — the staff view of the catalog.
- * Staff have no portal access, so this section (plus the quick match above)
- * is their entire pricing surface, including the way out of the session.
+ * Staff have no portal access, so the way out of the session has to live on
+ * the public page alongside the pricing surfaces.
  */
-function StaffPriceListPanel() {
+function StaffSignOut() {
   const [signingOut, setSigningOut] = useState(false);
 
   async function handleSignOut() {
@@ -164,26 +168,15 @@ function StaffPriceListPanel() {
   }
 
   return (
-    <div className="mt-10 border-t border-carbon-950 pt-6">
-      <div className="flex flex-wrap items-end justify-between gap-4 pb-4">
-        <div>
-          <p className="mnl-dim text-signal-600">STAFF PRICE LIST</p>
-          <h3 className="mnl-display mt-1 text-2xl text-carbon-950 sm:text-3xl">
-            All repair prices
-          </h3>
-        </div>
-        <button
-          type="button"
-          className="mnl-chip"
-          onClick={() => void handleSignOut()}
-          disabled={signingOut}
-        >
-          <LogOut className="h-4 w-4" aria-hidden="true" />
-          {signingOut ? "Signing out…" : "Sign out"}
-        </button>
-      </div>
-      <PriceListTable mode="staff" />
-    </div>
+    <button
+      type="button"
+      className="mnl-chip"
+      onClick={() => void handleSignOut()}
+      disabled={signingOut}
+    >
+      <LogOut className="h-4 w-4" aria-hidden="true" />
+      {signingOut ? "Signing out…" : "Sign out"}
+    </button>
   );
 }
 

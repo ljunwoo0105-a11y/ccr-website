@@ -11,6 +11,13 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import type { Diagnosis } from "./useDiagnosis";
 import type { Likelihood } from "./diagnostics/types";
+import StaffPriceTag from "./StaffPriceTag";
+import type { PriceBand } from "./useStaffPrices";
+
+export interface PartPrice {
+  readonly repairType: string | null;
+  readonly band: PriceBand | null;
+}
 
 const RANK_LABEL: Record<Likelihood, string> = {
   primary: "PRIMARY",
@@ -24,6 +31,7 @@ export default function DiagnosePanel({
   selected,
   onPickSuspect,
   onHoverSuspect,
+  partPrice,
 }: {
   diag: Diagnosis;
   /** Resolve a partId to its display name (from the device's parts). */
@@ -31,6 +39,8 @@ export default function DiagnosePanel({
   selected: string | null;
   onPickSuspect: (partId: string) => void;
   onHoverSuspect: (partId: string | null) => void;
+  /** Staff-only price band for a suspect part; empty for public visitors. */
+  partPrice: (partId: string) => PartPrice;
 }) {
   const headingRef = useRef<HTMLHeadingElement>(null);
 
@@ -199,6 +209,11 @@ export default function DiagnosePanel({
                       <span className="mt-1 block text-[0.6875rem] leading-relaxed text-carbon-700">
                         {s.why}
                       </span>
+                      <StaffPriceTag
+                        repairType={partPrice(first).repairType}
+                        band={partPrice(first).band}
+                        compact
+                      />
                     </button>
                   </li>
                 );
