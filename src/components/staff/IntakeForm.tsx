@@ -70,14 +70,10 @@ export default function IntakeForm(props: IntakeFormProps) {
   const [warrantyDays, setWarrantyDays] = useState("");
   const [quotedPrice, setQuotedPrice] = useState(prefill.seedQuotedPrice ?? "");
   const [depositPaid, setDepositPaid] = useState(false);
-  const [signature, setSignature] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const customerLookup = useCustomerLookup(phone);
-  const acknowledgements = useIntakeAcknowledgements({
-    repairs,
-    signature,
-  });
+  const acknowledgements = useIntakeAcknowledgements({ repairs });
 
   useEffect(() => {
     if (partQuality && QUALITY_DEFAULT_WARRANTY[partQuality] !== undefined) {
@@ -150,7 +146,9 @@ export default function IntakeForm(props: IntakeFormProps) {
         warrantyDays,
         quotedPrice,
         depositPaid,
-        signature,
+        // No typed signature is collected any more; the agree-all tick box is
+        // the acknowledgement. Kept in the payload shape for older records.
+        signature: "",
         ...prefill,
         acceptedPolicyIds: readiness.acceptedPolicyIds,
         preConditionAccuracyAccepted:
@@ -251,14 +249,9 @@ export default function IntakeForm(props: IntakeFormProps) {
         onDepositPaidChange={setDepositPaid}
       />
       <AcknowledgementSection
-        signature={signature}
         policyState={acknowledgements.policyState}
-        acknowledgementState={acknowledgements.state}
-        onTogglePolicy={acknowledgements.toggleAcceptedPolicy}
-        onPreConditionAccuracyAcceptedChange={
-          acknowledgements.setPreConditionAccuracyAccepted
-        }
-        onSignatureChange={setSignature}
+        agreedAll={acknowledgements.agreedAll}
+        onAgreeAllChange={acknowledgements.setAgreeAll}
       />
       <FormActions
         busy={busy}

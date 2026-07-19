@@ -1,19 +1,12 @@
 import type { AcknowledgementState, PolicyLoadState } from "./policies";
 
 type AcknowledgementSectionProps = {
-  readonly signature: string;
   readonly policyState: PolicyLoadState;
-  readonly acknowledgementState: AcknowledgementState;
-  readonly onTogglePolicy: (policyId: string) => void;
-  readonly onPreConditionAccuracyAcceptedChange: (accepted: boolean) => void;
-  readonly onSignatureChange: (value: string) => void;
+  readonly agreedAll: boolean;
+  readonly onAgreeAllChange: (accepted: boolean) => void;
 };
 
 export function AcknowledgementSection(props: AcknowledgementSectionProps) {
-  const acceptedPolicyIds = new Set(
-    props.acknowledgementState.acceptedPolicyIds
-  );
-
   return (
     <section className="card">
       <h2 className="mb-2 text-base font-semibold text-carbon-950">
@@ -36,28 +29,19 @@ export function AcknowledgementSection(props: AcknowledgementSectionProps) {
             {props.policyState.message}
           </p>
         )}
+        {/* The policies stay on screen in full — acceptance is a single tick,
+            but the customer must still be able to read what they accept. */}
         {props.policyState.kind === "ready" &&
           props.policyState.policies.map((policy) => (
-            <label
+            <div
               key={policy.id}
               className="block border border-carbon-150 bg-bone-50 p-3"
             >
-              <span className="flex items-start gap-2">
-                <input
-                  type="checkbox"
-                  className="mt-1"
-                  required
-                  checked={acceptedPolicyIds.has(policy.id)}
-                  onChange={() => props.onTogglePolicy(policy.id)}
-                />
-                <span>
-                  <span className="block text-sm font-semibold text-carbon-950">
-                    {policy.title} v{policy.version}
-                  </span>
-                  <span className="block text-xs text-carbon-600">
-                    {policy.category}
-                  </span>
-                </span>
+              <span className="block text-sm font-semibold text-carbon-950">
+                {policy.title} v{policy.version}
+              </span>
+              <span className="block text-xs text-carbon-600">
+                {policy.category}
               </span>
               <details className="mt-2 text-xs leading-relaxed text-carbon-700">
                 <summary className="cursor-pointer font-medium">
@@ -65,34 +49,26 @@ export function AcknowledgementSection(props: AcknowledgementSectionProps) {
                 </summary>
                 <p className="mt-2 whitespace-pre-wrap">{policy.body}</p>
               </details>
-            </label>
+            </div>
           ))}
-        <label className="flex items-start gap-2 border border-carbon-150 bg-bone-50 p-3 text-sm text-carbon-700">
-          <input
-            type="checkbox"
-            className="mt-1"
-            required
-            checked={props.acknowledgementState.preConditionAccuracyAccepted}
-            onChange={(event) =>
-              props.onPreConditionAccuracyAcceptedChange(event.target.checked)
-            }
-          />
-          <span>I confirm the pre-repair condition record is accurate.</span>
-        </label>
       </div>
-      <div className="max-w-sm">
-        <label htmlFor="in-signature" className="label">
-          Customer types full name to confirm the condition record is accurate
-        </label>
+      <label
+        htmlFor="in-agree-all"
+        className="flex cursor-pointer items-start gap-2 border border-carbon-950 bg-bone-100 p-3 text-sm font-medium text-carbon-950"
+      >
         <input
-          id="in-signature"
-          className="input"
+          id="in-agree-all"
+          type="checkbox"
+          className="mt-0.5 h-4 w-4"
           required
-          placeholder="Full name"
-          value={props.signature}
-          onChange={(event) => props.onSignatureChange(event.target.value)}
+          checked={props.agreedAll}
+          onChange={(event) => props.onAgreeAllChange(event.target.checked)}
         />
-      </div>
+        <span>
+          The customer agrees to all of the above — every policy listed here and
+          that the pre-repair condition record is accurate.
+        </span>
+      </label>
     </section>
   );
 }

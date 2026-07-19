@@ -12,7 +12,6 @@ import { useActivePolicies } from "./useActivePolicies";
 
 type IntakeAcknowledgementsInput = {
   readonly repairs: readonly string[];
-  readonly signature: string;
 };
 
 type IntakeAcknowledgements = {
@@ -21,6 +20,10 @@ type IntakeAcknowledgements = {
   readonly readiness: IntakeReadiness;
   readonly toggleAcceptedPolicy: (policyId: string) => void;
   readonly setPreConditionAccuracyAccepted: (accepted: boolean) => void;
+  /** Every active policy plus the accuracy confirmation, in one tick. */
+  readonly setAgreeAll: (accepted: boolean) => void;
+  /** True when every policy and the accuracy confirmation are accepted. */
+  readonly agreedAll: boolean;
 };
 
 export function useIntakeAcknowledgements(
@@ -33,8 +36,27 @@ export function useIntakeAcknowledgements(
     acceptedPolicyIds: state.acceptedPolicyIds,
     preConditionAccuracyAccepted: state.preConditionAccuracyAccepted,
     repairs: input.repairs,
-    signature: input.signature,
   });
+
+  const activePolicyIds =
+    policyState.kind === "ready"
+      ? policyState.policies.map((policy) => policy.id)
+      : [];
+  const agreedAll =
+    activePolicyIds.length > 0 &&
+    state.preConditionAccuracyAccepted &&
+    activePolicyIds.every((id) => state.acceptedPolicyIds.includes(id));
+
+  function setAgreeAll(accepted: boolean) {
+    setState(
+      accepted
+        ? {
+            acceptedPolicyIds: activePolicyIds,
+            preConditionAccuracyAccepted: true,
+          }
+        : EMPTY_ACKNOWLEDGEMENT_STATE
+    );
+  }
 
   function toggleAcceptedPolicy(policyId: string) {
     setState((currentState) =>
@@ -55,5 +77,7 @@ export function useIntakeAcknowledgements(
     readiness,
     toggleAcceptedPolicy,
     setPreConditionAccuracyAccepted,
+    setAgreeAll,
+    agreedAll,
   };
 }

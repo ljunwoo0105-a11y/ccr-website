@@ -180,12 +180,13 @@ test("preserves unspecified manual warranty through snapshot detail and renderin
   assert.doesNotMatch(markup, /0 days/);
 });
 
-test("rejects missing policy accuracy signature and acknowledgement contracts", async () => {
+// A blank signature is deliberately absent from these cases: acknowledgement
+// is the agree-all tick box now, and no typed name is collected.
+test("rejects missing policy accuracy and acknowledgement contracts", async () => {
   const cases = [
     { mutate: (repo: MemoryIntakeRepository) => repo.policies.pop(), body: input(), match: /active DATA/i },
     { body: input({ acceptedPolicyIds: ["policy-terms", "policy-warranty"] }), match: /active policy documents|DATA|policy-data/i },
     { body: input({ acceptedPolicyIds: ["policy-terms", "policy-warranty", "policy-data", "policy-old"] }), match: /exactly the active policy/i },
-    { body: input({ customerSignature: " " }), match: /signature/i },
     { body: input({ preConditionAccuracyAccepted: false }), match: /pre-condition/i },
   ] satisfies readonly {
     readonly body: IntakeSubmissionInput;

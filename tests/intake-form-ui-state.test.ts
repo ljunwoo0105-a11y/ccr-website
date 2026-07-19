@@ -76,36 +76,40 @@ function findButtonSegment(markup: string, label: string): string {
   return segment;
 }
 
-test("renders active policy acknowledgement state", () => {
-  // Given: only repair terms and pre-condition accuracy are accepted.
+test("shows every active policy but gates them behind one agree-all tick", () => {
+  // Given: acknowledgement is not yet given.
   const markup = render(
     createElement(AcknowledgementSection, {
-      signature: "",
       policyState: readyPolicyState,
-      acknowledgementState: {
-        acceptedPolicyIds: ["policy-terms"],
-        preConditionAccuracyAccepted: true,
-      },
-      onTogglePolicy: () => undefined,
-      onPreConditionAccuracyAcceptedChange: () => undefined,
-      onSignatureChange: () => undefined,
+      agreedAll: false,
+      onAgreeAllChange: () => undefined,
     })
   );
 
-  // When: the policy labels are located in rendered markup.
-  const termsSegment = findLabelSegment(markup, "Repair Terms");
-  const warrantySegment = findLabelSegment(markup, "Warranty Coverage");
-  const dataSegment = findLabelSegment(markup, "Data Handling");
-
-  // Then: all versions are visible and only the accepted controls are checked.
+  // Then: each policy is still readable, but there is a single unticked
+  // control — no per-policy checkbox and no typed-signature field.
   assert.ok(markup.includes("Repair Terms"));
   assert.ok(markup.includes("Warranty Coverage"));
   assert.ok(markup.includes("Data Handling"));
   assert.equal(countOccurrences(markup, "2026-07-01.1"), 3);
-  assert.ok(termsSegment.includes('checked=""'));
-  assert.equal(warrantySegment.includes('checked=""'), false);
-  assert.equal(dataSegment.includes('checked=""'), false);
-  assert.equal(countOccurrences(markup, 'checked=""'), 2);
+  assert.equal(countOccurrences(markup, 'type="checkbox"'), 1);
+  assert.equal(countOccurrences(markup, 'checked=""'), 0);
+  assert.equal(markup.includes("in-signature"), false);
+});
+
+test("agree-all ticks the single acknowledgement control", () => {
+  // Given: the customer has agreed to everything.
+  const markup = render(
+    createElement(AcknowledgementSection, {
+      policyState: readyPolicyState,
+      agreedAll: true,
+      onAgreeAllChange: () => undefined,
+    })
+  );
+
+  // Then: the one control reads as checked.
+  assert.equal(countOccurrences(markup, 'type="checkbox"'), 1);
+  assert.equal(countOccurrences(markup, 'checked=""'), 1);
 });
 
 test("renders custom repairs in order and common repairs as pressed controls", () => {

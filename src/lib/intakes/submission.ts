@@ -46,10 +46,6 @@ export async function createIntakeSubmission(input: {
   readonly input: IntakeSubmissionInput;
   readonly repository: IntakeSubmissionRepository;
 }): Promise<PersistedIntakeSubmission> {
-  if (input.input.customerSignature.trim().length === 0) {
-    throw new IntakeSubmissionValidationError("Customer signature is required.");
-  }
-
   return input.repository.withTransaction(async (transaction) => {
     const [part, diagnosis, policies] = await Promise.all([
       resolvePart(transaction, input.input),
@@ -91,7 +87,7 @@ export async function createIntakeSubmission(input: {
       warrantyDays: pricing.warrantyDays,
       quotedPrice: pricing.quotedPrice,
       depositPaid: input.input.depositPaid ?? false,
-      customerSignature: input.input.customerSignature.trim(),
+      customerSignature: input.input.customerSignature?.trim() || null,
       matchedPartId: part?.id ?? null,
       diagnosisRuleId: diagnosis?.id ?? null,
       diagnosisCode: diagnosis?.symptomCode ?? null,

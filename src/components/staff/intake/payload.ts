@@ -69,7 +69,9 @@ export function buildIntakePayload(state: IntakeFormState): StaffIntakePayload {
       ? { quotedPrice: Number(state.quotedPrice) }
       : {}),
     ...(state.depositPaid ? { depositPaid: true } : {}),
-    customerSignature: state.signature.trim(),
+    ...(state.signature.trim()
+      ? { customerSignature: state.signature.trim() }
+      : {}),
     ...(state.partId ? { partId: state.partId } : {}),
     ...(state.diagnosisRuleId
       ? { diagnosisRuleId: state.diagnosisRuleId }

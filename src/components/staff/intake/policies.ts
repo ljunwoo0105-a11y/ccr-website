@@ -44,7 +44,6 @@ export type IntakeReadinessInput = {
   readonly acceptedPolicyIds: readonly string[];
   readonly preConditionAccuracyAccepted: boolean;
   readonly repairs: readonly string[];
-  readonly signature: string;
 };
 
 export type IntakeReadiness =
@@ -59,8 +58,7 @@ export type IntakeReadiness =
         | "policyLoadFailed"
         | "missingPolicies"
         | "missingAccuracy"
-        | "missingRepair"
-        | "missingSignature";
+        | "missingRepair";
       readonly message: string;
     };
 
@@ -160,13 +158,6 @@ export function intakeSubmissionReadiness(
       kind: "blocked",
       reason: "missingRepair",
       message: "Select at least one repair type.",
-    };
-  }
-  if (!input.signature.trim()) {
-    return {
-      kind: "blocked",
-      reason: "missingSignature",
-      message: "Customer signature is required.",
     };
   }
   return { kind: "ready", acceptedPolicyIds: activePolicyIds };

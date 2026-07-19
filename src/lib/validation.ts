@@ -107,7 +107,9 @@ export const intakeSchema = z.object({
   // Whether a deposit was taken, not how much — the counter never recorded
   // an amount, and staff only tick that one was paid.
   depositPaid: z.boolean().optional(),
-  customerSignature: trimmed(100), // typed full name = acknowledgement
+  // Retained for records captured while the counter still took a typed name.
+  // Acknowledgement is now the agree-all tick box, so this is optional.
+  customerSignature: z.string().trim().max(100).optional(),
 });
 export type IntakeInput = z.infer<typeof intakeSchema>;
 
