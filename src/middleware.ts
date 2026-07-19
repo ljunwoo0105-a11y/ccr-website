@@ -4,6 +4,12 @@ import { jwtVerify } from "jose";
 /**
  * Edge gatekeeper for staff/admin surfaces.
  *
+ * Back-office PAGES (/staff portal + /admin console) are admin-only; a STAFF
+ * session's whole surface is the pricing section on the public landing page,
+ * so staff hitting a back-office page are sent to "/". /api/staff stays open
+ * to any authenticated session — the landing-page pricing widgets call it,
+ * and each route re-checks the required role itself.
+ *
  * This is the first line of defence only — every protected API route ALSO
  * re-validates the session against the database via `requireUser()` in
  * src/lib/auth.ts (middleware can't reach Prisma on the edge runtime).
@@ -55,11 +61,13 @@ export async function middleware(req: NextRequest) {
     return privateResponse(NextResponse.redirect(login));
   }
 
+  const isBackOfficePage =
+    (isAdminArea || isStaffArea) && !pathname.startsWith("/api/");
+  if (isBackOfficePage && session.role !== "ADMIN") {
+    return privateResponse(NextResponse.redirect(new URL("/", req.url)));
+  }
   if (isAdminArea && session.role !== "ADMIN") {
-    if (pathname.startsWith("/api/")) {
-      return privateResponse(NextResponse.json({ error: "Forbidden" }, { status: 403 }));
-    }
-    return privateResponse(NextResponse.redirect(new URL("/staff", req.url)));
+    return privateResponse(NextResponse.json({ error: "Forbidden" }, { status: 403 }));
   }
 
   return privateResponse(NextResponse.next());

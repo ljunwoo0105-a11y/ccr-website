@@ -16,6 +16,8 @@ interface ResultPanelProps {
   readonly diagnosisLabel: string;
   readonly selectedPartId: string | null;
   readonly onSelectPart: (partId: string) => void;
+  /** Intake pages are admin-only; hide the CTA for STAFF sessions. */
+  readonly canStartIntake: boolean;
 }
 
 export default function ResultPanel({
@@ -23,10 +25,12 @@ export default function ResultPanel({
   diagnosisLabel,
   selectedPartId,
   onSelectPart,
+  canStartIntake,
 }: ResultPanelProps) {
   const pricedParts = visiblePricedParts(result);
   const selectedPart = pricedParts.find((part) => part.id === selectedPartId) ?? null;
-  const canOpenIntake = selectedPart !== null && result.diagnosisRuleId !== null;
+  const canOpenIntake =
+    canStartIntake && selectedPart !== null && result.diagnosisRuleId !== null;
 
   return (
     <div className="border border-carbon-950 bg-bone-100">

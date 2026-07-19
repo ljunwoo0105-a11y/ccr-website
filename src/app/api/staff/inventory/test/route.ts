@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
  * staff UI can render them inline.
  */
 export async function GET() {
-  const { error } = await guard();
+  const { error } = await guard("ADMIN");
   if (error) return error;
 
   try {

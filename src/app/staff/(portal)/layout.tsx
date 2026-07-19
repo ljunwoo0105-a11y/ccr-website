@@ -6,9 +6,11 @@ import LogoutButton from "@/components/staff/LogoutButton";
 export const dynamic = "force-dynamic";
 
 /**
- * Authenticated staff shell: dark sidebar, light content. The login page
- * sits outside this (portal) route group, so redirecting here can't loop.
- * Middleware screens these paths too — this is the DB-backed second check.
+ * Authenticated back-office shell: dark sidebar, light content. Admin-only —
+ * STAFF sessions see pricing on the public landing page instead, so they are
+ * sent to "/". The login page sits outside this (portal) route group, so
+ * redirecting here can't loop. Middleware screens these paths too — this is
+ * the DB-backed second check.
  */
 export default async function StaffPortalLayout({
   children,
@@ -17,6 +19,7 @@ export default async function StaffPortalLayout({
 }) {
   const user = await requireUser();
   if (!user) redirect("/staff/login");
+  if (user.role !== "ADMIN") redirect("/");
 
   return (
     <div className="flex min-h-screen bg-bone-100 text-carbon-950">

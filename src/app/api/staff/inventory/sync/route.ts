@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 /** Pull stock levels from the POS into the parts price list. */
 export async function POST() {
-  const { error } = await guard();
+  const { error } = await guard("ADMIN");
   if (error) return error;
 
   try {

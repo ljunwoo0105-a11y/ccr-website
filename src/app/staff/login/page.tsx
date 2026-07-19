@@ -15,9 +15,9 @@ export const metadata: Metadata = {
 export default async function StaffLoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string }>;
+  searchParams: Promise<{ next?: string; error?: string }>;
 }) {
-  const { next } = await searchParams;
+  const { next, error } = await searchParams;
   return (
     <main className="mnl-page flex min-h-screen items-center justify-center px-6 py-20">
       <div className="w-full max-w-[400px]">
@@ -44,7 +44,12 @@ export default async function StaffLoginPage({
             Staff &amp; admin portal · authorised access
           </p>
           <div className="mt-7">
-            <LoginForm next={next} />
+            <LoginForm
+              next={next}
+              initialError={
+                error === "invalid" ? "Invalid email or password" : null
+              }
+            />
           </div>
         </div>
         <p className="mt-6 text-center">

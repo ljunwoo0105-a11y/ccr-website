@@ -6,7 +6,10 @@ import { partSchema } from "@/lib/validation";
 export const dynamic = "force-dynamic";
 
 /**
- * Staff price list. Cost prices are returned here by design — this route is
+ * Price list. ADMIN gets full rows (cost prices, margins, suppliers, POS
+ * links); STAFF gets only the sell-side fields the landing-page price list
+ * renders, and only active parts — the cost/supplier columns are admin data
+ * and must not leave the server for a STAFF session. This route is
  * session-guarded and must NEVER be proxied to a public surface.
  *
  * Query params:
@@ -14,11 +17,29 @@ export const dynamic = "force-dynamic";
  *   deviceType= exact
  *   brand=      exact
  *   quality=    exact
- *   active=     "true" (default) | "false" | "all"
+ *   active=     "true" (default) | "false" | "all" — admin only; staff is
+ *               always pinned to active parts
  */
+const STAFF_PART_SELECT = {
+  id: true,
+  deviceType: true,
+  brand: true,
+  model: true,
+  repairType: true,
+  quality: true,
+  colour: true,
+  sellPrice: true,
+  warrantyDays: true,
+  stockQty: true,
+  active: true,
+  createdAt: true,
+  updatedAt: true,
+} as const;
+
 export async function GET(req: Request) {
-  const { error } = await guard();
+  const { user, error } = await guard();
   if (error) return error;
+  const isAdmin = user.role === "ADMIN";
 
   const url = new URL(req.url);
   const search = url.searchParams.get("search")?.trim() ?? "";
@@ -28,9 +49,9 @@ export async function GET(req: Request) {
   const active = url.searchParams.get("active")?.trim() ?? "true";
 
   const where: Prisma.PartWhereInput = {};
-  if (active === "true") where.active = true;
+  if (!isAdmin || active === "true") where.active = true;
   else if (active === "false") where.active = false;
-  // "all" → no filter
+  // admin "all" → no filter
 
   if (deviceType) where.deviceType = deviceType;
   if (brand) where.brand = brand;
@@ -44,17 +65,17 @@ export async function GET(req: Request) {
     ];
   }
 
-  const parts = await db.part.findMany({
-    where,
-    orderBy: [
-      { brand: "asc" },
-      { model: "asc" },
-      { repairType: "asc" },
-      { sellPrice: "asc" },
-    ],
-  });
+  const orderBy: Prisma.PartOrderByWithRelationInput[] = [
+    { brand: "asc" },
+    { model: "asc" },
+    { repairType: "asc" },
+    { sellPrice: "asc" },
+  ];
 
-  return ok(parts);
+  if (!isAdmin) {
+    return ok(await db.part.findMany({ where, orderBy, select: STAFF_PART_SELECT }));
+  }
+  return ok(await db.part.findMany({ where, orderBy }));
 }
 
 /** Create a part (price list row). */

@@ -10,10 +10,11 @@ import {
 } from "@/lib/config";
 import { marginPct, marginTone } from "@/components/staff/ui";
 import type { ApiEnvelope, PartRow } from "@/components/staff/types";
+import type { CatalogPartRow } from "@/components/staff/part-catalog-schema";
 
 interface Props {
-  /** null = create a new part. */
-  part: PartRow | null;
+  /** null = create a new part. Rows come from the admin catalog fetch. */
+  part: CatalogPartRow | null;
   onSaved: (part: PartRow) => void;
   onClose: () => void;
 }
@@ -21,14 +22,14 @@ interface Props {
 export default function PartFormModal({ part, onSaved, onClose }: Props) {
   const editing = part !== null;
 
-  const [deviceType, setDeviceType] = useState(part?.deviceType ?? "Phone");
+  const [deviceType, setDeviceType] = useState<string>(part?.deviceType ?? "Phone");
   const [brand, setBrand] = useState(part?.brand ?? "");
   const [model, setModel] = useState(part?.model ?? "");
   const [repairType, setRepairType] = useState(part?.repairType ?? "");
-  const [quality, setQuality] = useState(part?.quality ?? "AFTERMARKET");
+  const [quality, setQuality] = useState<string>(part?.quality ?? "AFTERMARKET");
   const [colour, setColour] = useState(part?.colour ?? "");
   const [costPrice, setCostPrice] = useState(
-    part ? String(part.costPrice) : ""
+    part && part.costPrice !== undefined ? String(part.costPrice) : ""
   );
   const [sellPrice, setSellPrice] = useState(
     part ? String(part.sellPrice) : ""

@@ -4,7 +4,7 @@ import { pricingRepository } from "@/lib/pricing/prisma-repository";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const { error } = await guard();
+  const { error } = await guard("ADMIN");
   if (error) return error;
 
   const policies = await pricingRepository.listActivePolicies();

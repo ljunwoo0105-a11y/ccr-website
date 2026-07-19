@@ -1,5 +1,7 @@
 export type WorkbenchSession = "checking" | "anonymous" | "authenticated";
 
+export type StaffRole = "ADMIN" | "STAFF";
+
 export type CatalogKey = "deviceTypes" | "brands" | "models" | "repairTypes";
 
 export type LoadingTarget =
@@ -52,6 +54,8 @@ export interface MatchResult {
 
 export interface WorkbenchState {
   readonly session: WorkbenchSession;
+  /** Role of the authenticated session; null until authenticated. */
+  readonly role: StaffRole | null;
   readonly loadingTarget: LoadingTarget | null;
   readonly currentRequestId: number;
   readonly error: string | null;
@@ -69,7 +73,7 @@ export interface WorkbenchState {
 }
 
 export type WorkbenchAction =
-  | { readonly type: "SESSION_AUTHENTICATED" }
+  | { readonly type: "SESSION_AUTHENTICATED"; readonly role: StaffRole }
   | { readonly type: "SESSION_ANONYMOUS" }
   | {
       readonly type: "LOAD_STARTED";

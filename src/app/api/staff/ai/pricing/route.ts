@@ -13,7 +13,7 @@ export const maxDuration = 120;
  * result includes cost-derived figures and must never reach a public surface.
  */
 export async function POST(req: Request) {
-  const { error } = await guard();
+  const { error } = await guard("ADMIN");
   if (error) return error;
 
   const parsed = await parseBody(req, pricingRecommendationRequestSchema);

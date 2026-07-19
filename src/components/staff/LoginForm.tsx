@@ -4,19 +4,24 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import type { ApiEnvelope } from "@/components/staff/types";
-import { safeLoginDestination } from "@/lib/login-destination";
+import {
+  defaultLoginDestination,
+  safeLoginDestination,
+} from "@/lib/login-destination";
 
 interface Props {
   /** Optional ?next= destination passed through from the login page. */
   next?: string;
+  /** Server-rendered error (no-JS form fallback redirects with ?error=). */
+  initialError?: string | null;
 }
 
-export default function LoginForm({ next }: Props) {
+export default function LoginForm({ next, initialError }: Props) {
   const router = useRouter();
   const safeNext = safeLoginDestination(next) ?? "";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(initialError ?? null);
   const [busy, setBusy] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -36,7 +41,7 @@ export default function LoginForm({ next }: Props) {
         return;
       }
       const dest =
-        safeNext || "/staff";
+        safeNext || defaultLoginDestination(json.data?.role ?? "STAFF");
       router.push(dest);
       router.refresh();
     } catch {

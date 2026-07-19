@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-import { safeLoginDestination } from "../src/lib/login-destination";
+import {
+  defaultLoginDestination,
+  safeLoginDestination,
+} from "../src/lib/login-destination";
 
 test("permits only root and staff/admin descendants", () => {
   // Given: safe staff return destinations and unsafe lookalikes.
@@ -15,6 +18,8 @@ test("permits only root and staff/admin descendants", () => {
     "/staffish",
     "/admin%2fusers",
     "/staff%5creports",
+    "/staff/login",
+    "/staff/login?next=/staff/login",
   ];
 
   // When: destinations are normalized through the shared helper.
@@ -24,6 +29,14 @@ test("permits only root and staff/admin descendants", () => {
   // Then: only exact root/staff/admin destinations survive.
   assert.deepEqual(allowedResults, allowed);
   assert.deepEqual(rejectedResults, rejected.map(() => null));
+});
+
+test("fresh logins default staff to the landing page and admins to the console", () => {
+  // Given/When: no explicit next was carried through the login flow.
+  // Then: staff land on "/" (pricing unlocks there); admins get the console.
+  assert.equal(defaultLoginDestination("STAFF"), "/");
+  assert.equal(defaultLoginDestination("ADMIN"), "/admin");
+  assert.equal(defaultLoginDestination("anything-else"), "/");
 });
 
 test("LoginForm uses the shared login destination helper", () => {

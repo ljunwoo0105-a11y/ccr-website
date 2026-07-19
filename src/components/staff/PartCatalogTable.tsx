@@ -111,7 +111,8 @@ function PartCatalogRow({
   readonly onReactivate: (part: CatalogPartRow) => void;
   readonly onHardDelete: (part: CatalogPartRow) => void;
 }) {
-  const margin = marginPct(part.costPrice, part.sellPrice);
+  const margin =
+    part.costPrice === undefined ? null : marginPct(part.costPrice, part.sellPrice);
   const isAdmin = mode === "admin";
   return (
     <tr className={part.active ? undefined : "opacity-50"}>
@@ -124,7 +125,11 @@ function PartCatalogRow({
           {QUALITY_LABELS[part.quality]}
         </span>
       </td>
-      {isAdmin && <td className="px-4 py-2.5 text-right tabular-nums text-carbon-700">{formatAud(part.costPrice)}</td>}
+      {isAdmin && (
+        <td className="px-4 py-2.5 text-right tabular-nums text-carbon-700">
+          {part.costPrice === undefined ? "-" : formatAud(part.costPrice)}
+        </td>
+      )}
       <td className="px-4 py-2.5 text-right font-semibold tabular-nums text-carbon-950">{formatAud(part.sellPrice)}</td>
       {isAdmin && (
         <td className="px-4 py-2.5 text-right tabular-nums">

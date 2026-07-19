@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
  * Requires at least 3 digits to avoid dumping the customer list.
  */
 export async function GET(req: Request) {
-  const { error } = await guard();
+  const { error } = await guard("ADMIN");
   if (error) return error;
 
   const phone = new URL(req.url).searchParams.get("phone")?.trim() ?? "";

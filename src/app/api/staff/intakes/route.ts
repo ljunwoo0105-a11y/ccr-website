@@ -28,7 +28,7 @@ const INTAKE_STATUSES = [
  *   search= contains-match on customer name/phone and device brand/model
  */
 export async function GET(req: Request) {
-  const { error } = await guard();
+  const { error } = await guard("ADMIN");
   if (error) return error;
 
   const url = new URL(req.url);
@@ -61,7 +61,7 @@ export async function GET(req: Request) {
  * customer when the phone number matches exactly, otherwise creates one.
  */
 export async function POST(req: Request) {
-  const { user, error } = await guard();
+  const { user, error } = await guard("ADMIN");
   if (error) return error;
 
   const parsed = await parseBody(req, intakeSubmissionSchema);

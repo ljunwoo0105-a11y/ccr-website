@@ -14,7 +14,7 @@ function qualityLabel(quality: string): string {
 
 /** List saved repair forms (most recent first), with their line items. */
 export async function GET(req: Request) {
-  const { error } = await guard();
+  const { error } = await guard("ADMIN");
   if (error) return error;
 
   const url = new URL(req.url);
@@ -46,7 +46,7 @@ export async function GET(req: Request) {
  * for the same device. The full itemised quote is emailed and saved.
  */
 export async function POST(req: Request) {
-  const { user, error } = await guard();
+  const { user, error } = await guard("ADMIN");
   if (error) return error;
 
   const parsed = await parseBody(req, repairFormSchema);

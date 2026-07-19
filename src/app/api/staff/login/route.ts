@@ -9,6 +9,7 @@ import {
   SESSION_COOKIE,
   type Role,
 } from "@/lib/auth";
+import { defaultLoginDestination } from "@/lib/login-destination";
 import {
   parseLoginRequest,
   redirectUrlForRequest,
@@ -16,9 +17,13 @@ import {
 } from "@/lib/login-request";
 import { rateLimit, clientIp } from "@/lib/rate-limit";
 
-function loginRedirect(req: Request, input: LoginRequestInput): NextResponse {
+function loginRedirect(
+  req: Request,
+  input: LoginRequestInput,
+  role: Role
+): NextResponse {
   return NextResponse.redirect(
-    redirectUrlForRequest(req, input.next ?? "/staff"),
+    redirectUrlForRequest(req, input.next ?? defaultLoginDestination(role)),
     { status: 303 }
   );
 }
@@ -74,6 +79,8 @@ export async function POST(req: Request) {
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE, token, sessionCookieOptions());
 
-  if (data.wantsHtmlRedirect) return loginRedirect(req, data);
+  if (data.wantsHtmlRedirect) {
+    return loginRedirect(req, data, user.role as Role);
+  }
   return ok({ role: user.role });
 }

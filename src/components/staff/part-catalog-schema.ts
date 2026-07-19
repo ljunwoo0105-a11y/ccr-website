@@ -1,13 +1,16 @@
 import { z } from "zod";
 import { partSchema } from "@/lib/validation";
 
+// costPrice / sku / supplier / posItemId / notes are admin-only: the parts
+// API omits them for STAFF sessions, so the row schema treats them as absent.
 const catalogPartSchema = partSchema.extend({
   id: z.string(),
   colour: z.string().nullable(),
-  sku: z.string().nullable(),
-  supplier: z.string().nullable(),
-  posItemId: z.string().nullable(),
-  notes: z.string().nullable(),
+  costPrice: z.number().min(0).max(100000).optional(),
+  sku: z.string().nullable().optional(),
+  supplier: z.string().nullable().optional(),
+  posItemId: z.string().nullable().optional(),
+  notes: z.string().nullable().optional(),
   active: z.boolean(),
   createdAt: z.string(),
   updatedAt: z.string(),

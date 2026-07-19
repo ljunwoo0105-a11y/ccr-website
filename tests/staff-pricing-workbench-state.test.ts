@@ -35,7 +35,7 @@ test("anonymous server markup renders no staff pricing marker or price UI", () =
 test("staff session and catalog cascade reset lower selections", () => {
   // Given: an authenticated staff session and a fully selected cascade.
   const state = reduce(
-    { type: "SESSION_AUTHENTICATED" },
+    { type: "SESSION_AUTHENTICATED", role: "STAFF" },
     { type: "OPTIONS_LOADED", key: "deviceTypes", values: ["Phone"] },
     { type: "SELECT_DEVICE_TYPE", value: "Phone" },
     { type: "OPTIONS_LOADED", key: "brands", values: ["Apple"] },
@@ -82,7 +82,7 @@ test("staff session and catalog cascade reset lower selections", () => {
 test("stale request actions are ignored after a newer load starts", () => {
   // Given: a later request supersedes an earlier brand load.
   const state = reduce(
-    { type: "SESSION_AUTHENTICATED" },
+    { type: "SESSION_AUTHENTICATED", role: "STAFF" },
     { type: "LOAD_STARTED", requestId: 1, target: "brands" },
     { type: "LOAD_STARTED", requestId: 2, target: "brands" },
     { type: "LOAD_FAILED", requestId: 1, message: "old failure" },

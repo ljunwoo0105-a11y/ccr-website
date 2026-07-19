@@ -8,6 +8,7 @@ import type {
 
 export const initialWorkbenchState: WorkbenchState = {
   session: "checking",
+  role: null,
   loadingTarget: "session",
   currentRequestId: 0,
   error: null,
@@ -34,7 +35,12 @@ export function pricingWorkbenchReducer(
 
   switch (action.type) {
     case "SESSION_AUTHENTICATED":
-      return { ...state, session: "authenticated", loadingTarget: null };
+      return {
+        ...state,
+        session: "authenticated",
+        role: action.role,
+        loadingTarget: null,
+      };
     case "SESSION_ANONYMOUS":
       return { ...initialWorkbenchState, session: "anonymous", loadingTarget: null };
     case "LOAD_STARTED":
@@ -90,6 +96,7 @@ export function pricingWorkbenchReducer(
       return {
         ...initialWorkbenchState,
         session: state.session,
+        role: state.role,
         loadingTarget: null,
         options: { ...initialWorkbenchState.options, deviceTypes: state.options.deviceTypes },
       };

@@ -17,8 +17,9 @@ export default async function AdminLayout({
 }: {
   children: ReactNode;
 }) {
-  const user = await requireUser("ADMIN");
+  const user = await requireUser();
   if (!user) redirect("/staff/login");
+  if (user.role !== "ADMIN") redirect("/");
 
   const initials = user.name
     .split(/\s+/)

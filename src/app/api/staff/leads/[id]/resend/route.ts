@@ -16,7 +16,7 @@ export async function POST(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { error } = await guard();
+  const { error } = await guard("ADMIN");
   if (error) return error;
   const { id } = await params;
 

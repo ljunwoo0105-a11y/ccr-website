@@ -13,7 +13,7 @@ const LEAD_STATUSES = ["NEW", "EMAILED", "CONTACTED", "BOOKED", "CLOSED"];
  *   search= contains-match on name/email/phone/model
  */
 export async function GET(req: Request) {
-  const { error } = await guard();
+  const { error } = await guard("ADMIN");
   if (error) return error;
 
   const url = new URL(req.url);
