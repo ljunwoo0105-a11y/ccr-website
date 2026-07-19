@@ -30,10 +30,16 @@ function qualityLabel(quality: string): string {
 export default function StaffPriceTag({
   pricing,
   compact = false,
+  onConfirmQuote,
 }: {
   readonly pricing: PartPricing;
   /** Tighter form for the diagnosis suspect list. */
   readonly compact?: boolean;
+  /**
+   * Confirming a tier IS choosing the catalog part: the server re-derives
+   * quality, warranty and price from its id, so this is the whole quote.
+   */
+  readonly onConfirmQuote?: (quote: PriceQuote) => void;
 }) {
   const { repairType, quotes, band, modelLabel } = pricing;
   if (!repairType) return null;
@@ -86,25 +92,47 @@ export default function StaffPriceTag({
           <span className="shrink-0 text-carbon-500">{modelLabel}</span>
         </p>
         <ul className="divide-y divide-signal-500/30">
-          {quotes.map((q) => (
-            <li
-              key={q.id}
-              className="flex items-baseline justify-between gap-3 px-3 py-1.5"
-            >
-              <span className="min-w-0">
-                <span className="block truncate font-mono text-[0.6875rem] font-semibold text-carbon-950">
-                  {qualityLabel(q.quality)}
+          {quotes.map((q) => {
+            const detail = (
+              <>
+                <span className="min-w-0">
+                  <span className="block truncate font-mono text-[0.6875rem] font-semibold text-carbon-950">
+                    {qualityLabel(q.quality)}
+                  </span>
+                  <span className="mnl-dim text-carbon-500">
+                    {warrantyLabel(q.warrantyDays)} · STOCK {q.stockQty}
+                  </span>
                 </span>
-                <span className="mnl-dim text-carbon-500">
-                  {warrantyLabel(q.warrantyDays)} · STOCK {q.stockQty}
+                <span className="mnl-num shrink-0 text-base leading-none text-carbon-950">
+                  {formatAud(q.sellPrice)}
                 </span>
-              </span>
-              <span className="mnl-num shrink-0 text-base leading-none text-carbon-950">
-                {formatAud(q.sellPrice)}
-              </span>
-            </li>
-          ))}
+              </>
+            );
+            return (
+              <li key={q.id}>
+                {onConfirmQuote ? (
+                  <button
+                    type="button"
+                    onClick={() => onConfirmQuote(q)}
+                    className="flex w-full items-baseline justify-between gap-3 px-3 py-1.5 text-left transition-colors hover:bg-signal-500/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-signal-600"
+                    aria-label={`Confirm ${qualityLabel(q.quality)} at ${formatAud(q.sellPrice)} and start intake`}
+                  >
+                    {detail}
+                  </button>
+                ) : (
+                  <span className="flex items-baseline justify-between gap-3 px-3 py-1.5">
+                    {detail}
+                  </span>
+                )}
+              </li>
+            );
+          })}
         </ul>
+        {onConfirmQuote ? (
+          <p className="mnl-dim border-t border-signal-500/40 px-3 py-1.5 text-carbon-500">
+            PICK A TIER TO CONFIRM THE PART &amp; CHECK THE DEVICE IN
+          </p>
+        ) : null}
       </div>
     );
   }

@@ -15,30 +15,43 @@ import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import IntakeForm from "@/components/staff/IntakeForm";
 import type { IntakePrefill } from "@/components/staff/intake/prefill";
+import { QUALITY_LABELS } from "@/lib/config";
+import { formatAud } from "@/lib/utils";
+import { warrantyLabel } from "@/components/staff/ui";
+import type { PriceQuote } from "./useStaffPrices";
 
 export default function BayIntakeModal({
   prefill,
   deviceLabel,
+  confirmedQuote,
   onClose,
 }: {
   readonly prefill: IntakePrefill;
   /** "Apple iPhone 15 · Screen Replacement", for the dialog header. */
   readonly deviceLabel: string | null;
+  /** Set when staff got here by confirming a specific quality tier. */
+  readonly confirmedQuote?: PriceQuote | null;
   readonly onClose: () => void;
 }) {
   const [createdId, setCreatedId] = useState<string | null>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
 
-  // Escape closes; focus starts on the close control so keyboard users are
-  // never dropped into a long form with no obvious way out.
+  // Escape always closes. Focus goes to the first customer field when the part
+  // is already confirmed — that is the next thing to fill — and otherwise to
+  // the close control, so nobody is dropped into a long form with no way out.
   useEffect(() => {
-    closeRef.current?.focus();
+    const firstField =
+      bodyRef.current?.querySelector<HTMLInputElement>("#in-phone");
+    if (confirmedQuote && firstField) firstField.focus();
+    else closeRef.current?.focus();
+
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  }, [onClose, confirmedQuote]);
 
   // The bay's own scroll must not fight the dialog's.
   useEffect(() => {
@@ -75,7 +88,25 @@ export default function BayIntakeModal({
           </button>
         </div>
 
-        <div className="p-5">
+        {confirmedQuote && !createdId ? (
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-carbon-950 bg-signal-100 px-5 py-2.5">
+            <span className="mnl-dim text-signal-600">PART CONFIRMED</span>
+            <span className="min-w-0 flex-1 truncate font-mono text-xs font-semibold text-carbon-950">
+              {QUALITY_LABELS[
+                confirmedQuote.quality as keyof typeof QUALITY_LABELS
+              ] ?? confirmedQuote.quality}
+              <span className="mnl-dim ml-2 font-normal text-carbon-500">
+                {warrantyLabel(confirmedQuote.warrantyDays)} · STOCK{" "}
+                {confirmedQuote.stockQty}
+              </span>
+            </span>
+            <span className="mnl-num shrink-0 text-base leading-none text-carbon-950">
+              {formatAud(confirmedQuote.sellPrice)}
+            </span>
+          </div>
+        ) : null}
+
+        <div className="p-5" ref={bodyRef}>
           {createdId ? (
             <div className="py-6 text-center">
               <p className="mnl-dim text-signal-600">INTAKE FILED</p>

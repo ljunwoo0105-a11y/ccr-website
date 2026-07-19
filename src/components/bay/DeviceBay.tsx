@@ -40,7 +40,7 @@ import BayControlDeck from "./BayControlDeck";
 import StaffPriceTag from "./StaffPriceTag";
 import StaffModelPicker from "./StaffModelPicker";
 import BayIntakeModal from "./BayIntakeModal";
-import { useStaffPrices } from "./useStaffPrices";
+import { useStaffPrices, type PriceQuote } from "./useStaffPrices";
 import { CATALOG_DEVICE_TYPE, repairTypeForPart } from "./part-repair-map";
 import {
   DEVICES,
@@ -737,10 +737,30 @@ export default function DeviceBay() {
   // "free quote" CTA — they are standing at the counter with the device, so
   // the useful action is checking it in, not requesting a quote by email.
   const [intakeOpen, setIntakeOpen] = useState(false);
+  // The quality tier staff confirmed, if they came in by clicking a price.
+  // Its id is the whole quote — the server re-derives quality, warranty and
+  // price from it, so the client never has to be trusted on money.
+  const [confirmedQuote, setConfirmedQuote] = useState<PriceQuote | null>(null);
+
+  const confirmQuote = (quote: PriceQuote) => {
+    setConfirmedQuote(quote);
+    setIntakeOpen(true);
+  };
+  const closeIntake = () => {
+    setIntakeOpen(false);
+    setConfirmedQuote(null);
+  };
+
   const intakePrefill = {
-    ...(selectedPartPricing.quotes.length === 1
-      ? { partId: selectedPartPricing.quotes[0].id }
-      : {}),
+    ...(confirmedQuote
+      ? {
+          partId: confirmedQuote.id,
+          seedPartQuality: confirmedQuote.quality,
+          seedQuotedPrice: String(confirmedQuote.sellPrice),
+        }
+      : selectedPartPricing.quotes.length === 1
+        ? { partId: selectedPartPricing.quotes[0].id }
+        : {}),
     ...(selectedPartPricing.repairType
       ? { seedRepairType: selectedPartPricing.repairType }
       : {}),
@@ -1038,7 +1058,10 @@ export default function DeviceBay() {
                       </li>
                     ))}
                   </ul>
-                  <StaffPriceTag pricing={selectedPartPricing} />
+                  <StaffPriceTag
+                    pricing={selectedPartPricing}
+                    onConfirmQuote={prices.enabled ? confirmQuote : undefined}
+                  />
                   {prices.enabled ? (
                     <button
                       type="button"
@@ -1082,7 +1105,8 @@ export default function DeviceBay() {
         <BayIntakeModal
           prefill={intakePrefill}
           deviceLabel={intakeLabel || null}
-          onClose={() => setIntakeOpen(false)}
+          confirmedQuote={confirmedQuote}
+          onClose={closeIntake}
         />
       ) : null}
 

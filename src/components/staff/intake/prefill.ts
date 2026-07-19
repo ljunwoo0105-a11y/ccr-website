@@ -11,6 +11,10 @@ export type IntakePrefill = {
   readonly seedBrand?: string;
   readonly seedModel?: string;
   readonly seedRepairType?: string;
+  // Shown so staff can see the tier they confirmed. The server re-derives
+  // quality, warranty and price from partId, so these are display only.
+  readonly seedPartQuality?: string;
+  readonly seedQuotedPrice?: string;
 };
 
 type QueryValue = string | readonly string[] | undefined;

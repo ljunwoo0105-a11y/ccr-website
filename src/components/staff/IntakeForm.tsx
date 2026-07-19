@@ -64,10 +64,11 @@ export default function IntakeForm(props: IntakeFormProps) {
   const [batteryHealth, setBatteryHealth] = useState("");
   const [accessories, setAccessories] = useState("");
   const [conditionNotes, setConditionNotes] = useState("");
-  const [partQuality, setPartQuality] =
-    useState<IntakeInput["partQuality"] | "">("");
+  const [partQuality, setPartQuality] = useState<
+    IntakeInput["partQuality"] | ""
+  >((prefill.seedPartQuality as IntakeInput["partQuality"]) ?? "");
   const [warrantyDays, setWarrantyDays] = useState("");
-  const [quotedPrice, setQuotedPrice] = useState("");
+  const [quotedPrice, setQuotedPrice] = useState(prefill.seedQuotedPrice ?? "");
   const [depositPaid, setDepositPaid] = useState("");
   const [signature, setSignature] = useState("");
   const [error, setError] = useState<string | null>(null);
