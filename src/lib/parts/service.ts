@@ -59,6 +59,51 @@ export async function deletePart(
     : { kind: "conflict", message: "Part is referenced by repair records" };
 }
 
+export type BulkPartAction = "deactivate" | "reactivate" | "hard-delete";
+
+export type BulkPartOutcome = {
+  readonly id: string;
+  readonly ok: boolean;
+  /** Why this id was skipped — surfaced per row, never swallowed. */
+  readonly reason?: string;
+};
+
+export type BulkPartResult = {
+  readonly succeeded: readonly string[];
+  readonly failed: readonly BulkPartOutcome[];
+};
+
+/**
+ * Apply one action across many parts, reusing the single-part rules so a bulk
+ * hard delete cannot bypass the "must be inactive and unreferenced" guard.
+ * Runs sequentially and reports per-id outcomes: a partial success is normal
+ * (some parts are referenced by repair records) and must not read as total
+ * success or total failure.
+ */
+export async function bulkMutateParts(
+  repo: PartRepository,
+  ids: readonly string[],
+  action: BulkPartAction
+): Promise<BulkPartResult> {
+  const succeeded: string[] = [];
+  const failed: BulkPartOutcome[] = [];
+
+  for (const id of ids) {
+    const result =
+      action === "reactivate"
+        ? await updatePart(repo, id, { active: true })
+        : await deletePart(repo, id, action === "hard-delete");
+
+    if (result.kind === "ok" || result.kind === "deleted") {
+      succeeded.push(id);
+    } else {
+      failed.push({ id, ok: false, reason: result.message });
+    }
+  }
+
+  return { succeeded, failed };
+}
+
 export function partMutationResponse(
   result: PartMutationResult,
   respond: {

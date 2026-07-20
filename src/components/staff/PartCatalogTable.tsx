@@ -13,6 +13,9 @@ type PartCatalogTableProps = {
   readonly parts: readonly CatalogPartRow[];
   readonly loading: boolean;
   readonly busyRow: string | null;
+  readonly selectedIds?: readonly string[];
+  readonly onToggleSelected?: (id: string) => void;
+  readonly onToggleSelectAll?: () => void;
   readonly onEdit: (part: CatalogPartRow) => void;
   readonly onDeactivate: (part: CatalogPartRow) => void;
   readonly onReactivate: (part: CatalogPartRow) => void;
@@ -24,19 +27,37 @@ export function PartCatalogTable({
   parts,
   loading,
   busyRow,
+  selectedIds = [],
+  onToggleSelected,
+  onToggleSelectAll,
   onEdit,
   onDeactivate,
   onReactivate,
   onHardDelete,
 }: PartCatalogTableProps) {
   const isAdmin = mode === "admin";
-  const colSpan = isAdmin ? 12 : 8;
+  const selectable = isAdmin && onToggleSelected !== undefined;
+  const colSpan = (isAdmin ? 12 : 8) + (selectable ? 1 : 0);
+  const selected = new Set(selectedIds);
+  const allSelected = parts.length > 0 && selected.size === parts.length;
   return (
     <div className="card overflow-hidden p-0">
       <div className="overflow-x-auto">
         <table className={`w-full text-left text-sm ${isAdmin ? "min-w-[1080px]" : "min-w-[760px]"}`}>
           <thead>
             <tr className="border-b border-carbon-150 bg-bone-100 text-xs uppercase tracking-wide text-carbon-500">
+              {selectable && (
+                <th className="w-10 px-4 py-3">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4"
+                    aria-label={allSelected ? "Clear selection" : "Select all parts"}
+                    checked={allSelected}
+                    disabled={parts.length === 0}
+                    onChange={() => onToggleSelectAll?.()}
+                  />
+                </th>
+              )}
               <th className="px-4 py-3 font-semibold">Device</th>
               <th className="px-4 py-3 font-semibold">Brand</th>
               <th className="px-4 py-3 font-semibold">Model</th>
@@ -73,6 +94,9 @@ export function PartCatalogTable({
                   mode={mode}
                   part={part}
                   busy={busyRow === part.id}
+                  selectable={selectable}
+                  selected={selected.has(part.id)}
+                  onToggleSelected={onToggleSelected}
                   onEdit={onEdit}
                   onDeactivate={onDeactivate}
                   onReactivate={onReactivate}
@@ -98,6 +122,9 @@ function PartCatalogRow({
   mode,
   part,
   busy,
+  selectable,
+  selected,
+  onToggleSelected,
   onEdit,
   onDeactivate,
   onReactivate,
@@ -106,6 +133,9 @@ function PartCatalogRow({
   readonly mode: CatalogMode;
   readonly part: CatalogPartRow;
   readonly busy: boolean;
+  readonly selectable: boolean;
+  readonly selected: boolean;
+  readonly onToggleSelected?: (id: string) => void;
   readonly onEdit: (part: CatalogPartRow) => void;
   readonly onDeactivate: (part: CatalogPartRow) => void;
   readonly onReactivate: (part: CatalogPartRow) => void;
@@ -115,7 +145,20 @@ function PartCatalogRow({
     part.costPrice === undefined ? null : marginPct(part.costPrice, part.sellPrice);
   const isAdmin = mode === "admin";
   return (
-    <tr className={part.active ? undefined : "opacity-50"}>
+    <tr
+      className={`${part.active ? "" : "opacity-50"} ${selected ? "bg-signal-100" : ""}`}
+    >
+      {selectable && (
+        <td className="px-4 py-2.5">
+          <input
+            type="checkbox"
+            className="h-4 w-4"
+            aria-label={`Select ${part.brand} ${part.model} ${part.repairType}`}
+            checked={selected}
+            onChange={() => onToggleSelected?.(part.id)}
+          />
+        </td>
+      )}
       <td className="px-4 py-2.5 text-carbon-700">{part.deviceType}</td>
       <td className="px-4 py-2.5 font-medium text-carbon-950">{part.brand}</td>
       <td className="px-4 py-2.5 text-carbon-950">{part.model}</td>

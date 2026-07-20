@@ -60,6 +60,12 @@ export const partUpdateSchema = partSchema
     path: ["body"],
   });
 
+/** Bulk catalog action over selected parts (admin only). */
+export const partBulkSchema = z.object({
+  ids: z.array(z.string().trim().min(1)).min(1).max(500),
+  action: z.enum(["deactivate", "reactivate", "hard-delete"]),
+});
+
 // --- Customer intake -----------------------------------------------------
 export const preConditionSchema = z.object({
   powersOn: z.boolean(),

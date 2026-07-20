@@ -38,6 +38,28 @@ const catalogPartsResponseSchema = z.discriminatedUnion("ok", [
   }),
 ]);
 
+const bulkPartsResponseSchema = z.discriminatedUnion("ok", [
+  z.object({
+    ok: z.literal(true),
+    data: z.object({
+      succeeded: z.array(z.string()),
+      failed: z.array(
+        z.object({
+          id: z.string(),
+          ok: z.literal(false),
+          reason: z.string().optional(),
+        })
+      ),
+    }),
+  }),
+  z.object({
+    ok: z.literal(false),
+    error: z.string().optional(),
+  }),
+]);
+
+export type BulkPartsResponse = z.infer<typeof bulkPartsResponseSchema>;
+
 export class CatalogResponseParseError extends Error {
   constructor() {
     super("Invalid catalog response");
@@ -57,6 +79,12 @@ export function parseApiEnvelope(value: unknown): ApiEnvelope {
 
 export function parseCatalogPartsResponse(value: unknown): CatalogPartsResponse {
   const parsed = catalogPartsResponseSchema.safeParse(value);
+  if (!parsed.success) throw new CatalogResponseParseError();
+  return parsed.data;
+}
+
+export function parseBulkPartsResponse(value: unknown): BulkPartsResponse {
+  const parsed = bulkPartsResponseSchema.safeParse(value);
   if (!parsed.success) throw new CatalogResponseParseError();
   return parsed.data;
 }
