@@ -62,7 +62,7 @@ export default async function WorkshopPage() {
     {
       label: "AI spend this month",
       value: `US$${aiSpend.toFixed(2)}`,
-      href: "/admin/catalog",
+      href: "/admin/ai",
       icon: Sparkles,
       tone: "border border-violet-500/50 bg-violet-50 text-violet-700",
     },
