@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
+import { getNavLayout } from "@/lib/admin/nav-layout";
 import { AdminNav } from "@/components/admin/admin-nav";
 import { LogoutButton } from "@/components/admin/logout-button";
 
@@ -20,6 +21,8 @@ export default async function AdminLayout({
   const user = await requireUser();
   if (!user) redirect("/staff/login");
   if (user.role !== "ADMIN") redirect("/");
+
+  const navLayout = await getNavLayout();
 
   const initials = user.name
     .split(/\s+/)
@@ -42,7 +45,7 @@ export default async function AdminLayout({
             CCR Admin
           </span>
         </div>
-        <AdminNav />
+        <AdminNav layout={navLayout} />
         <div className="border-t border-bone-100/15 p-4">
           <div className="mb-2 flex items-center gap-3 px-1">
             <span
