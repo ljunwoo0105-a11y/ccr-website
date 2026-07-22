@@ -641,7 +641,14 @@ function BayScene({
         blur={2.6}
         far={4.4}
         color={dark ? "#000000" : "#161511"}
-        frames={reduced ? 1 : Infinity}
+        // Re-bake the shadow only while parts are settling, not every frame.
+        // autoRotate moves the camera, not the parts, so the shadow is static
+        // almost always. drei's bake counter resets on each React re-render, and
+        // every part-moving interaction (explode, select, diagnose, theme flip,
+        // device switch) re-renders BayScene — restarting this window. 240 frames
+        // (~4s @60Hz) covers the damp settle. No key: drei 10.7.7 never disposes
+        // ContactShadows' render targets, so remounting it would leak VRAM.
+        frames={reduced ? 1 : 240}
       />
       <Grid
         position={[0, -3.12, 0]}

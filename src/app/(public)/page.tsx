@@ -12,7 +12,7 @@ import Procedure from "@/components/sheet/Procedure";
 import QcLog from "@/components/sheet/QcLog";
 import FieldNotes from "@/components/sheet/FieldNotes";
 import Depot from "@/components/sheet/Depot";
-import StaffPricingWorkbench from "@/components/staff/StaffPricingWorkbench";
+import StaffPricingWorkbenchGate from "@/components/staff/StaffPricingWorkbenchGate";
 
 export const revalidate = 3600;
 
@@ -41,7 +41,7 @@ export default async function HomePage() {
       {/* Staff land here to start a job, so the pre-order bench sits above the
           marketing sheet. It renders nothing at all for public visitors, who
           still open on the teardown hero. */}
-      <StaffPricingWorkbench />
+      <StaffPricingWorkbenchGate />
 
       <HeroBay rating={rating} reviewCount={reviewCount} />
       <SpecStrip rating={rating} reviewCount={reviewCount} />

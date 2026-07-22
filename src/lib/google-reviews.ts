@@ -41,18 +41,31 @@ async function getDatabase(): Promise<DatabaseModule | null> {
   }
 }
 
+// After a failed read (e.g. the database is down or unreachable), public
+// pages skip the database entirely for a short window instead of paying the
+// full connection timeout on every request.
+const DB_RETRY_AFTER_MS = 30_000;
+let dbUnavailableUntil = 0;
+
 async function withPublicReviewFallback<T>(
   read: (database: DatabaseModule) => Promise<T>,
   fallback: T
 ): Promise<T> {
+  if (Date.now() < dbUnavailableUntil) {
+    return fallback;
+  }
+
   const database = await getDatabase();
   if (!database) {
     return fallback;
   }
 
   try {
-    return await read(database);
+    const result = await read(database);
+    dbUnavailableUntil = 0;
+    return result;
   } catch {
+    dbUnavailableUntil = Date.now() + DB_RETRY_AFTER_MS;
     return fallback;
   }
 }

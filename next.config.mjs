@@ -1,3 +1,5 @@
+import { fileURLToPath } from "node:url";
+
 /** @type {import('next').NextConfig} */
 const scriptSrc = [
   "script-src",
@@ -10,6 +12,16 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   output: "standalone",
+  // A stray package-lock.json in the user profile directory otherwise makes
+  // Next infer C:\Users\<name> as the workspace root.
+  outputFileTracingRoot: fileURLToPath(new URL(".", import.meta.url)),
+  // The hero/board pull ~16 named exports from the @react-three/drei barrel.
+  // Without this, dev (which doesn't tree-shake) compiles the whole 1.6 MB
+  // package into the "/" chunk on every compile. lucide-react is already on
+  // Next's built-in optimize list, so only drei needs adding here.
+  experimental: {
+    optimizePackageImports: ["@react-three/drei"],
+  },
   webpack(config) {
     config.output.hashSalt = "ccr-dark-default-v3";
     return config;
