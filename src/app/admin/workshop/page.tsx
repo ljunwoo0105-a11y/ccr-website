@@ -3,11 +3,9 @@ import {
   Inbox,
   Wrench,
   PackageOpen,
-  Sparkles,
   ArrowRight,
 } from "lucide-react";
 import { db } from "@/lib/db";
-import { monthSpendUsd } from "@/lib/ai/usage";
 import { formatAud, formatDateTime } from "@/lib/utils";
 import {
   intakeStatusBadge,
@@ -21,14 +19,13 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Workshop", robots: { index: false } };
 
 export default async function WorkshopPage() {
-  const [newLeads, activeRepairs, lowStock, aiSpend, recentLeads, recentIntakes] =
+  const [newLeads, activeRepairs, lowStock, recentLeads, recentIntakes] =
     await Promise.all([
       db.quoteRequest.count({ where: { status: "NEW" } }),
       db.repairIntake.count({
         where: { status: { in: ["CHECKED_IN", "IN_REPAIR"] } },
       }),
       db.part.count({ where: { active: true, stockQty: { lte: 1 } } }),
-      monthSpendUsd(),
       db.quoteRequest.findMany({ orderBy: { createdAt: "desc" }, take: 5 }),
       db.repairIntake.findMany({
         orderBy: { createdAt: "desc" },
@@ -59,13 +56,6 @@ export default async function WorkshopPage() {
       icon: PackageOpen,
       tone: "border border-amber-500/50 bg-amber-50 text-amber-700",
     },
-    {
-      label: "AI spend this month",
-      value: `US$${aiSpend.toFixed(2)}`,
-      href: "/admin/ai",
-      icon: Sparkles,
-      tone: "border border-violet-500/50 bg-violet-50 text-violet-700",
-    },
   ];
 
   return (
@@ -77,7 +67,7 @@ export default async function WorkshopPage() {
         </p>
       </header>
 
-      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {stats.map((stat) => {
           const Icon = stat.icon;
           return (

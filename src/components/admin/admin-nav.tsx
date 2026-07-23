@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import {
   Bot,
   Boxes,
-  Calculator,
   ClipboardList,
   FileText,
   Inbox,
@@ -53,7 +52,6 @@ export const NAV_META: Record<string, NavMeta> = {
   "/admin": { label: "Overview", icon: LayoutDashboard, exact: true },
   "/admin/workshop": { label: "Workshop", icon: Wrench },
   "/admin/intake": { label: "Customer Intake", icon: ClipboardList },
-  "/admin/quote": { label: "Quote Builder", icon: Calculator },
   "/admin/leads": { label: "Quote Leads", icon: Inbox },
   "/admin/inventory": { label: "Inventory", icon: Boxes },
   "/admin/catalog": { label: "Catalog & Pricing", icon: PackageSearch },
