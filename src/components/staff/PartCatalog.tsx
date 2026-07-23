@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import PartFormModal from "@/components/staff/PartFormModal";
+import PartImportModal from "@/components/staff/PartImportModal";
 import {
   type CatalogPartRow,
   CatalogResponseParseError,
@@ -17,6 +18,7 @@ type CatalogMode = "admin" | "staff";
 type ModalState =
   | { readonly mode: "create" }
   | { readonly mode: "edit"; readonly part: CatalogPartRow }
+  | { readonly mode: "import" }
   | null;
 type MutationAction = "deactivate" | "reactivate" | "hard-delete";
 
@@ -236,6 +238,7 @@ export default function PartCatalog({ mode }: PartCatalogProps) {
         onQuality={setQuality}
         onShowInactive={setShowInactive}
         onCreate={() => setModal({ mode: "create" })}
+        onImport={() => setModal({ mode: "import" })}
       />
 
       {(loadError || mutationError) && (
@@ -306,10 +309,21 @@ export default function PartCatalog({ mode }: PartCatalogProps) {
         onHardDelete={(part) => void mutatePart("hard-delete", part)}
       />
 
-      {modal && mode === "admin" && (
+      {modal && modal.mode !== "import" && mode === "admin" && (
         <PartFormModal
           part={modal.mode === "edit" ? modal.part : null}
           onSaved={handleSaved}
+          onClose={() => setModal(null)}
+        />
+      )}
+
+      {modal?.mode === "import" && mode === "admin" && (
+        <PartImportModal
+          onDone={(notice) => {
+            setModal(null);
+            setBulkNotice(notice);
+            void load();
+          }}
           onClose={() => setModal(null)}
         />
       )}

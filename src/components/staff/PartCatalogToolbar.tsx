@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Search } from "lucide-react";
+import { FileUp, Plus, Search } from "lucide-react";
 import { DEVICE_TYPES, PART_QUALITIES, QUALITY_LABELS } from "@/lib/config";
 
 type CatalogMode = "admin" | "staff";
@@ -19,6 +19,7 @@ type PartCatalogToolbarProps = {
   readonly onQuality: (value: string) => void;
   readonly onShowInactive: (value: boolean) => void;
   readonly onCreate: () => void;
+  readonly onImport: () => void;
 };
 
 export function PartCatalogToolbar({
@@ -35,6 +36,7 @@ export function PartCatalogToolbar({
   onQuality,
   onShowInactive,
   onCreate,
+  onImport,
 }: PartCatalogToolbarProps) {
   return (
     <div className="card flex flex-wrap items-end gap-3 p-4">
@@ -121,6 +123,10 @@ export function PartCatalogToolbar({
             />
             Show inactive
           </label>
+          <button type="button" className="btn-secondary px-4 py-2.5" onClick={onImport}>
+            <FileUp className="h-4 w-4" aria-hidden />
+            Import
+          </button>
           <button type="button" className="btn-secondary px-4 py-2.5" onClick={onCreate}>
             <Plus className="h-4 w-4" aria-hidden />
             Add part
