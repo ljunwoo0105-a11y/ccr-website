@@ -701,7 +701,7 @@
 @layer components {
   /* Outline display type on stamp plates (footer wordmark). */
   .mnl-outline {
-    -webkit-text-stroke: 1px rgb(var(--bone-100) / 0.16);
+    -webkit-text-stroke: 1.5px rgb(var(--signal-500) / 0.55);
   }
 }
 

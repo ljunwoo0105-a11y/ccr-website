@@ -45,7 +45,10 @@ const BOARD_CAMERA_DISTANCE = BOARD_CAMERA_POSITION.distanceTo(BOARD_CAMERA_TARG
 const MIN_ZOOM_PCT = 70;
 const MAX_ZOOM_PCT = 160;
 const ZOOM_STEP_PCT = 15;
+// 100% is the camera-distance reference (natural framing). The board opens and
+// resets to INITIAL_ZOOM_PCT — a touch zoomed out so the whole board reads.
 const DEFAULT_ZOOM_PCT = 100;
+const INITIAL_ZOOM_PCT = 70;
 
 /** Deterministic RNG — the board must not change between builds. */
 function mulberry32(seed: number) {
@@ -528,7 +531,7 @@ export default function SchematicBoard() {
   // failing safe (a delayed/absent observer must never leave the scene blank).
   // The eager-GL-context problem is handled by MountWhenNear in loaders.tsx.
   const [inView, setInView] = useState(true);
-  const [zoomPct, setZoomPct] = useState(DEFAULT_ZOOM_PCT);
+  const [zoomPct, setZoomPct] = useState(INITIAL_ZOOM_PCT);
   const dark = useDocTheme() === "dark";
   const reduced = useReducedMotion();
   const demand = useDemandLoop();
@@ -678,7 +681,7 @@ export default function SchematicBoard() {
         canZoomOut={zoomPct > MIN_ZOOM_PCT}
         onZoomIn={() => setZoom(zoomPct + ZOOM_STEP_PCT)}
         onZoomOut={() => setZoom(zoomPct - ZOOM_STEP_PCT)}
-        onResetZoom={() => setZoom(DEFAULT_ZOOM_PCT)}
+        onResetZoom={() => setZoom(INITIAL_ZOOM_PCT)}
       />
 
       {/* IC legend — the keyboard/touch path to selection (3D meshes are

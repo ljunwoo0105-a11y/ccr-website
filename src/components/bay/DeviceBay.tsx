@@ -88,7 +88,10 @@ const DIM_DARK = new THREE.Color("#131210");
 const MIN_ZOOM_PCT = 70;
 const MAX_ZOOM_PCT = 160;
 const ZOOM_STEP_PCT = 15;
+// 100% is the camera-distance reference (natural framing). The rig opens and
+// resets to INITIAL_ZOOM_PCT — a touch zoomed out so the whole device reads.
 const DEFAULT_ZOOM_PCT = 100;
+const INITIAL_ZOOM_PCT = 70;
 
 /** Mutable per-frame control state shared with the canvas without re-renders. */
 interface BayControls {
@@ -672,7 +675,7 @@ function BayScene({
 export default function DeviceBay() {
   const [deviceId, setDeviceId] = useState<DeviceDef["id"]>("phone");
   const [explodePct, setExplodePct] = useState(62);
-  const [zoomPct, setZoomPct] = useState(DEFAULT_ZOOM_PCT);
+  const [zoomPct, setZoomPct] = useState(INITIAL_ZOOM_PCT);
   const [xray, setXray] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
@@ -943,7 +946,7 @@ export default function DeviceBay() {
           }}
           onZoomIn={() => setZoom(zoomPct + ZOOM_STEP_PCT)}
           onZoomOut={() => setZoom(zoomPct - ZOOM_STEP_PCT)}
-          onResetZoom={() => setZoom(DEFAULT_ZOOM_PCT)}
+          onResetZoom={() => setZoom(INITIAL_ZOOM_PCT)}
         />
       </div>
 

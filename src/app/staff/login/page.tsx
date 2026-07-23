@@ -67,7 +67,7 @@ export default async function StaffLoginPage({
             href="/"
             className="font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-carbon-500 underline-offset-4 transition-colors hover:text-signal-600 hover:underline"
           >
-            &larr; Back to coolcaserepair.com.au
+            &larr; Back to Main Page
           </Link>
         </p>
       </div>

@@ -108,9 +108,6 @@ export default function ManualHeader() {
               <ShieldCheck className="h-4 w-4" aria-hidden="true" />
               Staff
             </Link>
-            <Link href="/quote" className="mnl-btn mnl-btn-sm hidden sm:inline-flex">
-              Free quote
-            </Link>
             <button
               type="button"
               className="mnl-chip xl:hidden"
@@ -125,6 +122,9 @@ export default function ManualHeader() {
               )}
               Index
             </button>
+            <Link href="/quote" className="mnl-btn mnl-btn-sm hidden sm:inline-flex">
+              Free quote
+            </Link>
           </div>
         </div>
       </div>
