@@ -68,7 +68,10 @@ export const PHONE: PhoneDef = {
       material: "screen",
       shape: { kind: "box", size: [1.42, 3.02, 0.05], radius: 0.07 },
       position: [0, 0, 0.06],
-      explode: [0, 0, 1.25],
+      // Glass and panel are laminated into one screen assembly and are only
+      // ever replaced as a unit, so P-02 stays tucked behind P-01 instead of
+      // drifting back past the earpiece and front camera.
+      explode: [0, 0, 1.95],
       decos: [
         {
           shape: { kind: "box", size: [1.3, 2.86, 0.012], radius: 0.05 },
