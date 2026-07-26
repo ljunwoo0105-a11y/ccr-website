@@ -14,7 +14,7 @@ export default function ManualFooter() {
       {/* Outline wordmark backdrop */}
       <div
         aria-hidden="true"
-        className="mnl-outline pointer-events-none select-none whitespace-nowrap px-4 pt-10 font-display text-[clamp(3.2rem,10.5vw,9rem)] uppercase leading-none text-transparent"
+        className="mnl-outline pointer-events-none select-none whitespace-nowrap px-4 pt-10 font-display text-[clamp(3.2rem,10.5vw,9rem)] uppercase leading-none text-signal-500"
       >
         COOL CASE REPAIR
       </div>
