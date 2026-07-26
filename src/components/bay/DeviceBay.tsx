@@ -93,6 +93,27 @@ const ZOOM_STEP_PCT = 15;
 const DEFAULT_ZOOM_PCT = 100;
 const INITIAL_ZOOM_PCT = 70;
 
+// Teardown sequencing: the explode slider sweeps the BOM in order — the screen
+// lifts before the battery, the shells last — like a real bench teardown. Each
+// part traverses its own SEQ_SPAN-wide window of the slider, windows staggered
+// evenly across the parts list (which is authored in teardown order).
+const SEQ_SPAN = 0.5;
+// Motion-based "pry": while a part is in transit it rises a touch and tips
+// about an axis perpendicular to its travel — the hand motion of levering a
+// module out — then settles flat as it arrives. Scaled by remaining travel
+// distance, so a resting slider never leaves parts frozen mid-tilt.
+const PRY_LIFT_PER_UNIT = 0.26;
+const PRY_LIFT_MAX = 0.3;
+const PRY_TILT_PER_UNIT = 0.3;
+const PRY_TILT_MAX = 0.22;
+const WORLD_UP = new THREE.Vector3(0, 1, 0);
+
+/** Smoothstepped position of `k` inside a part's slider window. */
+function seqEase(k: number, start: number) {
+  const t = Math.min(1, Math.max(0, (k - start) / SEQ_SPAN));
+  return t * t * (3 - 2 * t);
+}
+
 /** Mutable per-frame control state shared with the canvas without re-renders. */
 interface BayControls {
   explode: number;
@@ -248,6 +269,7 @@ function GridDeco({
 function PartMesh({
   part,
   order,
+  total,
   controls,
   rig,
   xray,
@@ -258,6 +280,7 @@ function PartMesh({
 }: {
   part: PartDef;
   order: number;
+  total: number;
   controls: MutableRefObject<BayControls>;
   rig: RigState;
   xray: boolean;
@@ -294,12 +317,30 @@ function PartMesh({
   );
   const dimScratch = useMemo(() => new THREE.Color(), []);
 
+  // Where this part's animation window sits on the explode slider (parts are
+  // authored in teardown order, so window order IS teardown order).
+  const seqStart = useMemo(
+    () => (total <= 1 ? 0 : (order / (total - 1)) * (1 - SEQ_SPAN)),
+    [order, total],
+  );
+
+  // Pry axis — perpendicular to the part's travel direction. Null for parts
+  // that never move (the chassis), which also skips the transit lift.
+  const pryAxis = useMemo(() => {
+    const dir = new THREE.Vector3(...part.explode);
+    if (dir.lengthSq() < 1e-6) return null;
+    dir.normalize();
+    const axis = new THREE.Vector3().crossVectors(dir, WORLD_UP);
+    if (axis.lengthSq() < 1e-4) axis.set(1, 0, 0);
+    return axis.normalize();
+  }, [part]);
+
   // Parts fly in from a scattered field on mount (device switch remounts).
   // Under reduced motion they appear already settled at their exploded slot —
   // no fly-in — so the scene has nothing to animate on load.
   const initial = useMemo<Vec3>(() => {
-    const k = controls.current.explode;
     if (reduced) {
+      const k = seqEase(controls.current.explode, seqStart);
       return [
         part.position[0] + part.explode[0] * k,
         part.position[1] + part.explode[1] * k,
@@ -311,24 +352,38 @@ function PartMesh({
       part.position[1] + part.explode[1] * 2.6,
       part.position[2] + part.explode[2] * 2.6 - 1.5,
     ];
-  }, [part, reduced, controls]);
+  }, [part, reduced, controls, seqStart]);
+
+  // The damp runs on this virtual base; the rendered position is base + the
+  // transit lift, so the lift can't feed back into the damp.
+  const basePos = useMemo(() => new THREE.Vector3(...initial), [initial]);
+  const targetScratch = useMemo(() => new THREE.Vector3(), []);
 
   useFrame((_, delta) => {
     const g = group.current;
     if (!g) return;
-    const k = controls.current.explode;
+    const k = seqEase(controls.current.explode, seqStart);
     // A selected part pulls slightly forward of its exploded slot.
     const lift = selected ? 0.25 : 0;
-    damp3(
-      g.position,
-      [
-        part.position[0] + part.explode[0] * k,
-        part.position[1] + part.explode[1] * k + lift * 0.4,
-        part.position[2] + part.explode[2] * k + lift,
-      ],
-      0.34 + order * 0.028,
-      delta,
+    const target = targetScratch.set(
+      part.position[0] + part.explode[0] * k,
+      part.position[1] + part.explode[1] * k + lift * 0.4,
+      part.position[2] + part.explode[2] * k + lift,
     );
+    damp3(basePos, target, 0.34 + order * 0.028, delta);
+    g.position.copy(basePos);
+    if (pryAxis && !reduced) {
+      // Remaining travel drives the pry pose — rises and tips while moving,
+      // settles flat on arrival.
+      const dist = basePos.distanceTo(target);
+      g.position.y += Math.min(dist * PRY_LIFT_PER_UNIT, PRY_LIFT_MAX);
+      g.quaternion.setFromAxisAngle(
+        pryAxis,
+        Math.min(dist * PRY_TILT_PER_UNIT, PRY_TILT_MAX),
+      );
+    } else {
+      g.quaternion.identity();
+    }
     const m = mainMat.current;
     if (m) {
       // Emphasis tiers. A ranked suspect keeps its glow when also
@@ -422,7 +477,6 @@ function PartMesh({
         else partRefs.current.delete(part.id);
       }}
       position={initial}
-      rotation={part.rotation}
       onPointerOver={(e) => {
         e.stopPropagation();
         onHover(part.id);
@@ -438,24 +492,28 @@ function PartMesh({
         onSelect(part.id);
       }}
     >
-      {shapeEl}
-      {part.decos?.map((deco, i) =>
-        deco.grid ? (
-          <GridDeco key={i} deco={deco} xray={xray} dark={dark} />
-        ) : (
-          <ShapeMesh
-            key={i}
-            shape={deco.shape}
-            material={deco.material}
-            xray={xray}
-            dark={dark}
-            position={deco.position}
-            rotation={deco.rotation}
-            spin={deco.spin}
-            spinBoost={spinBoost}
-          />
-        ),
-      )}
+      {/* The pry animation owns the outer group's quaternion, so the part's
+          authored rotation lives one level down. */}
+      <group rotation={part.rotation}>
+        {shapeEl}
+        {part.decos?.map((deco, i) =>
+          deco.grid ? (
+            <GridDeco key={i} deco={deco} xray={xray} dark={dark} />
+          ) : (
+            <ShapeMesh
+              key={i}
+              shape={deco.shape}
+              material={deco.material}
+              xray={xray}
+              dark={dark}
+              position={deco.position}
+              rotation={deco.rotation}
+              spin={deco.spin}
+              spinBoost={spinBoost}
+            />
+          ),
+        )}
+      </group>
       {active && (
         <Html
           position={[0, 0, 0]}
@@ -620,6 +678,7 @@ function BayScene({
             key={part.id}
             part={part}
             order={i}
+            total={device.parts.length}
             controls={controls}
             rig={rig}
             xray={xray}
