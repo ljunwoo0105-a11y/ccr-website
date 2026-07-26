@@ -2,8 +2,7 @@ import type { DeviceDef, PartDef } from "./types";
 
 /** Compile-time part-id registry — diagnostics suspects reference these. */
 export type PhonePartId =
-  | "front-glass"
-  | "oled"
+  | "screen"
   | "display-flex"
   | "earpiece"
   | "front-camera"
@@ -49,40 +48,38 @@ export const PHONE: PhoneDef = {
   baseTilt: [0.08, -0.35, 0],
   parts: [
     {
-      id: "front-glass",
+      id: "screen",
       index: "P-01",
-      name: "Front glass + digitiser",
-      role: "Touch layer laminated to the display stack",
-      faults: ["Cracked / shattered glass", "Ghost touch", "Dead touch zones"],
+      name: "Screen assembly",
+      role: "Front glass, digitiser and OLED laminated as one unit",
+      faults: [
+        "Cracked / shattered glass",
+        "Ghost touch, dead zones",
+        "Black screen",
+        "Green / pink lines, burn-in",
+      ],
       material: "glass",
       shape: { kind: "box", size: [1.52, 3.14, 0.045], radius: 0.09 },
       position: [0, 0, 0.115],
       explode: [0, 0, 2.1],
-    },
-    {
-      id: "oled",
-      index: "P-02",
-      name: "OLED display module",
-      role: "Self-emissive panel — the picture itself",
-      faults: ["Black screen", "Green / pink lines", "Burn-in, dead pixels"],
-      material: "screen",
-      shape: { kind: "box", size: [1.42, 3.02, 0.05], radius: 0.07 },
-      position: [0, 0, 0.06],
-      // Glass and panel are laminated into one screen assembly and are only
-      // ever replaced as a unit, so P-02 stays tucked behind P-01 instead of
-      // drifting back past the earpiece and front camera.
-      explode: [0, 0, 1.95],
+      // Glass and OLED are laminated and only ever replaced as a unit, so the
+      // panel rides along as decoration on the one selectable screen part.
       decos: [
+        {
+          shape: { kind: "box", size: [1.42, 3.02, 0.05], radius: 0.07 },
+          material: "screen",
+          position: [0, 0, -0.055],
+        },
         {
           shape: { kind: "box", size: [1.3, 2.86, 0.012], radius: 0.05 },
           material: "signal",
-          position: [0, 0, 0.032],
+          position: [0, 0, -0.023],
         },
       ],
     },
     {
       id: "display-flex",
-      index: "P-03",
+      index: "P-02",
       name: "Display flex cable",
       role: "Ribbon carrying signal and touch to the panel",
       faults: [
@@ -104,7 +101,7 @@ export const PHONE: PhoneDef = {
     },
     {
       id: "earpiece",
-      index: "P-04",
+      index: "P-03",
       name: "Earpiece speaker",
       role: "Top front speaker for call audio",
       faults: ["No sound on calls", "Muffled earpiece", "Crackling in-call audio"],
@@ -122,7 +119,7 @@ export const PHONE: PhoneDef = {
     },
     {
       id: "front-camera",
-      index: "P-05",
+      index: "P-04",
       name: "Front camera",
       role: "Selfie and Face-unlock camera module",
       faults: ["Blurry selfies", "Black front camera", "Face unlock failures"],
@@ -141,7 +138,7 @@ export const PHONE: PhoneDef = {
     },
     {
       id: "frame",
-      index: "P-06",
+      index: "P-05",
       name: "Mid-frame chassis",
       role: "Machined housing every module bolts into",
       faults: ["Bent frame after drops", "Worn SIM tray", "Button wear"],
@@ -165,7 +162,7 @@ export const PHONE: PhoneDef = {
     },
     {
       id: "battery",
-      index: "P-07",
+      index: "P-06",
       name: "Li-ion battery",
       role: "3,200 mAh cell — the most-replaced part in the shop",
       faults: ["Rapid drain", "Swelling (urgent!)", "Random shutdowns"],
@@ -188,7 +185,7 @@ export const PHONE: PhoneDef = {
     },
     {
       id: "emi-shield",
-      index: "P-08",
+      index: "P-07",
       name: "EMI shield can",
       role: "RF shield can over the logic board",
       faults: [
@@ -210,7 +207,7 @@ export const PHONE: PhoneDef = {
     },
     {
       id: "logic-board",
-      index: "P-09",
+      index: "P-08",
       name: "Logic board",
       role: "SoC, memory, power management — the brain",
       faults: ["No power", "Water damage corrosion", "Audio / charging ICs"],
@@ -239,7 +236,7 @@ export const PHONE: PhoneDef = {
     },
     {
       id: "sub-board",
-      index: "P-10",
+      index: "P-09",
       name: "Sub-board / interconnect",
       role: "Lower interconnect board by the charge port",
       faults: ["Charging faults", "Sound routing dropouts", "Intermittent connections"],
@@ -267,7 +264,7 @@ export const PHONE: PhoneDef = {
     },
     {
       id: "taptic",
-      index: "P-11",
+      index: "P-10",
       name: "Haptic engine",
       role: "Linear actuator behind every buzz and tap",
       faults: ["No vibration", "Rattling feedback"],
@@ -278,7 +275,7 @@ export const PHONE: PhoneDef = {
     },
     {
       id: "speaker",
-      index: "P-12",
+      index: "P-11",
       name: "Loudspeaker module",
       role: "Bottom-firing driver in a tuned box",
       faults: ["Muffled / crackling audio", "No ringtone"],
@@ -298,7 +295,7 @@ export const PHONE: PhoneDef = {
     },
     {
       id: "charge-port",
-      index: "P-13",
+      index: "P-12",
       name: "Charging port flex",
       role: "USB-C connector, main mic and antenna feed",
       faults: ["Won't charge / loose cable", "No data transfer", "Mic faults"],
@@ -316,7 +313,7 @@ export const PHONE: PhoneDef = {
     },
     {
       id: "top-mic",
-      index: "P-14",
+      index: "P-13",
       name: "Top microphone",
       role: "Top noise-cancelling microphone on a carrier",
       faults: ["Muffled voice on calls", "Noise cancellation faults", "Video sound issues"],
@@ -335,7 +332,7 @@ export const PHONE: PhoneDef = {
     },
     {
       id: "sim-tray",
-      index: "P-15",
+      index: "P-14",
       name: "SIM tray",
       role: "SIM / eSIM tray in the frame edge",
       faults: ["No SIM detected", "Bent or stuck tray", "Dropped signal from a loose SIM"],
@@ -353,7 +350,7 @@ export const PHONE: PhoneDef = {
     },
     {
       id: "button-flex",
-      index: "P-16",
+      index: "P-15",
       name: "Power / volume flex",
       role: "Power and volume switch ribbon",
       faults: ["Stuck power button", "Volume buttons not working", "Buttons feel mushy"],
@@ -376,7 +373,7 @@ export const PHONE: PhoneDef = {
     },
     {
       id: "upper-antenna",
-      index: "P-17",
+      index: "P-16",
       name: "Upper antenna",
       role: "Top edge cellular / GPS antenna",
       faults: ["Weak signal up top", "Dropped calls", "Slow mobile data"],
@@ -388,7 +385,7 @@ export const PHONE: PhoneDef = {
     },
     {
       id: "lower-antenna",
-      index: "P-18",
+      index: "P-17",
       name: "Lower antenna",
       role: "Bottom edge cellular / Wi-Fi antenna",
       faults: ["Weak signal / no bars", "Bluetooth / GPS dropouts", "Calls drop when held low"],
@@ -400,7 +397,7 @@ export const PHONE: PhoneDef = {
     },
     {
       id: "camera",
-      index: "P-19",
+      index: "P-18",
       name: "Rear camera array",
       role: "Wide + ultrawide optics with OIS",
       faults: ["Blurry photos (OIS)", "Cracked lens glass", "Focus rattle"],
@@ -431,7 +428,7 @@ export const PHONE: PhoneDef = {
     },
     {
       id: "lens-cover",
-      index: "P-20",
+      index: "P-19",
       name: "Rear lens cover",
       role: "Sapphire glass over the rear optics",
       faults: [
@@ -460,7 +457,7 @@ export const PHONE: PhoneDef = {
     },
     {
       id: "coil",
-      index: "P-21",
+      index: "P-20",
       name: "Wireless charge coil",
       role: "Qi induction loop + NFC antenna",
       faults: ["No wireless charging", "Tap-to-pay failures"],
@@ -475,7 +472,7 @@ export const PHONE: PhoneDef = {
     },
     {
       id: "back-glass",
-      index: "P-22",
+      index: "P-21",
       name: "Back glass",
       role: "Rear panel — glued, and famously fragile",
       faults: ["Shattered back", "Lifting from swollen battery"],

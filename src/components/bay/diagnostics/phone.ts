@@ -82,7 +82,7 @@ const nodes: Record<N, DiagNode<PhonePartId, N>> = {
     kind: "question",
     question: "Plug it into a charger you trust and wait. Any sign of life?",
     help: "Give it a good 15–30 minutes first — a deeply flat battery can look dead. Watch and listen for a charging LED, a vibration, a chime, or the back getting slightly warm.",
-    focusParts: ["charge-port", "battery", "oled"],
+    focusParts: ["charge-port", "battery", "screen"],
     options: [
       {
         id: "no-signs",
@@ -326,7 +326,7 @@ const nodes: Record<N, DiagNode<PhonePartId, N>> = {
       "Your phone is taking power and booting — it just can't show you. That most likely points at the display stack rather than the board. Often it is the panel itself, though sometimes just its ribbon cable, which is the cheaper fix.",
     suspects: [
       {
-        partIds: ["oled"],
+        partIds: ["screen"],
         likelihood: "primary",
         why: "A panel that no longer lights while the phone runs is the classic OLED failure after a drop or pressure damage.",
       },

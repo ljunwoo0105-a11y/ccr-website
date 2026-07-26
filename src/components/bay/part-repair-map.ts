@@ -3,7 +3,7 @@
 //
 // The teardown bay models generic devices (a phone, a tablet…) while the parts
 // catalog is priced per brand/model. The bridge between them is the repair
-// TYPE: selecting "Front glass + digitiser" on the phone rig is a Screen
+// TYPE: selecting "Screen assembly" on the phone rig is a Screen
 // Replacement, whichever handset the customer actually brings in. Staff see a
 // price band for that repair across every model on file.
 //
@@ -26,8 +26,7 @@ export const CATALOG_DEVICE_TYPE: Record<DeviceId, string> = {
 /** partId → catalog repairType, per rig. */
 const PART_REPAIR: Record<DeviceId, Readonly<Record<string, string>>> = {
   phone: {
-    "front-glass": "Screen Replacement",
-    oled: "Screen Replacement",
+    screen: "Screen Replacement",
     "display-flex": "Screen Replacement",
     battery: "Battery Replacement",
     "charge-port": "Charging Port Repair",
