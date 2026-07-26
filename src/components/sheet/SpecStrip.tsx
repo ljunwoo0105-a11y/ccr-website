@@ -64,7 +64,9 @@ export default function SpecStrip({
             // the container so the strip aligns with the rest of the page grid
             // (2-col below sm, 4-col with dividers from sm up).
             className={cn(
-              "py-5",
+              // Flex column with the value pushed to the bottom, so the big
+              // numbers share one line even when a label wraps to two.
+              "flex flex-col py-5",
               i % 2 === 0 ? "pl-0 pr-4" : "pl-4 pr-0",
               i === 0 && "sm:pl-0 sm:pr-6",
               (i === 1 || i === 2) && "sm:pl-6 sm:pr-6",
@@ -72,8 +74,8 @@ export default function SpecStrip({
             )}
           >
             <dt className="mnl-dim text-carbon-500">{s.k}</dt>
-            <dd className="mt-1.5 flex items-baseline gap-1.5">
-              <span className="mnl-title mnl-num text-3xl text-carbon-950 sm:text-4xl">
+            <dd className="mt-auto flex items-baseline gap-1.5 pt-1.5">
+              <span className="mnl-title mnl-num whitespace-nowrap text-3xl text-carbon-950 sm:text-4xl">
                 {s.v}
               </span>
               <span className="mnl-dim text-signal-600">{s.unit}</span>
