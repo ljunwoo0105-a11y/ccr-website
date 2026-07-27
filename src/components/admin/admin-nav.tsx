@@ -16,7 +16,6 @@ import {
   Star,
   Stethoscope,
   Users,
-  Wrench,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -49,8 +48,7 @@ type NavMeta = {
 };
 
 export const NAV_META: Record<string, NavMeta> = {
-  "/admin": { label: "Overview", icon: LayoutDashboard, exact: true },
-  "/admin/workshop": { label: "Workshop", icon: Wrench },
+  "/admin": { label: "Dashboard", icon: LayoutDashboard, exact: true },
   "/admin/intake": { label: "Customer Intake", icon: ClipboardList },
   "/admin/leads": { label: "Quote Leads", icon: Inbox },
   "/admin/inventory": { label: "Inventory", icon: Boxes },

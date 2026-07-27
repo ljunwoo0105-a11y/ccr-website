@@ -1,67 +1,90 @@
 import "server-only";
 import { unstable_cache } from "next/cache";
-import { currentMonthStart, monthSpendUsd } from "@/lib/ai/usage";
-import { db, getSetting } from "@/lib/db";
+import { db } from "@/lib/db";
 
 export const ADMIN_OVERVIEW_REVALIDATE_SECONDS = 15;
 
-export interface AdminOverviewLog {
+export interface OverviewLead {
   readonly id: string;
-  readonly createdAt: string;
-  readonly feature: string;
-  readonly modelId: string;
-  readonly inputTokens: number;
-  readonly outputTokens: number;
-  readonly costUsd: number;
+  readonly name: string;
+  readonly brand: string;
+  readonly model: string;
+  readonly repairType: string;
   readonly status: string;
+  readonly createdAt: string;
+}
+
+export interface OverviewIntake {
+  readonly id: string;
+  readonly customerName: string;
+  readonly brand: string;
+  readonly model: string;
+  readonly repairTypes: string;
+  readonly quotedPrice: number | null;
+  readonly status: string;
+  readonly createdAt: string;
 }
 
 export interface AdminOverviewData {
-  readonly spend: number;
-  readonly budget: number;
-  readonly leadCount: number;
+  readonly newLeads: number;
+  readonly activeRepairs: number;
+  readonly lowStock: number;
   readonly reviewCount: number;
-  readonly staffCount: number;
-  readonly monthStartLabel: string;
-  readonly recentLogs: readonly AdminOverviewLog[];
+  readonly recentLeads: readonly OverviewLead[];
+  readonly recentIntakes: readonly OverviewIntake[];
 }
 
 async function loadAdminOverviewData(): Promise<AdminOverviewData> {
-  const monthStart = currentMonthStart();
-
-  const [spend, budget, leadCount, reviewCount, staffCount, recentLogs] =
+  const [newLeads, activeRepairs, lowStock, reviewCount, leads, intakes] =
     await Promise.all([
-      monthSpendUsd(monthStart),
-      getSetting<number>("ai.monthlyBudgetUsd", 50),
-      db.quoteRequest.count({ where: { createdAt: { gte: monthStart } } }),
+      db.quoteRequest.count({ where: { status: "NEW" } }),
+      db.repairIntake.count({
+        where: { status: { in: ["CHECKED_IN", "IN_REPAIR"] } },
+      }),
+      db.part.count({ where: { active: true, stockQty: { lte: 1 } } }),
       db.review.count({ where: { visible: true, rating: 5 } }),
-      db.user.count({ where: { active: true } }),
-      db.aiUsageLog.findMany({
+      db.quoteRequest.findMany({
         orderBy: { createdAt: "desc" },
-        take: 10,
+        take: 5,
         select: {
           id: true,
-          createdAt: true,
-          feature: true,
-          modelId: true,
-          inputTokens: true,
-          outputTokens: true,
-          costUsd: true,
+          name: true,
+          brand: true,
+          model: true,
+          repairType: true,
           status: true,
+          createdAt: true,
+        },
+      }),
+      db.repairIntake.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 5,
+        select: {
+          id: true,
+          brand: true,
+          model: true,
+          repairTypes: true,
+          quotedPrice: true,
+          status: true,
+          createdAt: true,
+          customer: { select: { name: true } },
         },
       }),
     ]);
 
   return {
-    spend,
-    budget,
-    leadCount,
+    newLeads,
+    activeRepairs,
+    lowStock,
     reviewCount,
-    staffCount,
-    monthStartLabel: monthStart.toLocaleDateString("en-AU"),
-    recentLogs: recentLogs.map((log) => ({
-      ...log,
-      createdAt: log.createdAt.toISOString(),
+    recentLeads: leads.map((lead) => ({
+      ...lead,
+      createdAt: lead.createdAt.toISOString(),
+    })),
+    recentIntakes: intakes.map(({ customer, createdAt, ...intake }) => ({
+      ...intake,
+      customerName: customer.name,
+      createdAt: createdAt.toISOString(),
     })),
   };
 }

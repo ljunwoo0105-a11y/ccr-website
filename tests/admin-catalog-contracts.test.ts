@@ -126,11 +126,10 @@ test("the console is the single catalog surface and manages parts", () => {
 });
 
 test("the merged nav carries the former staff portal sections", () => {
+  // Workshop merged into the console dashboard; Quote Builder was removed.
   const nav = source(ADMIN_NAV);
   for (const label of [
-    "Workshop",
     "Customer Intake",
-    "Quote Builder",
     "Quote Leads",
     "Inventory",
   ]) {

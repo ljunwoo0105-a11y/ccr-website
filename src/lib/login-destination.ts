@@ -28,11 +28,8 @@ export function safeLoginDestination(value: string | null | undefined): string |
 
   if (url.origin !== SAFE_ROOT) return null;
   if (url.pathname === "/") return url.pathname + url.search + url.hash;
-  // A finished login must never land back on the login form.
-  if (url.pathname === "/staff/login") return null;
-  if (url.pathname === "/staff" || url.pathname.startsWith("/staff/")) {
-    return url.pathname + url.search + url.hash;
-  }
+  // No /staff pages exist anymore (the portal folded into /admin), so only
+  // console destinations survive; anything else falls back to the role default.
   if (url.pathname === "/admin" || url.pathname.startsWith("/admin/")) {
     return url.pathname + url.search + url.hash;
   }

@@ -1,34 +1,6 @@
-import { getSetting, setSetting } from "@/lib/db";
+import { setSetting } from "@/lib/db";
 import { guard, ok, parseBody } from "@/lib/api";
 import { aiSettingsSchema } from "@/lib/validation";
-
-/** Current AI defaults + budget settings. */
-export async function GET() {
-  const { error } = await guard("ADMIN");
-  if (error) return error;
-
-  const [
-    monthlyBudgetUsd,
-    blockAtCap,
-    defaultPricingModel,
-    defaultResearchModel,
-    targetMarginPct,
-  ] = await Promise.all([
-    getSetting<number>("ai.monthlyBudgetUsd", 50),
-    getSetting<boolean>("ai.blockAtCap", true),
-    getSetting<string>("ai.defaultPricingModel", "claude-opus-4-8"),
-    getSetting<string>("ai.defaultResearchModel", "claude-opus-4-8"),
-    getSetting<number>("pricing.targetMarginPct", 55),
-  ]);
-
-  return ok({
-    monthlyBudgetUsd,
-    blockAtCap,
-    defaultPricingModel,
-    defaultResearchModel,
-    targetMarginPct,
-  });
-}
 
 /** Save AI defaults + budget settings. */
 export async function PUT(req: Request) {

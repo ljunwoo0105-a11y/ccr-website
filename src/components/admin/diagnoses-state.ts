@@ -88,7 +88,3 @@ export function diagnosisFormFromRule(rule: DiagnosisRule): DiagnosisForm {
     notes: rule.notes ?? "",
   };
 }
-
-export function diagnosisLayoutForWidth(width: number): "mobile-rows" | "table" {
-  return width < 768 ? "mobile-rows" : "table";
-}

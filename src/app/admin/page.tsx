@@ -1,205 +1,182 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import {
-  Bot,
-  MessageSquareQuote,
+  ArrowRight,
+  Inbox,
+  PackageOpen,
   Star,
-  Users,
+  Wrench,
 } from "lucide-react";
 import { getAdminOverviewData } from "@/lib/admin/overview";
-import { cn, formatDateTime } from "@/lib/utils";
-import { formatUsd } from "@/components/admin/shared";
+import { formatAud, formatDateTime } from "@/lib/utils";
+import {
+  intakeStatusBadge,
+  leadStatusBadge,
+  statusLabel,
+} from "@/components/staff/ui";
+import { parseJsonStringArray } from "@/components/staff/types";
 
-export const metadata: Metadata = { title: "Overview" };
+export const metadata: Metadata = { title: "Dashboard" };
 export const dynamic = "force-dynamic";
 
-function StatusBadge({ status }: { status: string }) {
-  const bad = status === "failed" || status === "blocked_budget";
-  return (
-    <span
-      className={cn(
-        "inline-flex rounded-full px-2 py-0.5 text-xs font-medium",
-        bad ? "bg-rose-100 text-rose-700" : "border border-emerald-500/50 bg-emerald-50 text-emerald-700"
-      )}
-    >
-      {status}
-    </span>
-  );
-}
-
-export default async function AdminOverviewPage() {
+export default async function AdminDashboardPage() {
   const {
-    spend,
-    budget,
-    leadCount,
+    newLeads,
+    activeRepairs,
+    lowStock,
     reviewCount,
-    staffCount,
-    monthStartLabel,
-    recentLogs,
+    recentLeads,
+    recentIntakes,
   } = await getAdminOverviewData();
 
-  const pct = budget > 0 ? Math.min(100, (spend / budget) * 100) : 0;
-  const overBudget = budget > 0 && spend >= budget;
+  const stats = [
+    {
+      label: "New leads",
+      value: String(newLeads),
+      href: "/admin/leads",
+      icon: Inbox,
+      tone: "border border-signal-500/50 bg-signal-100 text-signal-600",
+    },
+    {
+      label: "Active repairs",
+      value: String(activeRepairs),
+      href: "/admin/intake",
+      icon: Wrench,
+      tone: "border border-sky-500/50 bg-sky-50 text-sky-700",
+    },
+    {
+      label: "Low stock parts",
+      value: String(lowStock),
+      href: "/admin/inventory",
+      icon: PackageOpen,
+      tone: "border border-amber-500/50 bg-amber-50 text-amber-700",
+    },
+    {
+      label: "Visible 5★ reviews",
+      value: String(reviewCount),
+      href: "/admin/reviews",
+      icon: Star,
+      tone: "border border-emerald-500/50 bg-emerald-50 text-emerald-700",
+    },
+  ];
 
   return (
     <div className="space-y-8">
       <header>
-        <h1 className="text-2xl font-bold text-carbon-950">Overview</h1>
-        <p className="mt-1 text-sm text-carbon-500">
-          What the site and AI tools have been doing this month.
+        <h1 className="text-2xl font-bold text-carbon-950">Dashboard</h1>
+        <p className="text-sm text-carbon-500">
+          What&apos;s happening at the kiosk today.
         </p>
       </header>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="card">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-carbon-500">
-              AI spend this month
-            </p>
-            <Bot className="h-5 w-5 text-signal-600" aria-hidden />
-          </div>
-          <p
-            className={cn(
-              "mt-2 text-2xl font-bold",
-              overBudget ? "text-rose-600" : "text-carbon-950"
-            )}
-          >
-            {formatUsd(spend, 2)}{" "}
-            <span className="text-sm font-normal text-carbon-400">
-              / {formatUsd(budget, 2)} USD
-            </span>
-          </p>
-          <div
-            className="mt-3 h-2 w-full overflow-hidden rounded-full bg-bone-200"
-            role="progressbar"
-            aria-valuenow={Math.round(pct)}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-label="Monthly AI budget used"
-          >
-            <div
-              className={cn(
-                "h-full rounded-full transition-all",
-                overBudget
-                  ? "bg-rose-500"
-                  : pct >= 80
-                    ? "bg-amber-500"
-                    : "bg-signal-500"
-              )}
-              style={{ width: `${pct}%` }}
-            />
-          </div>
-          {overBudget ? (
-            <p className="mt-2 text-xs font-medium text-rose-600">
-              Budget reached — AI calls may be blocked.
-            </p>
-          ) : (
-            <p className="mt-2 text-xs text-carbon-400">
-              {pct.toFixed(0)}% of monthly budget used
-            </p>
-          )}
-        </div>
-
-        <div className="card">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-carbon-500">
-              Quote leads this month
-            </p>
-            <MessageSquareQuote
-              className="h-5 w-5 text-signal-600"
-              aria-hidden
-            />
-          </div>
-          <p className="mt-2 text-2xl font-bold text-carbon-950">{leadCount}</p>
-          <p className="mt-2 text-xs text-carbon-400">
-            Quote requests since {monthStartLabel}
-          </p>
-        </div>
-
-        <div className="card">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-carbon-500">
-              Visible 5★ reviews
-            </p>
-            <Star className="h-5 w-5 text-star" aria-hidden />
-          </div>
-          <p className="mt-2 text-2xl font-bold text-carbon-950">
-            {reviewCount}
-          </p>
-          <p className="mt-2 text-xs text-carbon-400">
-            Shown on the public site
-          </p>
-        </div>
-
-        <div className="card">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-carbon-500">
-              Active staff accounts
-            </p>
-            <Users className="h-5 w-5 text-signal-600" aria-hidden />
-          </div>
-          <p className="mt-2 text-2xl font-bold text-carbon-950">
-            {staffCount}
-          </p>
-          <p className="mt-2 text-xs text-carbon-400">
-            Staff and admin logins enabled
-          </p>
-        </div>
-      </div>
-
-      <section className="card p-0">
-        <div className="border-b border-carbon-150 px-6 py-4">
-          <h2 className="text-base font-semibold text-carbon-950">
-            Recent AI activity
-          </h2>
-        </div>
-        {recentLogs.length === 0 ? (
-          <p className="px-6 py-8 text-sm text-carbon-500">
-            No AI calls logged yet. Usage from the staff price-check tools will
-            appear here automatically.
-          </p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-carbon-150 text-xs uppercase tracking-wide text-carbon-400">
-                  <th className="px-6 py-3 font-medium">Time</th>
-                  <th className="px-4 py-3 font-medium">Feature</th>
-                  <th className="px-4 py-3 font-medium">Model</th>
-                  <th className="px-4 py-3 font-medium">Tokens in / out</th>
-                  <th className="px-4 py-3 font-medium">Cost</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentLogs.map((log) => (
-                  <tr
-                    key={log.id}
-                    className="border-b border-carbon-150 last:border-0"
-                  >
-                    <td className="whitespace-nowrap px-6 py-3 text-carbon-500">
-                      {formatDateTime(log.createdAt)}
-                    </td>
-                    <td className="px-4 py-3 text-carbon-700">{log.feature}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-carbon-700">
-                      {log.modelId}
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-3 text-carbon-700">
-                      {log.inputTokens.toLocaleString("en-AU")} /{" "}
-                      {log.outputTokens.toLocaleString("en-AU")}
-                    </td>
-                    <td className="px-4 py-3 text-carbon-700">
-                      {formatUsd(log.costUsd)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <StatusBadge status={log.status} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {stats.map((stat) => {
+          const Icon = stat.icon;
+          return (
+            <Link
+              key={stat.label}
+              href={stat.href}
+              className="card flex items-center gap-4 transition hover:shadow-hard-sm"
+            >
+              <span
+                className={`flex h-11 w-11 shrink-0 items-center justify-center ${stat.tone}`}
+              >
+                <Icon className="h-5 w-5" aria-hidden />
+              </span>
+              <span>
+                <span className="block text-2xl font-bold text-carbon-950">
+                  {stat.value}
+                </span>
+                <span className="block text-xs font-medium text-carbon-500">
+                  {stat.label}
+                </span>
+              </span>
+            </Link>
+          );
+        })}
       </section>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <section className="card p-0">
+          <div className="flex items-center justify-between border-b border-carbon-150 px-5 py-4">
+            <h2 className="text-sm font-semibold text-carbon-950">
+              Recent quote leads
+            </h2>
+            <Link
+              href="/admin/leads"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-signal-600 hover:underline"
+            >
+              All leads <ArrowRight className="h-3 w-3" aria-hidden />
+            </Link>
+          </div>
+          {recentLeads.length === 0 ? (
+            <p className="px-5 py-6 text-sm text-carbon-500">No leads yet.</p>
+          ) : (
+            <ul className="divide-y divide-carbon-150">
+              {recentLeads.map((lead) => (
+                <li key={lead.id} className="flex items-center gap-3 px-5 py-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-carbon-950">
+                      {lead.name}
+                    </p>
+                    <p className="truncate text-xs text-carbon-500">
+                      {lead.brand} {lead.model} — {lead.repairType} ·{" "}
+                      {formatDateTime(lead.createdAt)}
+                    </p>
+                  </div>
+                  <span className={leadStatusBadge(lead.status)}>
+                    {statusLabel(lead.status)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <section className="card p-0">
+          <div className="flex items-center justify-between border-b border-carbon-150 px-5 py-4">
+            <h2 className="text-sm font-semibold text-carbon-950">
+              Recent intakes
+            </h2>
+            <Link
+              href="/admin/intake"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-signal-600 hover:underline"
+            >
+              All intakes <ArrowRight className="h-3 w-3" aria-hidden />
+            </Link>
+          </div>
+          {recentIntakes.length === 0 ? (
+            <p className="px-5 py-6 text-sm text-carbon-500">No intakes yet.</p>
+          ) : (
+            <ul className="divide-y divide-carbon-150">
+              {recentIntakes.map((intake) => (
+                <li key={intake.id} className="flex items-center gap-3 px-5 py-3">
+                  <div className="min-w-0 flex-1">
+                    <Link
+                      href={`/admin/intake/${intake.id}`}
+                      className="block truncate text-sm font-medium text-carbon-950 hover:text-signal-600"
+                    >
+                      {intake.customerName} — {intake.brand} {intake.model}
+                    </Link>
+                    <p className="truncate text-xs text-carbon-500">
+                      {parseJsonStringArray(intake.repairTypes).join(", ") ||
+                        "Repair"}{" "}
+                      ·{" "}
+                      {intake.quotedPrice !== null
+                        ? formatAud(intake.quotedPrice)
+                        : "No quote"}{" "}
+                      · {formatDateTime(intake.createdAt)}
+                    </p>
+                  </div>
+                  <span className={intakeStatusBadge(intake.status)}>
+                    {statusLabel(intake.status)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

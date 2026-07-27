@@ -39,7 +39,9 @@ test("parses form login requests when JavaScript submit does not run", async () 
     assert.deepEqual(result.data, {
       email: "staff@ccr.local",
       password: "CCRLocal2026!",
-      next: "/staff",
+      // /staff pages no longer exist, so the destination falls back to the
+      // role default instead of surviving the parse.
+      next: null,
       wantsHtmlRedirect: true,
     });
   }
@@ -78,8 +80,9 @@ test("builds login redirects from the browser origin when present", () => {
   assert.equal(url.href, "http://127.0.0.1:3000/staff");
 });
 
-test("accepts only root and staff/admin descendants as shared login destinations", async () => {
-  // Given: login destinations that are allowed to survive every auth boundary.
+test("accepts only root and admin console descendants as shared login destinations", async () => {
+  // Given: login destinations, including retired /staff paths that must now
+  // fall back to the role default rather than land on a 404.
   const destinations = [
     "/",
     "/staff",
@@ -94,11 +97,11 @@ test("accepts only root and staff/admin descendants as shared login destinations
     parsedDestinations.push([destination, await parsedNextFor(destination)]);
   }
 
-  // Then: the shared safe-destination contract preserves each permitted path.
+  // Then: only root and console paths survive the parse.
   assert.deepEqual(parsedDestinations, [
     ["/", "/"],
-    ["/staff", "/staff"],
-    ["/staff/intake/new?from=login", "/staff/intake/new?from=login"],
+    ["/staff", null],
+    ["/staff/intake/new?from=login", null],
     ["/admin", "/admin"],
     ["/admin/users#invite", "/admin/users#invite"],
   ]);

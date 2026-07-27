@@ -72,7 +72,3 @@ export function policyFormFromRecord(record: Policy): PolicyForm {
     active: record.active,
   };
 }
-
-export function policyLayoutForWidth(width: number): "mobile-rows" | "table" {
-  return width < 768 ? "mobile-rows" : "table";
-}

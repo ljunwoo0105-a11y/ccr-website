@@ -2,10 +2,7 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 
-const DASHBOARD_FILES = [
-  "src/app/admin/page.tsx",
-  "src/app/admin/workshop/page.tsx",
-] as const;
+const DASHBOARD_FILES = ["src/app/admin/page.tsx"] as const;
 
 test("dashboard routes avoid importing the full AI client for spend totals", () => {
   for (const file of DASHBOARD_FILES) {

@@ -20,7 +20,6 @@ export const NAV_LAYOUT_SETTING_KEY = "admin.navLayout";
 /** Every admin section that can appear in the menu. Order = default order. */
 export const NAV_SECTION_HREFS = [
   "/admin",
-  "/admin/workshop",
   "/admin/intake",
   "/admin/leads",
   "/admin/inventory",
@@ -53,7 +52,6 @@ export const DEFAULT_NAV_LAYOUT: NavLayout = {
       title: "Operations",
       items: [
         "/admin",
-        "/admin/workshop",
         "/admin/intake",
         "/admin/leads",
         "/admin/inventory",

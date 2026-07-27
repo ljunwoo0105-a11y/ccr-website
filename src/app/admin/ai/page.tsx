@@ -6,10 +6,6 @@ import {
   type AiSettings,
   type ModelOption,
 } from "@/components/admin/ai-settings-form";
-import {
-  CostEstimator,
-  type EstimatorModel,
-} from "@/components/admin/cost-estimator";
 import { UsageDashboard } from "@/components/admin/usage-dashboard";
 
 export const metadata: Metadata = { title: "AI Console" };
@@ -45,20 +41,13 @@ export default async function AdminAiPage() {
     modelId: m.modelId,
     label: `${m.label} (${m.modelId})`,
   }));
-  const estimatorModels: EstimatorModel[] = enabledModels.map((m) => ({
-    modelId: m.modelId,
-    label: m.label,
-    inputPerMTok: m.inputPerMTok,
-    outputPerMTok: m.outputPerMTok,
-  }));
 
   return (
     <div className="space-y-8">
       <header>
         <h1 className="text-2xl font-bold text-carbon-950">AI Console</h1>
         <p className="mt-1 text-sm text-carbon-500">
-          Model registry, default model + budget settings, cost estimation and
-          real usage.
+          Model registry, default model + budget settings, and real usage.
         </p>
       </header>
 
@@ -68,8 +57,6 @@ export default async function AdminAiPage() {
       />
 
       <AiSettingsForm options={options} initial={settings} />
-
-      <CostEstimator models={estimatorModels} />
 
       <UsageDashboard />
     </div>

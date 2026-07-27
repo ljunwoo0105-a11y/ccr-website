@@ -10,12 +10,16 @@ const EXPECTED_ZOOM = {
   MAX_ZOOM_PCT: 160,
   ZOOM_STEP_PCT: 15,
   DEFAULT_ZOOM_PCT: 100,
+  // Scenes open and reset a touch zoomed out; 100% stays the camera-distance
+  // reference for the zoom math.
+  INITIAL_ZOOM_PCT: 70,
 } as const;
 const ZOOM_NAMES = [
   "MIN_ZOOM_PCT",
   "MAX_ZOOM_PCT",
   "ZOOM_STEP_PCT",
   "DEFAULT_ZOOM_PCT",
+  "INITIAL_ZOOM_PCT",
 ] as const;
 
 type ZoomConstantName = keyof typeof EXPECTED_ZOOM;
@@ -168,7 +172,7 @@ function assertZoomContract(boardSource: string, teardownSource: string): void {
   assert.ok(controls, "board should render BoardZoomControls");
   assert.equal(jsxAttrText(controls, "canZoomIn"), "{zoomPct < MAX_ZOOM_PCT}");
   assert.equal(jsxAttrText(controls, "canZoomOut"), "{zoomPct > MIN_ZOOM_PCT}");
-  assert.equal(jsxAttrText(controls, "onResetZoom"), "{() => setZoom(DEFAULT_ZOOM_PCT)}");
+  assert.equal(jsxAttrText(controls, "onResetZoom"), "{() => setZoom(INITIAL_ZOOM_PCT)}");
   assert.equal(jsxAttrText(controls, "onZoomIn"), "{() => setZoom(zoomPct + ZOOM_STEP_PCT)}");
   assert.equal(jsxAttrText(controls, "onZoomOut"), "{() => setZoom(zoomPct - ZOOM_STEP_PCT)}");
 

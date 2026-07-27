@@ -2,15 +2,6 @@ import { db } from "@/lib/db";
 import { fail, guard, ok, parseBody } from "@/lib/api";
 import { aiModelSchema } from "@/lib/validation";
 
-/** List all registry models (admin only — pricing is internal). */
-export async function GET() {
-  const { error } = await guard("ADMIN");
-  if (error) return error;
-
-  const models = await db.aiModel.findMany({ orderBy: { label: "asc" } });
-  return ok(models);
-}
-
 /** Add a model to the registry. */
 export async function POST(req: Request) {
   const { error } = await guard("ADMIN");

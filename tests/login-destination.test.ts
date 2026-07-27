@@ -7,9 +7,10 @@ import {
   safeLoginDestination,
 } from "../src/lib/login-destination";
 
-test("permits only root and staff/admin descendants", () => {
-  // Given: safe staff return destinations and unsafe lookalikes.
-  const allowed = ["/", "/staff", "/staff/quote?from=%2F", "/admin/users#top"];
+test("permits only root and admin console descendants", () => {
+  // Given: safe return destinations and unsafe lookalikes. /staff/* pages no
+  // longer exist, so those destinations must fall back to the role default.
+  const allowed = ["/", "/admin", "/admin/users#top"];
   const rejected = [
     "https://evil.example/staff",
     "//evil.example/staff",
@@ -18,6 +19,8 @@ test("permits only root and staff/admin descendants", () => {
     "/staffish",
     "/admin%2fusers",
     "/staff%5creports",
+    "/staff",
+    "/staff/quote?from=%2F",
     "/staff/login",
     "/staff/login?next=/staff/login",
   ];

@@ -5,27 +5,6 @@ import { intakeStatusSchema } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
 
-/** Full intake record, including the customer and the staff member's name. */
-export async function GET(
-  _req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { error } = await guard("ADMIN");
-  if (error) return error;
-  const { id } = await params;
-
-  const intake = await db.repairIntake.findUnique({
-    where: { id },
-    include: {
-      customer: true,
-      staff: { select: { id: true, name: true } },
-    },
-  });
-  if (!intake) return fail("Intake not found", 404);
-
-  return ok(intake);
-}
-
 /** Status transitions; COLLECTED also stamps completedAt. */
 export async function PATCH(
   req: Request,

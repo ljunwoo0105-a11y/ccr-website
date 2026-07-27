@@ -6,9 +6,11 @@ export const dynamic = "force-dynamic";
 /**
  * Phone-number lookup for intake autofill. Returns up to 5 matches.
  * Requires at least 3 digits to avoid dumping the customer list.
+ * Staff-level: the same staff who can create the intake (bay check-in)
+ * need the autofill working at the counter.
  */
 export async function GET(req: Request) {
-  const { error } = await guard("ADMIN");
+  const { error } = await guard();
   if (error) return error;
 
   const phone = new URL(req.url).searchParams.get("phone")?.trim() ?? "";

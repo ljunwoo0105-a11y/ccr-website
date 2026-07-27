@@ -32,8 +32,9 @@ const nextConfig = {
     // instead of a 404. /staff/login is untouched — it is still the way in.
     return [
       { source: "/staff", destination: "/admin", permanent: false },
+      // The Workshop dashboard merged into the console home.
+      { source: "/admin/workshop", destination: "/admin", permanent: false },
       { source: "/staff/price-list", destination: "/admin/catalog", permanent: false },
-      { source: "/staff/quote/:path*", destination: "/admin/quote/:path*", permanent: false },
       { source: "/staff/intake/:path*", destination: "/admin/intake/:path*", permanent: false },
       { source: "/staff/inventory/:path*", destination: "/admin/inventory/:path*", permanent: false },
       { source: "/staff/leads/:path*", destination: "/admin/leads/:path*", permanent: false },
