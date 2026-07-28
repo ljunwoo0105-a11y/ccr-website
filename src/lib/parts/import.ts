@@ -31,9 +31,10 @@ const REQUIRED_COLUMNS = [
   "model",
   "repairtype",
   "quality",
-  "costprice",
-  "sellprice",
 ] as const;
+
+/** At least one price column must exist; one-price files can still update. */
+const PRICE_COLUMNS = ["costprice", "sellprice"] as const;
 
 const OPTIONAL_COLUMNS = [
   "colour",
@@ -81,6 +82,11 @@ export interface ImportResult {
   readonly errors: number;
   /** Set when the file itself is unusable (bad header, too many rows). */
   readonly fileError?: string;
+  /**
+   * Why the file was unusable. Only "header" failures are worth an AI-rescue
+   * pass — empty files and over-limit files must surface their error as-is.
+   */
+  readonly fileErrorKind?: "empty" | "header" | "rowLimit";
 }
 
 // --- CSV parsing (dependency-free) ---------------------------------------
@@ -225,14 +231,22 @@ function assembleRow(
     values.quality = quality;
   }
 
+  // Prices: at least one is needed; a row carrying only one can still UPDATE
+  // a matched part (supplier cost lists often have a single price column).
+  // Creates keep requiring both via partSchema downstream.
   for (const key of ["costprice", "sellprice"] as const) {
+    const field = key === "costprice" ? "costPrice" : "sellPrice";
     const raw = get(key) ?? "";
-    const value = raw === "" ? null : coerceNumber(raw);
-    if (value === null) {
-      problems.push(raw === "" ? `${key === "costprice" ? "costPrice" : "sellPrice"} is required` : `${key} "${raw}" is not a number`);
-    } else {
-      values[key === "costprice" ? "costPrice" : "sellPrice"] = value;
+    if (raw === "") continue;
+    const value = coerceNumber(raw);
+    if (value === null) problems.push(`${key} "${raw}" is not a number`);
+    else {
+      values[field] = value;
+      provided.add(field);
     }
+  }
+  if (!provided.has("costPrice") && !provided.has("sellPrice")) {
+    problems.push("a price (costPrice or sellPrice) is required");
   }
 
   const warrantyRaw = get("warrantydays");
@@ -309,7 +323,10 @@ export async function importPriceList(
   csv: string,
   mode: "preview" | "apply"
 ): Promise<ImportResult> {
-  const failFile = (fileError: string): ImportResult => ({
+  const failFile = (
+    fileErrorKind: NonNullable<ImportResult["fileErrorKind"]>,
+    fileError: string
+  ): ImportResult => ({
     ok: false,
     mode,
     rows: [],
@@ -317,12 +334,13 @@ export async function importPriceList(
     updates: 0,
     errors: 0,
     fileError,
+    fileErrorKind,
   });
 
   const delimiter = detectDelimiter(csv.split(/\r?\n/, 1)[0] ?? "");
   const grid = parseCsv(csv, delimiter);
   if (grid.length < 2) {
-    return failFile("The file needs a header row and at least one data row.");
+    return failFile("empty", "The file needs a header row and at least one data row.");
   }
 
   const header = grid[0].map((cell) => {
@@ -330,15 +348,24 @@ export async function importPriceList(
     return COLUMN_ALIASES[normalized] ?? normalized.replace(/\s+/g, "");
   });
   const missing = REQUIRED_COLUMNS.filter((column) => !header.includes(column));
-  if (missing.length > 0) {
+  const hasPrice = PRICE_COLUMNS.some((column) => header.includes(column));
+  if (missing.length > 0 || !hasPrice) {
+    const missingLabel = [
+      ...missing,
+      ...(hasPrice ? [] : ["costprice and/or sellprice"]),
+    ].join(", ");
     return failFile(
-      `Missing required column(s): ${missing.join(", ")}. Required: deviceType, brand, model, repairType, quality, costPrice, sellPrice. Optional: ${OPTIONAL_COLUMNS.join(", ")}.`
+      "header",
+      `Missing required column(s): ${missingLabel}. Required: deviceType, brand, model, repairType, quality and at least one of costPrice/sellPrice. Optional: ${OPTIONAL_COLUMNS.join(", ")}.`
     );
   }
 
   const dataRows = grid.slice(1);
   if (dataRows.length > MAX_IMPORT_ROWS) {
-    return failFile(`Too many rows (${dataRows.length}). The limit is ${MAX_IMPORT_ROWS} per import.`);
+    return failFile(
+      "rowLimit",
+      `Too many rows (${dataRows.length}). The limit is ${MAX_IMPORT_ROWS} per import.`
+    );
   }
 
   // Existing catalog snapshot for matching (all parts incl. inactive).
@@ -385,6 +412,7 @@ export async function importPriceList(
     data: Partial<z.infer<typeof partSchema>>;
   }[] = [];
   const seenInFile = new Map<string, number>();
+  const seenSkusInFile = new Map<string, number>();
 
   for (let i = 0; i < dataRows.length; i++) {
     const line = i + 2; // 1-based, after header
@@ -409,6 +437,19 @@ export async function importPriceList(
 
     // Resolve the target part.
     const sku = typeof parsed.values.sku === "string" ? parsed.values.sku.trim().toLowerCase() : "";
+    if (sku) {
+      const skuDuplicateOf = seenSkusInFile.get(sku);
+      if (skuDuplicateOf !== undefined) {
+        results.push({
+          line,
+          action: "error",
+          summary: rowSummary(parsed.values),
+          message: `duplicate SKU of line ${skuDuplicateOf} — two rows would write the same part`,
+        });
+        continue;
+      }
+      seenSkusInFile.set(sku, line);
+    }
     let target: (typeof existing)[number] | null = null;
     let ambiguous = false;
     if (sku && bySku.has(sku)) {
@@ -445,21 +486,36 @@ export async function importPriceList(
           line,
           action: "error",
           summary: rowSummary(parsed.values),
-          message: validated.error.errors.map((issue) => `${issue.path.join(".")}: ${issue.message}`).join("; "),
+          message: validated.error.errors
+            .map((issue) =>
+              (issue.path[0] === "costPrice" || issue.path[0] === "sellPrice") &&
+              issue.code === "invalid_type"
+                ? "creating a NEW part needs both costPrice and sellPrice (one price can only update an existing part)"
+                : `${issue.path.join(".")}: ${issue.message}`
+            )
+            .join("; "),
         });
         continue;
       }
       creates.push({ line, data: validated.data });
-      results.push({ line, action: "create", summary: rowSummary(parsed.values) });
+      results.push({
+        line,
+        action: "create",
+        summary: rowSummary(parsed.values),
+        // Money must be visible in the preview gate, not just in the file.
+        changes: [
+          `costPrice ${validated.data.costPrice}`,
+          `sellPrice ${validated.data.sellPrice}`,
+          `stock ${validated.data.stockQty}`,
+        ],
+      });
       continue;
     }
 
-    // Update: only provided fields; always the required price columns.
-    const patch: Partial<z.infer<typeof partSchema>> = {
-      costPrice: parsed.values.costPrice,
-      sellPrice: parsed.values.sellPrice,
-    };
-    for (const key2 of ["warrantyDays", "stockQty", "colour", "sku", "supplier", "notes", "active"] as const) {
+    // Update: only provided fields, prices included — a one-price supplier
+    // list must never zero out the other price.
+    const patch: Partial<z.infer<typeof partSchema>> = {};
+    for (const key2 of ["costPrice", "sellPrice", "warrantyDays", "stockQty", "colour", "sku", "supplier", "notes", "active"] as const) {
       if (parsed.provided.has(key2) && parsed.values[key2] !== undefined) {
         (patch as Record<string, unknown>)[key2] = parsed.values[key2];
       }

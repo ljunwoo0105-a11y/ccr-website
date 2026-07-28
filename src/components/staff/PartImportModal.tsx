@@ -1,15 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { FileUp, Loader2, X } from "lucide-react";
+import { FileUp, Loader2, Sparkles, X } from "lucide-react";
 import { apiJson } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 
 /**
- * CSV price-list import. Two steps mirroring the server contract: upload →
- * preview (nothing written), then a single confirm applies the valid rows.
- * Error rows never block the rest — they are listed with line numbers so the
- * owner can fix the sheet and re-import just those.
+ * Price-list import. Attach a CSV, Excel sheet, PDF or photo of a price list;
+ * the server extracts the rows (AI transcription for the messy formats) and
+ * returns a preview — nothing is written until the single confirm, which
+ * re-submits the normalised CSV deterministically. Error rows never block the
+ * rest — they are listed with line numbers so the owner can fix and re-import
+ * just those.
  */
 
 interface ImportRow {
@@ -26,6 +28,13 @@ interface ImportPayload {
   readonly creates: number;
   readonly updates: number;
   readonly errors: number;
+  /** Normalised CSV to apply (present on file-based previews). */
+  readonly csv?: string;
+  readonly extraction?: {
+    readonly via: "text" | "xlsx" | "ai";
+    readonly note: string | null;
+    readonly truncated: boolean;
+  };
 }
 
 const TEMPLATE_CSV = [
@@ -34,6 +43,19 @@ const TEMPLATE_CSV = [
   "Phone,Apple,iPhone 13,Screen Replacement,GENUINE,,120,249,365,2,IP13-SCR-GEN,ExampleSupplier,",
   "Phone,Samsung,Galaxy S22,Battery Replacement,OEM,,35,99,180,5,,,",
 ].join("\n");
+
+// Matches the server's base64 cap (~8 MB decoded).
+const MAX_FILE_BYTES = 8 * 1024 * 1024;
+
+function base64FromBuffer(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  const chunk = 0x8000;
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  }
+  return btoa(binary);
+}
 
 export default function PartImportModal({
   onDone,
@@ -49,6 +71,9 @@ export default function PartImportModal({
   const [busy, setBusy] = useState<"preview" | "apply" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  // Bumped on every new file pick; stale reader/fetch results are discarded
+  // so a re-pick mid-read can't show the old file under the new name.
+  const pickRef = useRef(0);
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
@@ -58,16 +83,26 @@ export default function PartImportModal({
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  async function submit(mode: "preview" | "apply", text: string) {
+  async function submit(
+    mode: "preview" | "apply",
+    payload:
+      | { csv: string }
+      | { file: { name: string; mediaType: string; dataBase64: string } },
+    pick: number
+  ) {
     setBusy(mode);
     setError(null);
     try {
-      const res = await fetch("/api/admin/parts/import", apiJson("POST", { csv: text, mode }));
+      const res = await fetch(
+        "/api/admin/parts/import",
+        apiJson("POST", { ...payload, mode })
+      );
       const body = (await res.json()) as {
         ok?: boolean;
         error?: string;
         data?: ImportPayload;
       };
+      if (pick !== pickRef.current) return; // superseded by a newer file pick
       if (!res.ok || !body.ok || !body.data) {
         setError(body.error ?? "Could not read the file.");
         setPreview(null);
@@ -75,31 +110,50 @@ export default function PartImportModal({
       }
       if (mode === "preview") {
         setPreview(body.data);
+        // The preview returns the normalised CSV; applying that exact text is
+        // what makes the confirm deterministic (the AI is never re-run).
+        if (body.data.csv) setCsv(body.data.csv);
       } else {
         onDone(
           `Imported: ${body.data.creates} new part${body.data.creates === 1 ? "" : "s"}, ${body.data.updates} updated${body.data.errors > 0 ? `, ${body.data.errors} row${body.data.errors === 1 ? "" : "s"} skipped` : ""}.`
         );
       }
     } catch {
-      setError("Network error — try again.");
+      if (pick === pickRef.current) setError("Network error — try again.");
     } finally {
-      setBusy(null);
+      if (pick === pickRef.current) setBusy(null);
     }
   }
 
   function handleFile(file: File | undefined) {
     if (!file) return;
+    if (file.size > MAX_FILE_BYTES) {
+      setError("That file is over 8 MB — export it as CSV or split it up.");
+      return;
+    }
+    const pick = ++pickRef.current;
     setFileName(file.name);
     setPreview(null);
+    setCsv(null);
     setError(null);
+
+    // Every format goes through the file path: the server reads CSV/xlsx
+    // deterministically (free) and only uses the AI reader for pdf/photo or
+    // when the sheet's headers can't be mapped.
     const reader = new FileReader();
-    reader.onload = () => {
-      const text = String(reader.result ?? "");
-      setCsv(text);
-      void submit("preview", text);
+    reader.onerror = () => {
+      if (pick === pickRef.current) setError("Could not read the file.");
     };
-    reader.onerror = () => setError("Could not read the file.");
-    reader.readAsText(file);
+    reader.onload = () => {
+      if (pick !== pickRef.current) return;
+      const dataBase64 = base64FromBuffer(reader.result as ArrayBuffer);
+      void submit(
+        "preview",
+        { file: { name: file.name, mediaType: file.type, dataBase64 } },
+        pick
+      );
+    };
+    reader.readAsArrayBuffer(file);
   }
 
   function downloadTemplate() {
@@ -113,6 +167,7 @@ export default function PartImportModal({
   }
 
   const applicable = preview ? preview.creates + preview.updates : 0;
+  const aiRead = preview?.extraction?.via === "ai";
 
   return (
     <div
@@ -132,15 +187,15 @@ export default function PartImportModal({
               Import price list
             </h2>
             <p className="mt-0.5 text-xs text-carbon-500">
-              CSV with columns: deviceType, brand, model, repairType, quality,
-              costPrice, sellPrice — plus optional colour, warrantyDays,
-              stockQty, sku, supplier, notes, active.{" "}
+              Attach a CSV, Excel sheet (.xlsx), PDF or photo of a price list —
+              rows are read automatically and nothing is saved until you
+              confirm.{" "}
               <button
                 type="button"
                 onClick={downloadTemplate}
                 className="font-medium text-signal-600 underline-offset-2 hover:underline"
               >
-                Download template
+                Download CSV template
               </button>
             </p>
           </div>
@@ -159,7 +214,7 @@ export default function PartImportModal({
             <input
               ref={fileRef}
               type="file"
-              accept=".csv,text/csv,text/plain"
+              accept=".csv,.txt,.tsv,.xlsx,.pdf,image/png,image/jpeg,image/webp,text/csv,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
               className="hidden"
               onChange={(event) => handleFile(event.target.files?.[0])}
             />
@@ -170,7 +225,7 @@ export default function PartImportModal({
               onClick={() => fileRef.current?.click()}
             >
               <FileUp className="h-4 w-4" aria-hidden />
-              {fileName ? "Choose a different file" : "Choose CSV file"}
+              {fileName ? "Choose a different file" : "Choose file"}
             </button>
             {fileName ? (
               <span className="font-mono text-xs text-carbon-600">{fileName}</span>
@@ -178,7 +233,7 @@ export default function PartImportModal({
             {busy === "preview" ? (
               <span className="inline-flex items-center gap-2 text-sm text-carbon-600">
                 <Loader2 className="h-4 w-4 animate-spin text-signal-600" aria-hidden />
-                Checking file…
+                Reading the file — PDFs and photos can take a minute…
               </span>
             ) : null}
           </div>
@@ -191,6 +246,28 @@ export default function PartImportModal({
 
           {preview ? (
             <>
+              {aiRead ? (
+                <p className="flex items-start gap-2 border border-carbon-150 bg-bone-100 px-3 py-2 text-xs text-carbon-600">
+                  <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-signal-600" aria-hidden />
+                  <span>
+                    Read automatically from the attached file — check every row
+                    and price below before importing.
+                    {/* The note is model output over untrusted file content —
+                        always shown attributed and quoted, never as our UI. */}
+                    {preview.extraction?.note ? (
+                      <>
+                        {" "}
+                        AI reader&apos;s note:{" "}
+                        <em>&ldquo;{preview.extraction.note}&rdquo;</em>
+                      </>
+                    ) : null}
+                    {preview.extraction?.truncated
+                      ? " Only the first rows were read — split the file or use CSV for the rest."
+                      : ""}
+                  </span>
+                </p>
+              ) : null}
+
               <div className="flex flex-wrap gap-4 border border-carbon-150 bg-bone-100 px-4 py-3 text-sm">
                 <span className="font-semibold text-emerald-700">
                   {preview.creates} new
@@ -256,7 +333,7 @@ export default function PartImportModal({
           <button
             type="button"
             disabled={!preview || applicable === 0 || busy !== null || !csv}
-            onClick={() => csv && void submit("apply", csv)}
+            onClick={() => csv && void submit("apply", { csv }, pickRef.current)}
             className="border border-carbon-950 bg-signal-500 px-4 py-1.5 text-sm font-semibold text-carbon-950 hover:bg-signal-400 disabled:opacity-50"
           >
             {busy === "apply"
