@@ -2,6 +2,7 @@ import "server-only";
 import { NextResponse } from "next/server";
 import { ZodError, type ZodSchema } from "zod";
 import { requireUser, type Role } from "@/lib/auth";
+import { DEFAULT_JSON_BODY_BYTES, readJsonBody } from "@/lib/request-body";
 
 const PRIVATE_CACHE_CONTROL = "private, no-store";
 
@@ -38,16 +39,18 @@ export function privateFail(message: string, status = 400, extra?: ResponseInit)
 /** Parse + validate a JSON body against a Zod schema. */
 export async function parseBody<T>(
   req: Request,
-  schema: ZodSchema<T>
+  schema: ZodSchema<T>,
+  options: { readonly maxBytes?: number } = {}
 ): Promise<{ data: T; error: null } | { data: null; error: NextResponse }> {
-  let raw: unknown;
-  try {
-    raw = await req.json();
-  } catch {
-    return { data: null, error: fail("Invalid JSON body", 400) };
+  const body = await readJsonBody(
+    req,
+    options.maxBytes ?? DEFAULT_JSON_BODY_BYTES
+  );
+  if (!body.ok) {
+    return { data: null, error: fail(body.message, body.status) };
   }
   try {
-    return { data: schema.parse(raw), error: null };
+    return { data: schema.parse(body.data), error: null };
   } catch (e) {
     const message =
       e instanceof ZodError

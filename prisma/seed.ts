@@ -1,8 +1,15 @@
+import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import { randomBytes } from "crypto";
 
-const db = new PrismaClient();
+const connectionString = process.env.DATABASE_URL?.trim();
+if (!connectionString) {
+  throw new Error("DATABASE_URL is required.");
+}
+
+const db = new PrismaClient({
+  adapter: new PrismaPg({ connectionString }),
+});
 
 const policyDocuments = [
   { id: "policy-terms-current", category: "TERMS", version: "2026-07-10.1", title: "Repair terms", body: "Customer authorises CCR to inspect and repair the device, accepts that further faults may be found during repair, and agrees that quoted work may require staff confirmation before parts are ordered.", active: true },
@@ -29,39 +36,57 @@ const diagnosisRules = [
   { id: "rule-iphone-audio-panic-dock", deviceType: "Phone", brand: "Apple", model: null, symptomCode: "panic-aop-bosch", symptomLabel: "Panic log: AOP / Bosch write failure", repairType: "Charging Port Repair", outcome: "PART", priority: 80, active: true, notes: "'AOP Panic - K2 - Bosch control channel write failure' = dock flex (the Bosch barometer lives on that flex); classically triggers during loud audio playback. Replace with a quality dock flex assembly." },
 ] as const;
 
-function randomPassword(): string {
-  return randomBytes(9).toString("base64url");
+function requiredSeedPassword(name: "SEED_ADMIN_PASSWORD" | "SEED_STAFF_PASSWORD"): string {
+  const password = process.env[name];
+  if (!password || password.trim().length < 12) {
+    throw new Error(`${name} must be set to at least 12 characters before creating the account.`);
+  }
+  return password;
+}
+
+async function ensureSeedUser(input: {
+  email: string;
+  name: string;
+  role: "ADMIN" | "STAFF";
+  passwordEnv: "SEED_ADMIN_PASSWORD" | "SEED_STAFF_PASSWORD";
+}): Promise<boolean> {
+  const existing = await db.user.findUnique({
+    where: { email: input.email },
+    select: { id: true },
+  });
+  if (existing) return false;
+
+  await db.user.create({
+    data: {
+      email: input.email,
+      name: input.name,
+      role: input.role,
+      passwordHash: await bcrypt.hash(requiredSeedPassword(input.passwordEnv), 12),
+    },
+  });
+  return true;
 }
 
 async function seedUsers() {
   const adminEmail = process.env.SEED_ADMIN_EMAIL ?? "coolcaserepair@gmail.com";
-  const adminPassword = process.env.SEED_ADMIN_PASSWORD || randomPassword();
   const staffEmail = process.env.SEED_STAFF_EMAIL ?? "staff@ccr.local";
-  const staffPassword = process.env.SEED_STAFF_PASSWORD || randomPassword();
-
-  await db.user.upsert({
-    where: { email: adminEmail },
-    update: {},
-    create: {
-      email: adminEmail,
-      name: "CCR Owner",
-      role: "ADMIN",
-      passwordHash: await bcrypt.hash(adminPassword, 12),
-    },
+  const adminCreated = await ensureSeedUser({
+    email: adminEmail,
+    name: "CCR Owner",
+    role: "ADMIN",
+    passwordEnv: "SEED_ADMIN_PASSWORD",
   });
-  await db.user.upsert({
-    where: { email: staffEmail },
-    update: {},
-    create: {
-      email: staffEmail,
-      name: "Front Counter",
-      role: "STAFF",
-      passwordHash: await bcrypt.hash(staffPassword, 12),
-    },
+  const staffCreated = await ensureSeedUser({
+    email: staffEmail,
+    name: "Front Counter",
+    role: "STAFF",
+    passwordEnv: "SEED_STAFF_PASSWORD",
   });
 
-  console.log(`Seeded users for ${adminEmail} and ${staffEmail}.`);
-  console.log("Initial credentials are supplied by env or generated silently.");
+  console.log(
+    `Seed users: ${adminEmail} (${adminCreated ? "created" : "already exists"}), ` +
+      `${staffEmail} (${staffCreated ? "created" : "already exists"}).`
+  );
 }
 
 async function seedAiModels() {

@@ -12,9 +12,15 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   output: "standalone",
+  // OpenNext's Prisma patch expects the generated client to remain an external
+  // server package. The Neon adapter supplies the Worker-compatible transport.
+  serverExternalPackages: ["@prisma/client", ".prisma/client"],
   // A stray package-lock.json in the user profile directory otherwise makes
   // Next infer C:\Users\<name> as the workspace root.
   outputFileTracingRoot: fileURLToPath(new URL(".", import.meta.url)),
+  outputFileTracingIncludes: {
+    "/**": ["./node_modules/.prisma/client/query_compiler_bg.wasm"],
+  },
   // The hero/board pull ~16 named exports from the @react-three/drei barrel.
   // Without this, dev (which doesn't tree-shake) compiles the whole 1.6 MB
   // package into the "/" chunk on every compile. lucide-react is already on

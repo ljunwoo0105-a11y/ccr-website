@@ -17,12 +17,14 @@ npm run setup     # prisma generate + apply schema + seed
 npm run dev       # http://localhost:3000
 ```
 
-`npm run db:seed` prints the **initial admin/staff passwords once** — store
-them and change them after first login (Admin → Users → reset password).
+Set `SEED_ADMIN_PASSWORD` and `SEED_STAFF_PASSWORD` to unique values of at
+least 12 characters before the first `npm run db:seed`. Credentials are never
+printed. Change them after first login (Admin → Users → reset password), then
+remove the seed password variables.
 
 ## Tech stack
 
-- **Next.js 14 (App Router) + TypeScript (strict) + Tailwind CSS**
+- **Next.js 15 (App Router) + TypeScript (strict) + Tailwind CSS**
 - **Prisma + PostgreSQL** for the Node staff/admin deployment
 - **jose** JWT sessions in an httpOnly cookie, **bcryptjs** password hashing
 - **@anthropic-ai/sdk** for the AI pricing agents
@@ -79,8 +81,8 @@ See `.env.example` for the full annotated list:
 - `AUTH_SECRET` — session signing key (generate a long random string)
 - `ANTHROPIC_API_KEY` — enables AI price recommendations + admin AI console
 - `GOOGLE_PLACES_API_KEY` / `GOOGLE_PLACE_ID` — live Google review sync
-- `SMTP_*` — outgoing quote emails (without it, emails are written to
-  `var/outbox/*.html` so you can preview them in dev)
+- `SMTP_*` — outgoing quote emails; required in production. With all SMTP
+  credentials empty, development writes `var/outbox/*.html` previews.
 - `POS_PROVIDER` (`loyverse` | `mock`) + `LOYVERSE_API_TOKEN` — inventory
   stock sync. Parts match POS items by `posItemId` or SKU.
 
@@ -99,15 +101,22 @@ normal Node/Next.js service on Railway with Railway Postgres.
    values.
 5. Railway uses `railway.json`: build runs `npm run railway:build`; start runs
    `prisma migrate deploy && next start`.
-6. After the first successful deploy, run the seed once from Railway:
+6. Set both seed passwords, then after the first successful deploy run the
+   seed once from Railway:
 
 ```bash
 npm run db:seed
 ```
 
+   Remove the seed password variables after both users have been created.
+
 7. Set Sites environment variable `CCR_NODE_ORIGIN` to the Railway app origin,
    for example `https://ccr-admin-production.up.railway.app`, then redeploy
    Sites. The Sites worker proxies `/staff`, `/admin`, and `/api/*` there.
+   It serves the current public build's `/_next/static/*` files locally and
+   falls back to Railway only when a hashed asset is missing, so a staggered
+   deployment cannot leave staff/admin pages unstyled. Railway and Sites should
+   still be deployed from the same source revision, with Railway first.
 
 ## AI features
 
@@ -127,7 +136,8 @@ untracked path to the API.
 
 ## Production checklist
 
-- [ ] Change the seeded passwords; set a strong `AUTH_SECRET`
+- [ ] Set explicit seed passwords, seed once, change the created passwords,
+      remove the seed variables, and set a strong `AUTH_SECRET`
 - [ ] Set `DATABASE_URL` to Railway Postgres
 - [ ] Configure SMTP (and send a test quote)
 - [ ] Add `GOOGLE_PLACES_API_KEY`, run Admin → Reviews → Sync, and confirm

@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
+import {
+  AUTH_TOKEN_AUDIENCE,
+  AUTH_TOKEN_ISSUER,
+  authSecretBytes,
+} from "@/lib/auth-token";
 
 /**
  * Edge gatekeeper for staff/admin surfaces.
@@ -26,8 +31,11 @@ function privateResponse(response: NextResponse): NextResponse {
 
 async function verify(token: string) {
   try {
-    const secret = new TextEncoder().encode(process.env.AUTH_SECRET ?? "");
-    const { payload } = await jwtVerify(token, secret);
+    const { payload } = await jwtVerify(token, authSecretBytes(), {
+      algorithms: ["HS256"],
+      issuer: AUTH_TOKEN_ISSUER,
+      audience: AUTH_TOKEN_AUDIENCE,
+    });
     return payload as { sub?: string; role?: string };
   } catch {
     return null;

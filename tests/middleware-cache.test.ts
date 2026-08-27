@@ -5,6 +5,10 @@ import { SignJWT } from "jose";
 import { NextRequest } from "next/server";
 
 import { middleware } from "../src/middleware";
+import {
+  AUTH_TOKEN_AUDIENCE,
+  AUTH_TOKEN_ISSUER,
+} from "../src/lib/auth-token";
 
 const secret = "0123456789abcdef0123456789abcdef";
 
@@ -17,12 +21,16 @@ function request(path: string, token?: string): NextRequest {
 async function staffToken(): Promise<string> {
   return new SignJWT({ sub: "staff-user", role: "STAFF" })
     .setProtectedHeader({ alg: "HS256" })
+    .setIssuer(AUTH_TOKEN_ISSUER)
+    .setAudience(AUTH_TOKEN_AUDIENCE)
     .sign(new TextEncoder().encode(secret));
 }
 
 async function adminToken(): Promise<string> {
   return new SignJWT({ sub: "admin-user", role: "ADMIN" })
     .setProtectedHeader({ alg: "HS256" })
+    .setIssuer(AUTH_TOKEN_ISSUER)
+    .setAudience(AUTH_TOKEN_AUDIENCE)
     .sign(new TextEncoder().encode(secret));
 }
 
@@ -108,4 +116,15 @@ test("ADMIN session passes to portal and admin pages", async () => {
     // Then: the request continues to the page.
     assert.equal(response.status, 200, path);
   }
+});
+
+test("middleware rejects otherwise signed tokens without the application context", async () => {
+  process.env.AUTH_SECRET = secret;
+  const legacyToken = await new SignJWT({ sub: "staff-user", role: "STAFF" })
+    .setProtectedHeader({ alg: "HS256" })
+    .sign(new TextEncoder().encode(secret));
+
+  const response = await middleware(request("/api/staff/session", legacyToken));
+
+  assert.equal(response.status, 401);
 });

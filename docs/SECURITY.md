@@ -31,10 +31,12 @@ security architecture and where to look when auditing.
 
 ## Input handling
 
-- Every body is parsed with `parseBody()` against a zod schema
-  (`src/lib/validation.ts`) — unknown shapes are rejected before any DB call.
-- SQL injection: all queries go through Prisma's parameterised client; there
-  is no raw SQL in the codebase.
+- Every body is byte-bounded before parsing and then validated against a zod
+  schema (`src/lib/validation.ts`) — unknown shapes are rejected before any
+  DB call. Large authenticated file imports opt into their own explicit cap.
+- SQL injection: queries use Prisma's parameterised client. The few tagged
+  `$queryRaw` statements are parameterised advisory-lock/read queries; never
+  replace them with unsafe string interpolation.
 - XSS: React escapes all interpolated content; the only
   `dangerouslySetInnerHTML` is JSON-LD built from `JSON.stringify` of
   server-controlled data. Email HTML escapes user input via `escapeHtml`.
@@ -71,6 +73,8 @@ internet, or per-IP limits become spoofable.
   import `"server-only"` — the build fails if a client component pulls them in.
 - The browser receives no API keys of any kind; AI/POS/Places calls are all
   server-to-server.
+- `AUTH_SECRET` rejects known placeholders and must be a unique random value
+  of at least 32 characters. JWT verification pins HS256, issuer, and audience.
 
 ## Data protection
 

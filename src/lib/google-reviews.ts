@@ -28,6 +28,15 @@ interface PlaceDetails {
 }
 
 type DatabaseModule = typeof import("@/lib/db");
+interface PublicReview {
+  id: string;
+  authorName: string;
+  rating: number;
+  text: string;
+  reviewedAt: Date | null;
+  source: string;
+}
+const GOOGLE_REQUEST_TIMEOUT_MS = 10_000;
 
 async function getDatabase(): Promise<DatabaseModule | null> {
   if (!process.env.DATABASE_URL?.trim()) {
@@ -89,16 +98,25 @@ export async function syncGoogleReviews(): Promise<ReviewSyncResult> {
     };
   }
 
-  const res = await fetch(
-    `https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}`,
-    {
-      headers: {
-        "X-Goog-Api-Key": apiKey,
-        "X-Goog-FieldMask": "rating,userRatingCount,reviews",
-      },
-      cache: "no-store",
-    }
-  );
+  let res: Response;
+  try {
+    res = await fetch(
+      `https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}`,
+      {
+        headers: {
+          "X-Goog-Api-Key": apiKey,
+          "X-Goog-FieldMask": "rating,userRatingCount,reviews",
+        },
+        cache: "no-store",
+        signal: AbortSignal.timeout(GOOGLE_REQUEST_TIMEOUT_MS),
+      }
+    );
+  } catch {
+    return {
+      ok: false,
+      message: "Google Places API could not be reached within 10 seconds.",
+    };
+  }
   if (!res.ok) {
     return {
       ok: false,
@@ -225,7 +243,7 @@ export async function getAggregateRating(): Promise<{
  * single query the public site is allowed to read reviews through.
  */
 export async function getPublicReviews(limit = 12) {
-  return withPublicReviewFallback(
+  return withPublicReviewFallback<PublicReview[]>(
     ({ db }) =>
       db.review.findMany({
         where: {

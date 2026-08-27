@@ -2,7 +2,8 @@
 // PostgreSQL is used for the Node staff/admin deployment.
 
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
+  engineType = "client"
 }
 
 datasource db {

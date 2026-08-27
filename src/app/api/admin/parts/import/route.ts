@@ -25,6 +25,7 @@ export const dynamic = "force-dynamic";
  *                                 apply is a plain deterministic CSV call.
  */
 const MAX_CSV_CHARS = 600_000;
+const MAX_IMPORT_BODY_BYTES = 12 * 1024 * 1024;
 
 const importRequestSchema = z.union([
   z.object({
@@ -51,7 +52,9 @@ export async function POST(req: Request) {
   const { error } = await guard("ADMIN");
   if (error) return error;
 
-  const parsed = await parseBody(req, importRequestSchema);
+  const parsed = await parseBody(req, importRequestSchema, {
+    maxBytes: MAX_IMPORT_BODY_BYTES,
+  });
   if (parsed.error) return parsed.error;
 
   if ("csv" in parsed.data) {

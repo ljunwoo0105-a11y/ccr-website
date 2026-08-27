@@ -1,6 +1,13 @@
 import { ZodError, z } from "zod";
 import { safeLoginDestination } from "@/lib/login-destination";
 import { loginSchema } from "@/lib/validation";
+import {
+  readJsonBody,
+  readRequestBytes,
+  readRequestText,
+} from "@/lib/request-body";
+
+const MAX_LOGIN_BODY_BYTES = 16 * 1024;
 
 const loginRequestSchema = loginSchema.extend({
   next: z.string().trim().max(500).optional().or(z.literal("")),
@@ -30,15 +37,29 @@ function validationMessage(error: ZodError): string {
 }
 
 export function redirectUrlForRequest(req: Request, path: string): URL {
-  const origin = req.headers.get("origin");
-  if (origin) return new URL(path, origin);
+  const configuredSite = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (configuredSite) {
+    try {
+      const configuredUrl = new URL(configuredSite);
+      if (configuredUrl.protocol === "https:" || configuredUrl.protocol === "http:") {
+        return new URL(path, configuredUrl.origin);
+      }
+    } catch {
+      // Fall through to trusted proxy/request metadata.
+    }
+  }
 
-  const forwardedHost = req.headers.get("x-forwarded-host");
+  const forwardedHost = req.headers.get("x-forwarded-host")?.split(",", 1)[0]?.trim();
   const host = forwardedHost ?? req.headers.get("host");
-  if (!host) return new URL(path, req.url);
+  if (!host || !/^[a-z0-9.:[\]-]+$/i.test(host)) return new URL(path, req.url);
 
-  const forwardedProto = req.headers.get("x-forwarded-proto");
+  const forwardedProto = req.headers
+    .get("x-forwarded-proto")
+    ?.split(",", 1)[0]
+    ?.trim()
+    .toLowerCase();
   const protocol = forwardedProto ?? new URL(req.url).protocol.replace(":", "");
+  if (protocol !== "http" && protocol !== "https") return new URL(path, req.url);
   return new URL(path, `${protocol}://${host}`);
 }
 
@@ -88,7 +109,43 @@ export async function parseLoginRequest(
 
   if (wantsHtmlRedirect) {
     try {
-      const form = await req.formData();
+      let form: FormData;
+      if (contentType.includes("application/x-www-form-urlencoded")) {
+        const body = await readRequestText(req, MAX_LOGIN_BODY_BYTES);
+        if (!body.ok) {
+          return {
+            ok: false,
+            message: body.message,
+            status: body.status,
+            next: null,
+            wantsHtmlRedirect: true,
+          };
+        }
+        form = new FormData();
+        for (const [key, value] of new URLSearchParams(body.data)) {
+          form.append(key, value);
+        }
+      } else {
+        const body = await readRequestBytes(req, MAX_LOGIN_BODY_BYTES);
+        if (!body.ok) {
+          return {
+            ok: false,
+            message: body.message,
+            status: body.status,
+            next: null,
+            wantsHtmlRedirect: true,
+          };
+        }
+        const boundedRequest = new Request(req.url, {
+          method: "POST",
+          headers: { "content-type": contentType },
+          body: body.data.buffer.slice(
+            body.data.byteOffset,
+            body.data.byteOffset + body.data.byteLength
+          ) as ArrayBuffer,
+        });
+        form = await boundedRequest.formData();
+      }
       return parsedResult(
         {
           email: formValue(form, "email") ?? "",
@@ -109,16 +166,15 @@ export async function parseLoginRequest(
     }
   }
 
-  try {
-    return parsedResult(await req.json(), false);
-  } catch (error) {
-    if (!(error instanceof Error)) throw error;
+  const body = await readJsonBody(req, MAX_LOGIN_BODY_BYTES);
+  if (!body.ok) {
     return {
       ok: false,
-      message: "Invalid JSON body",
-      status: 400,
+      message: body.message,
+      status: body.status,
       next: null,
       wantsHtmlRedirect: false,
     };
   }
+  return parsedResult(body.data, false);
 }

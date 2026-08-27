@@ -70,14 +70,45 @@ test("parses JSON login requests for hydrated client submits", async () => {
   }
 });
 
-test("builds login redirects from the browser origin when present", () => {
-  const req = new Request("http://localhost:3000/api/staff/login", {
-    headers: { origin: "http://127.0.0.1:3000" },
-  });
+test("does not let Origin steer a successful login redirect", () => {
+  const previousSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  delete process.env.NEXT_PUBLIC_SITE_URL;
+  try {
+    const req = new Request("http://localhost:3000/api/staff/login", {
+      headers: {
+        host: "localhost:3000",
+        origin: "https://attacker.example",
+      },
+    });
 
-  const url = redirectUrlForRequest(req, "/staff");
+    const url = redirectUrlForRequest(req, "/admin");
 
-  assert.equal(url.href, "http://127.0.0.1:3000/staff");
+    assert.equal(url.href, "http://localhost:3000/admin");
+  } finally {
+    if (previousSiteUrl === undefined) delete process.env.NEXT_PUBLIC_SITE_URL;
+    else process.env.NEXT_PUBLIC_SITE_URL = previousSiteUrl;
+  }
+});
+
+test("uses canonical site configuration before forwarded request metadata", () => {
+  const previousSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  process.env.NEXT_PUBLIC_SITE_URL = "https://www.coolcaserepair.example/base";
+  try {
+    const req = new Request("http://node.internal/api/staff/login", {
+      headers: {
+        "x-forwarded-host": "spoofed.example",
+        "x-forwarded-proto": "http",
+      },
+    });
+
+    assert.equal(
+      redirectUrlForRequest(req, "/admin").href,
+      "https://www.coolcaserepair.example/admin"
+    );
+  } finally {
+    if (previousSiteUrl === undefined) delete process.env.NEXT_PUBLIC_SITE_URL;
+    else process.env.NEXT_PUBLIC_SITE_URL = previousSiteUrl;
+  }
 });
 
 test("accepts only root and admin console descendants as shared login destinations", async () => {
@@ -129,5 +160,24 @@ test("rejects external, encoded, backslash, and lookalike login destinations", a
       null,
       `${destination} should be rejected as an unsafe login destination`
     );
+  }
+});
+
+test("rejects login bodies over 16 KiB before validation", async () => {
+  const req = new Request("http://127.0.0.1:3000/api/staff/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: "staff@ccr.local",
+      password: "x".repeat(17 * 1024),
+    }),
+  });
+
+  const result = await parseLoginRequest(req);
+
+  assert.equal(result.ok, false);
+  if (!result.ok) {
+    assert.equal(result.status, 413);
+    assert.equal(result.message, "Request body is too large");
   }
 });

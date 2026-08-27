@@ -1,30 +1,50 @@
-import { cp, mkdir, rm, writeFile } from "node:fs/promises";
+import { cp, mkdir, readdir, rm, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { join } from "node:path";
 
 const rootDir = process.cwd();
 const distDir = join(rootDir, "dist");
-const assetsDir = join(distDir, "assets");
 const serverDir = join(distDir, "server");
-const appOutputDir = join(rootDir, ".next", "server", "app");
-const nextStaticDir = join(rootDir, ".next", "static");
-const publicDir = join(rootDir, "public");
-const hostingConfig = join(rootDir, ".openai", "hosting.json");
+const rawServerDir = join(distDir, ".worker-source");
+const bundleDir = join(distDir, ".worker-bundle");
+const assetsDir = join(distDir, "assets");
 const distHostingDir = join(distDir, ".openai");
-const npm = "npm";
+const openNextDir = join(rootDir, ".open-next");
+const hostingConfig = join(rootDir, ".openai", "hosting.json");
+const prismaCompiler = join(
+  rootDir,
+  "node_modules",
+  ".prisma",
+  "client",
+  "query_compiler_bg.wasm",
+);
+const openNextCli = join(
+  rootDir,
+  "node_modules",
+  "@opennextjs",
+  "cloudflare",
+  "dist",
+  "cli",
+  "index.js",
+);
+const wranglerCli = join(
+  rootDir,
+  "node_modules",
+  "wrangler",
+  "bin",
+  "wrangler.js",
+);
 
 function run(command, args) {
   const result = spawnSync(command, args, {
     cwd: rootDir,
     env: process.env,
-    shell: process.platform === "win32",
     stdio: "inherit",
   });
 
   if (result.error) {
-    console.error(result.error);
-    process.exit(1);
+    throw result.error;
   }
 
   if (result.status !== 0) {
@@ -32,214 +52,98 @@ function run(command, args) {
   }
 }
 
-async function copyIfExists(from, to) {
-  if (existsSync(from)) {
-    await cp(from, to, { recursive: true });
+function runNpm(args) {
+  const npmCli = process.env.npm_execpath;
+  if (npmCli) {
+    run(process.execPath, [npmCli, ...args]);
+    return;
   }
+
+  run(process.platform === "win32" ? "npm.cmd" : "npm", args);
 }
 
-async function copyFileIfExists(from, to) {
-  if (existsSync(from)) {
-    await cp(from, to);
-  }
+if (!existsSync(hostingConfig)) {
+  throw new Error(".openai/hosting.json is required for a Sites build.");
 }
-
-const pages = [
-  "index",
-  "privacy",
-  "quote",
-  "reviews",
-  "services",
-  "terms",
-  "warranty",
-  "_not-found",
-];
+if (!existsSync(prismaCompiler)) {
+  throw new Error("Prisma's generated query compiler is required.");
+}
 
 await rm(distDir, { recursive: true, force: true });
-run(npm, ["run", "build:next"]);
+runNpm(["run", "build:node"]);
+run(process.execPath, [openNextCli, "build", "--skipNextBuild"]);
 
+await mkdir(rawServerDir, { recursive: true });
 await mkdir(assetsDir, { recursive: true });
-await mkdir(serverDir, { recursive: true });
 await mkdir(distHostingDir, { recursive: true });
 
-await copyIfExists(publicDir, assetsDir);
-await copyIfExists(nextStaticDir, join(assetsDir, "_next", "static"));
-
-for (const page of pages) {
-  await copyFileIfExists(
-    join(appOutputDir, `${page}.html`),
-    join(assetsDir, `${page}.html`),
-  );
-  await copyFileIfExists(
-    join(appOutputDir, `${page}.rsc`),
-    join(assetsDir, `${page}.rsc`),
-  );
+for (const entry of await readdir(openNextDir, { withFileTypes: true })) {
+  if (entry.name === "assets" || entry.name === "worker.js") continue;
+  await cp(join(openNextDir, entry.name), join(rawServerDir, entry.name), {
+    recursive: entry.isDirectory(),
+  });
 }
 
-await copyFileIfExists(join(appOutputDir, "icon.svg.body"), join(assetsDir, "icon.svg"));
-await copyFileIfExists(join(appOutputDir, "robots.txt.body"), join(assetsDir, "robots.txt"));
-await copyFileIfExists(join(appOutputDir, "sitemap.xml.body"), join(assetsDir, "sitemap.xml"));
-await cp(hostingConfig, join(distHostingDir, "hosting.json"));
-
+await cp(
+  join(openNextDir, "worker.js"),
+  join(rawServerDir, "open-next-worker.js"),
+);
 await writeFile(
-  join(serverDir, "index.js"),
-  `const HTML_ROUTES = new Map([
-  ["/", "/index.html"],
-  ["/privacy", "/privacy.html"],
-  ["/quote", "/quote.html"],
-  ["/reviews", "/reviews.html"],
-  ["/services", "/services.html"],
-  ["/terms", "/terms.html"],
-  ["/warranty", "/warranty.html"],
-]);
+  join(rawServerDir, "index.js"),
+  `import openNextWorker from "./open-next-worker.js";
+export * from "./open-next-worker.js";
 
-const RSC_ROUTES = new Map([
-  ["/", "/index.rsc"],
-  ["/privacy", "/privacy.rsc"],
-  ["/quote", "/quote.rsc"],
-  ["/reviews", "/reviews.rsc"],
-  ["/services", "/services.rsc"],
-  ["/terms", "/terms.rsc"],
-  ["/warranty", "/warranty.rsc"],
-]);
-
-const SECURITY_HEADERS = {
-  "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
-  "content-security-policy": "default-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'; font-src 'self' data:; upgrade-insecure-requests",
-  "permissions-policy": "camera=(), microphone=(), geolocation=()",
-  "referrer-policy": "strict-origin-when-cross-origin",
-  "x-content-type-options": "nosniff",
-  "x-frame-options": "DENY",
-};
-
-const PROXY_PATH_PREFIXES = ["/api/", "/staff", "/admin"];
-
-function normalizedPath(pathname) {
-  if (pathname.length > 1 && pathname.endsWith("/")) {
-    return pathname.slice(0, -1);
-  }
-
-  return pathname;
-}
-
-function contentTypeFor(pathname) {
-  if (pathname.endsWith(".html")) return "text/html; charset=utf-8";
-  if (pathname.endsWith(".rsc")) return "text/x-component; charset=utf-8";
-  if (pathname.endsWith(".svg")) return "image/svg+xml; charset=utf-8";
-  if (pathname.endsWith(".txt")) return "text/plain; charset=utf-8";
-  if (pathname.endsWith(".xml")) return "application/xml; charset=utf-8";
-  return null;
-}
-
-function withHeaders(response, pathname) {
-  const headers = new Headers(response.headers);
-  for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
-    headers.set(key, value);
-  }
-
-  const contentType = contentTypeFor(pathname);
-  if (contentType) {
-    headers.set("content-type", contentType);
-  }
-
-  if (pathname.includes("/_next/static/")) {
-    headers.set("cache-control", "public, max-age=31536000, immutable");
-  } else if (pathname.endsWith(".html") || pathname.endsWith(".rsc")) {
-    headers.set("cache-control", "s-maxage=3600, stale-while-revalidate=2592000");
-  }
-
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers,
-  });
-}
-
-async function asset(env, request, pathname) {
-  const url = new URL(request.url);
-  url.pathname = pathname;
-  url.search = "";
-  const response = await env.ASSETS.fetch(new Request(url, request));
-  return withHeaders(response, pathname);
-}
-
-function shouldProxy(pathname) {
-  return PROXY_PATH_PREFIXES.some((prefix) => pathname.startsWith(prefix));
-}
-
-function nodeOrigin(env) {
-  const origin = env.CCR_NODE_ORIGIN;
-  if (typeof origin !== "string" || origin.trim().length === 0) {
-    return null;
-  }
-
-  return origin.replace(/\\/+$/, "");
-}
-
-async function proxyToNode(request, origin) {
-  const sourceUrl = new URL(request.url);
-  const targetUrl = new URL(origin);
-  targetUrl.pathname = sourceUrl.pathname;
-  targetUrl.search = sourceUrl.search;
-
-  return fetch(new Request(targetUrl, request));
-}
-
-function unavailable(message, asJson = false) {
-  if (asJson) {
-    return new Response(JSON.stringify({ ok: false, error: message }), {
-      status: 503,
-      headers: {
-        "content-type": "application/json; charset=utf-8",
-        ...SECURITY_HEADERS,
-      },
-    });
-  }
-
-  return new Response("<!doctype html><title>Temporarily unavailable</title><main style=\\"font-family:system-ui,sans-serif;padding:3rem;max-width:42rem\\"><h1>Temporarily unavailable</h1><p>" + message + "</p><p><a href=\\"/\\">Return to CCR Cool Case Repair</a></p></main>", {
-    status: 503,
-    headers: {
-      "content-type": "text/html; charset=utf-8",
-      ...SECURITY_HEADERS,
-    },
-  });
-}
+const runtimeEnvSymbol = Symbol.for("ccr.worker.env");
 
 export default {
-  async fetch(request, env) {
-    const url = new URL(request.url);
-    const pathname = normalizedPath(url.pathname);
-
-    if (shouldProxy(pathname)) {
-      const origin = nodeOrigin(env);
-      if (origin) {
-        return proxyToNode(request, origin);
-      }
-
-      return unavailable("The staff/admin backend is not configured yet.", pathname.startsWith("/api/"));
-    }
-
-    if (pathname.startsWith("/_next/") || /\.[a-z0-9]+$/i.test(pathname)) {
-      const response = await env.ASSETS.fetch(request);
-      if (response.status !== 404) {
-        return withHeaders(response, pathname);
-      }
-    }
-
-    const route = request.headers.get("rsc") === "1" || url.searchParams.has("_rsc")
-      ? RSC_ROUTES.get(pathname)
-      : HTML_ROUTES.get(pathname);
-
-    if (route) {
-      return asset(env, request, route);
-    }
-
-    const notFound = await asset(env, request, "/_not-found.html");
-    return new Response(notFound.body, {
-      status: 404,
-      headers: notFound.headers,
-    });
+  fetch(request, env, ctx) {
+    globalThis[runtimeEnvSymbol] = env;
+    return openNextWorker.fetch(request, env, ctx);
   },
 };
 `,
 );
+const packagedPrismaClient = join(
+  rawServerDir,
+  "server-functions",
+  "default",
+  "node_modules",
+  ".prisma",
+  "client",
+);
+await mkdir(packagedPrismaClient, { recursive: true });
+await cp(prismaCompiler, join(packagedPrismaClient, "query_compiler_bg.wasm"));
+await cp(join(openNextDir, "assets"), assetsDir, { recursive: true });
+
+// Sites executes uploaded modules directly. Pre-bundle OpenNext's Node-style
+// external packages so production never depends on an ambient CommonJS
+// `require`, while preserving Prisma's compiler as a compiled WASM module.
+run(process.execPath, [
+  wranglerCli,
+  "deploy",
+  join(rawServerDir, "index.js"),
+  "--assets",
+  assetsDir,
+  "--dry-run",
+  "--outdir",
+  bundleDir,
+]);
+
+await mkdir(serverDir, { recursive: true });
+await cp(join(bundleDir, "index.js"), join(serverDir, "index.js"));
+for (const entry of await readdir(bundleDir, { withFileTypes: true })) {
+  if (
+    entry.name === "index.js" ||
+    entry.name === "README.md" ||
+    entry.name.endsWith(".map")
+  ) {
+    continue;
+  }
+  await cp(join(bundleDir, entry.name), join(serverDir, entry.name), {
+    recursive: entry.isDirectory(),
+  });
+}
+
+await rm(rawServerDir, { recursive: true, force: true });
+await rm(bundleDir, { recursive: true, force: true });
+await cp(hostingConfig, join(distHostingDir, "hosting.json"));

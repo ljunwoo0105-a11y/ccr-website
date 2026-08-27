@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev", "--", "--port", "3007"],
       "port": 3007
+    },
+    {
+      "name": "video-check",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["run", "remotion/scripts/serve.ts"],
+      "port": 7399
     }
   ]
 }

@@ -1,8 +1,15 @@
 // One-off: give a few seeded screen parts colour variants so the in-store
 // quote builder's colour step has real options to show. Idempotent-ish: it
 // skips models that already have any coloured part. Safe to delete afterwards.
+const { PrismaPg } = require("@prisma/adapter-pg");
 const { PrismaClient } = require("@prisma/client");
-const db = new PrismaClient();
+const connectionString = process.env.DATABASE_URL?.trim();
+if (!connectionString) {
+  throw new Error("DATABASE_URL is required.");
+}
+const db = new PrismaClient({
+  adapter: new PrismaPg({ connectionString }),
+});
 
 async function main() {
   // Target screen repairs (colour matters most for screens).

@@ -1,9 +1,11 @@
 import "server-only";
 import nodemailer from "nodemailer";
 import { mkdir, writeFile } from "fs/promises";
+import { randomUUID } from "crypto";
 import path from "path";
 import { BUSINESS, SITE_URL } from "@/lib/config";
 import { formatAud, applyDiscount, discountLabel } from "@/lib/utils";
+import { emailDeliveryMode } from "@/lib/email-mode";
 
 /**
  * Outgoing email. With SMTP_* configured, sends via SMTP. Without it (local
@@ -19,13 +21,14 @@ interface SendArgs {
 
 export async function sendEmail({ to, subject, html }: SendArgs): Promise<void> {
   const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM } = process.env;
+  const mode = emailDeliveryMode(process.env);
 
-  if (SMTP_HOST && SMTP_USER && SMTP_PASS) {
+  if (mode === "smtp") {
     const transporter = nodemailer.createTransport({
-      host: SMTP_HOST,
+      host: SMTP_HOST!,
       port: Number(SMTP_PORT ?? 587),
       secure: Number(SMTP_PORT ?? 587) === 465,
-      auth: { user: SMTP_USER, pass: SMTP_PASS },
+      auth: { user: SMTP_USER!, pass: SMTP_PASS! },
     });
     await transporter.sendMail({
       from: SMTP_FROM ?? `${BUSINESS.name} <${BUSINESS.email}>`,
@@ -39,11 +42,8 @@ export async function sendEmail({ to, subject, html }: SendArgs): Promise<void> 
   // Dev fallback: write to var/outbox for preview.
   const outDir = path.join(process.cwd(), "var", "outbox");
   await mkdir(outDir, { recursive: true });
-  const file = path.join(
-    outDir,
-    `${Date.now()}-${to.replace(/[^a-z0-9@.]/gi, "_")}.html`
-  );
-  await writeFile(file, `<!-- to: ${to} | subject: ${subject} -->\n${html}`);
+  const file = path.join(outDir, `${Date.now()}-${randomUUID()}.html`);
+  await writeFile(file, html);
   console.info(`[email] SMTP not configured — wrote preview to ${file}`);
 }
 

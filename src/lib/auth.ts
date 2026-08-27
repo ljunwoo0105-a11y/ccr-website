@@ -3,6 +3,11 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
+import {
+  AUTH_TOKEN_AUDIENCE,
+  AUTH_TOKEN_ISSUER,
+  authSecretBytes,
+} from "@/lib/auth-token";
 
 /**
  * Session/auth for the staff portal and admin console.
@@ -26,16 +31,6 @@ export interface SessionPayload {
   role: Role;
 }
 
-function getSecret(): Uint8Array {
-  const secret = process.env.AUTH_SECRET;
-  if (!secret || secret.length < 32) {
-    throw new Error(
-      "AUTH_SECRET must be set to a random string of at least 32 characters."
-    );
-  }
-  return new TextEncoder().encode(secret);
-}
-
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12);
 }
@@ -52,16 +47,22 @@ export async function createSessionToken(
 ): Promise<string> {
   return new SignJWT({ ...payload })
     .setProtectedHeader({ alg: "HS256" })
+    .setIssuer(AUTH_TOKEN_ISSUER)
+    .setAudience(AUTH_TOKEN_AUDIENCE)
     .setIssuedAt()
     .setExpirationTime(`${SESSION_TTL_HOURS}h`)
-    .sign(getSecret());
+    .sign(authSecretBytes());
 }
 
 export async function verifySessionToken(
   token: string
 ): Promise<SessionPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, getSecret());
+    const { payload } = await jwtVerify(token, authSecretBytes(), {
+      algorithms: ["HS256"],
+      issuer: AUTH_TOKEN_ISSUER,
+      audience: AUTH_TOKEN_AUDIENCE,
+    });
     if (
       typeof payload.sub !== "string" ||
       (payload.role !== "ADMIN" && payload.role !== "STAFF")

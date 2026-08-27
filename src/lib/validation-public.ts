@@ -45,6 +45,6 @@ export const quoteRequestSchema = z.object({
     errorMap: () => ({ message: "Please accept the privacy terms" }),
   }),
   // Honeypot — humans never fill this; bots do.
-  website: z.string().max(0).optional().or(z.literal("")),
+  website: z.string().max(200).optional().or(z.literal("")),
 });
 export type QuoteRequestInput = z.infer<typeof quoteRequestSchema>;

@@ -7,6 +7,7 @@ import { findCheapestPart } from "@/lib/quotes";
 import { BUSINESS } from "@/lib/config";
 
 export const dynamic = "force-dynamic";
+const MAX_QUOTE_BODY_BYTES = 32 * 1024;
 
 /**
  * Public quote request (lead capture). The estimate is EMAILED only —
@@ -21,24 +22,14 @@ export async function POST(req: Request) {
       return fail("Too many quote requests. Please call us instead.", 429);
     }
 
-    // Honeypot defence-in-depth: bots that fill the hidden "website" field
-    // get a silent success — nothing is stored, no email is sent. (The zod
-    // schema also rejects it, but a silent drop gives bots no signal.)
-    let rawWebsite: unknown;
-    try {
-      const raw = (await req.clone().json()) as unknown;
-      if (raw && typeof raw === "object") {
-        rawWebsite = (raw as Record<string, unknown>).website;
-      }
-    } catch {
-      // Unparsable body — parseBody below returns the proper 400.
-    }
-    if (rawWebsite) {
-      return ok({ received: true });
-    }
-
-    const { data, error } = await parseBody(req, quoteRequestSchema);
+    const { data, error } = await parseBody(req, quoteRequestSchema, {
+      maxBytes: MAX_QUOTE_BODY_BYTES,
+    });
     if (error) return error;
+
+    // Honeypot defence-in-depth: bots that fill the hidden field get a silent
+    // success — nothing is stored and no email is sent.
+    if (data.website) return ok({ received: true });
 
     const emailLimit = rateLimit(
       "quote:email:" + data.email.toLowerCase(),

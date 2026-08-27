@@ -8,6 +8,8 @@ import type { PosAdapter, PosItem } from "@/lib/pos/types";
  */
 
 const BASE = "https://api.loyverse.com/v1.0";
+const REQUEST_TIMEOUT_MS = 10_000;
+const MAX_PAGES = 100;
 
 interface LoyverseVariant {
   variant_id: string;
@@ -35,11 +37,38 @@ export class LoyverseAdapter implements PosAdapter {
     const res = await fetch(`${BASE}${path}`, {
       headers: { Authorization: `Bearer ${this.token()}` },
       cache: "no-store",
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
     if (!res.ok) {
       throw new Error(`Loyverse API ${res.status} on ${path}`);
     }
     return (await res.json()) as T;
+  }
+
+  private async eachPage<T extends { cursor?: string }>(
+    resource: string,
+    visit: (page: T) => void
+  ): Promise<void> {
+    let cursor: string | null = null;
+    const seen = new Set<string>();
+
+    for (let pageNumber = 0; pageNumber < MAX_PAGES; pageNumber += 1) {
+      const path: string = cursor
+        ? `/${resource}?limit=250&cursor=${encodeURIComponent(cursor)}`
+        : `/${resource}?limit=250`;
+      const page: T = await this.get<T>(path);
+      visit(page);
+
+      const next: string | null = page.cursor?.trim() || null;
+      if (!next) return;
+      if (seen.has(next)) {
+        throw new Error(`Loyverse API repeated a pagination cursor for ${resource}`);
+      }
+      seen.add(next);
+      cursor = next;
+    }
+
+    throw new Error(`Loyverse API exceeded ${MAX_PAGES} pages for ${resource}`);
   }
 
   async testConnection(): Promise<{ ok: boolean; message: string }> {
@@ -56,14 +85,12 @@ export class LoyverseAdapter implements PosAdapter {
 
   async listItems(): Promise<PosItem[]> {
     const items: PosItem[] = [];
-    let cursor: string | null = null;
+    const variantToItem = new Map<string, string>();
 
     // Item catalog (names, SKUs, prices)
-    do {
-      const qs: string = cursor
-        ? `/items?limit=250&cursor=${encodeURIComponent(cursor)}`
-        : "/items?limit=250";
-      const page = await this.get<{ items: LoyverseItem[]; cursor?: string }>(qs);
+    await this.eachPage<{ items: LoyverseItem[]; cursor?: string }>(
+      "items",
+      (page) => {
       for (const item of page.items ?? []) {
         const v = item.variants?.[0];
         items.push({
@@ -73,46 +100,27 @@ export class LoyverseAdapter implements PosAdapter {
           price: v?.default_price ?? null,
           stock: null, // filled from inventory below
         });
+        for (const variant of item.variants ?? []) {
+          variantToItem.set(variant.variant_id, item.id);
+        }
       }
-      cursor = page.cursor ?? null;
-    } while (cursor);
+      }
+    );
 
     // Stock levels per variant
     const stockByVariant = new Map<string, number>();
-    cursor = null;
-    do {
-      const qs: string = cursor
-        ? `/inventory?limit=250&cursor=${encodeURIComponent(cursor)}`
-        : "/inventory?limit=250";
-      const page = await this.get<{
+    await this.eachPage<{
         inventory_levels: Array<{ variant_id: string; in_stock: number }>;
         cursor?: string;
-      }>(qs);
-      for (const level of page.inventory_levels ?? []) {
-        stockByVariant.set(
-          level.variant_id,
-          (stockByVariant.get(level.variant_id) ?? 0) + level.in_stock
-        );
-      }
-      cursor = page.cursor ?? null;
-    } while (cursor);
-
-    // Re-walk items to attach stock (variant ids needed a second pass).
-    // Loyverse keys stock by variant; we re-fetch item variants mapping.
-    cursor = null;
-    const variantToItem = new Map<string, string>();
-    do {
-      const qs: string = cursor
-        ? `/items?limit=250&cursor=${encodeURIComponent(cursor)}`
-        : "/items?limit=250";
-      const page = await this.get<{ items: LoyverseItem[]; cursor?: string }>(qs);
-      for (const item of page.items ?? []) {
-        for (const v of item.variants ?? []) {
-          variantToItem.set(v.variant_id, item.id);
+      }>("inventory", (page) => {
+        for (const level of page.inventory_levels ?? []) {
+          stockByVariant.set(
+            level.variant_id,
+            (stockByVariant.get(level.variant_id) ?? 0) + level.in_stock
+          );
         }
       }
-      cursor = page.cursor ?? null;
-    } while (cursor);
+    );
 
     const stockByItem = new Map<string, number>();
     for (const [variantId, stock] of stockByVariant) {
